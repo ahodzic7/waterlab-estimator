@@ -1,7 +1,12 @@
 # Stochastic Model Predictive Control for Combined Sewer Overflows in Urban Drainage Networks
-## Masters Thises in Control and Automation 
 This repo has the objective of covering the "code" produced as part of Adis and Caspers Mater Thises at Aalborg University.
+The repo may include snippets of code from a previous project: https://github.com/dmicha16/waterlab_mpc
 
+Futhermore some code may have been provided by our supervisors:
+- Krisztian Mark Balla - [LinkedIn](https://www.linkedin.com/in/krisztian-mark-balla-ba6484191/)
+- Carsten Skovmose Kallesøe - [LinedIn](https://www.linkedin.com/in/carsten-skovmose-kalles%C3%B8e-97b5865/)
+
+## Masters Thises at Programme: Control and Automation 
 The thises plan includes the following tasks¨.
 1. System identification:
 System identification (Grey-box) of gravity pipes, relying on the physical
