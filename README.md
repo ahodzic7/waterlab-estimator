@@ -7,7 +7,8 @@ Futhermore some code may have been provided by our supervisors:
 - Carsten Skovmose Kallesøe - [LinedIn](https://www.linkedin.com/in/carsten-skovmose-kalles%C3%B8e-97b5865/)
 
 ## Masters Thises at Programme: Control and Automation 
-The thises plan includes the following tasks¨.
+The thises plan includes the following tasks
+
 1. System identification:
 System identification (Grey-box) of gravity pipes, relying on the physical
 laws described by the Saint-Venant hyperbolic Partial Differential
