@@ -1,0 +1,127 @@
+[TITLE]
+;;Project Title/Notes
+
+[OPTIONS]
+;;Option             Value
+FLOW_UNITS           CMS
+INFILTRATION         HORTON
+FLOW_ROUTING         KINWAVE
+LINK_OFFSETS         DEPTH
+MIN_SLOPE            0
+ALLOW_PONDING        NO
+SKIP_STEADY_STATE    NO
+
+START_DATE           05/02/2020
+START_TIME           00:00:00
+REPORT_START_DATE    05/02/2020
+REPORT_START_TIME    00:00:00
+END_DATE             05/02/2020
+END_TIME             06:00:00
+SWEEP_START          01/01
+SWEEP_END            12/31
+DRY_DAYS             0
+REPORT_STEP          00:01:00
+WET_STEP             00:05:00
+DRY_STEP             01:00:00
+ROUTING_STEP         0:00:30 
+RULE_STEP            00:00:00
+
+INERTIAL_DAMPING     PARTIAL
+NORMAL_FLOW_LIMITED  BOTH
+FORCE_MAIN_EQUATION  H-W
+VARIABLE_STEP        0.75
+LENGTHENING_STEP     0
+MIN_SURFAREA         1.167
+MAX_TRIALS           8
+HEAD_TOLERANCE       0.0015
+SYS_FLOW_TOL         5
+LAT_FLOW_TOL         5
+MINIMUM_STEP         0.5
+THREADS              1
+
+[EVAPORATION]
+;;Data Source    Parameters
+;;-------------- ----------------
+CONSTANT         0.0
+DRY_ONLY         NO
+
+[JUNCTIONS]
+;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded   
+;;-------------- ---------- ---------- ---------- ---------- ----------
+N1               20         1          0          0          0         
+N2               18         1          0          0          0         
+N3               16         1          0          0          0         
+N4               14         1          0          0          0         
+N5               12         1          0          0          0         
+
+[OUTFALLS]
+;;Name           Elevation  Type       Stage Data       Gated    Route To        
+;;-------------- ---------- ---------- ---------------- -------- ----------------
+out              0          FREE                        NO                       
+
+[STORAGE]
+;;Name           Elev.    MaxDepth   InitDepth  Shape      Curve Name/Params            N/A      Fevap    Psi      Ksat     IMD     
+;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
+T1               0        3          0          FUNCTIONAL 0         0         150      0        0       
+T2               9        2          0          FUNCTIONAL 0         0         200      0        0       
+T3               0        1000       950        FUNCTIONAL 1000      0         0        0        0       
+
+[CONDUITS]
+;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow   
+;;-------------- ---------------- ---------------- ---------- ---------- ---------- ---------- ---------- ----------
+P1               N1               N2               400        0.01       0          0          0          0         
+P2               N2               N3               400        0.01       0          0          0          0         
+P3               N3               N4               400        0.01       0          0          0          0         
+P4               N4               N5               400        0.01       0          0          0          0         
+P5               N5               T2               400        0.01       0          1          0          0         
+
+[PUMPS]
+;;Name           From Node        To Node          Pump Curve       Status   Sartup Shutoff 
+;;-------------- ---------------- ---------------- ---------------- ------ -------- --------
+FP1              T1               N1               const_curve      OFF      0        0       
+FP2              T2               out              const_curve      OFF      0        0       
+FP3              T3               T1               const_curve      OFF      0        0       
+
+[XSECTIONS]
+;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels    Culvert   
+;;-------------- ------------ ---------------- ---------- ---------- ---------- ---------- ----------
+P1               CIRCULAR     1                0          0          0          1                    
+P2               CIRCULAR     1                0          0          0          1                    
+P3               CIRCULAR     1                0          0          0          1                    
+P4               CIRCULAR     1                0          0          0          1                    
+P5               CIRCULAR     1                0          0          0          1                    
+
+[CURVES]
+;;Name           Type       X-Value    Y-Value   
+;;-------------- ---------- ---------- ----------
+const_curve      Pump1      0          1         
+
+[REPORT]
+;;Reporting Options
+SUBCATCHMENTS ALL
+NODES ALL
+LINKS ALL
+
+[TAGS]
+
+[MAP]
+DIMENSIONS 0.000 0.000 10000.000 10000.000
+Units      None
+
+[COORDINATES]
+;;Node           X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+N1               -513.264           2722.030          
+N2               905.421            2410.611          
+N3               2020.384           2170.264          
+N4               2935.409           1937.716          
+N5               4010.791           1666.667          
+out              6288.969           1450.839          
+T1               -2128.297          2733.813          
+T2               4898.082           1450.839          
+T3               -3723.022          3908.873          
+
+[VERTICES]
+;;Link           X-Coord            Y-Coord           
+;;-------------- ------------------ ------------------
+
