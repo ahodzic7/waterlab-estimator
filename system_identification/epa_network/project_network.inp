@@ -48,11 +48,10 @@ DRY_ONLY         NO
 [JUNCTIONS]
 ;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded   
 ;;-------------- ---------- ---------- ---------- ---------- ----------
-N1               20         1          0          0          0         
+N1               20         1          0          0          2         
 N2               18         1          0          0          0         
 N3               16         1          0          0          0         
 N4               14         1          0          0          0         
-N5               12         1          0          0          0         
 
 [OUTFALLS]
 ;;Name           Elevation  Type       Stage Data       Gated    Route To        
@@ -62,7 +61,7 @@ out              0          FREE                        NO
 [STORAGE]
 ;;Name           Elev.    MaxDepth   InitDepth  Shape      Curve Name/Params            N/A      Fevap    Psi      Ksat     IMD     
 ;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
-T1               0        3          0          FUNCTIONAL 0         0         150      0        0       
+T1               0        3          2.5        FUNCTIONAL 0         0         150      0        0       
 T2               9        2          0          FUNCTIONAL 0         0         200      0        0       
 T3               0        1000       950        FUNCTIONAL 1000      0         0        0        0       
 
@@ -72,15 +71,14 @@ T3               0        1000       950        FUNCTIONAL 1000      0         0
 P1               N1               N2               400        0.01       0          0          0          0         
 P2               N2               N3               400        0.01       0          0          0          0         
 P3               N3               N4               400        0.01       0          0          0          0         
-P4               N4               N5               400        0.01       0          0          0          0         
-P5               N5               T2               400        0.01       0          1          0          0         
+P4               N4               T2               400        0.01       0          0          0          0         
 
 [PUMPS]
 ;;Name           From Node        To Node          Pump Curve       Status   Sartup Shutoff 
 ;;-------------- ---------------- ---------------- ---------------- ------ -------- --------
-FP1              T1               N1               const_curve      OFF      0        0       
+FP1              T1               N1               const_curve      ON       0        0       
 FP2              T2               out              const_curve      OFF      0        0       
-FP3              T3               T1               const_curve      OFF      0        0       
+FP3              T3               T1               const_curve      ON       0        0       
 
 [XSECTIONS]
 ;;Link           Shape        Geom1            Geom2      Geom3      Geom4      Barrels    Culvert   
@@ -89,7 +87,6 @@ P1               CIRCULAR     1                0          0          0          
 P2               CIRCULAR     1                0          0          0          1                    
 P3               CIRCULAR     1                0          0          0          1                    
 P4               CIRCULAR     1                0          0          0          1                    
-P5               CIRCULAR     1                0          0          0          1                    
 
 [CURVES]
 ;;Name           Type       X-Value    Y-Value   
@@ -115,7 +112,6 @@ N1               -513.264           2722.030
 N2               905.421            2410.611          
 N3               2020.384           2170.264          
 N4               2935.409           1937.716          
-N5               4010.791           1666.667          
 out              6288.969           1450.839          
 T1               -2128.297          2733.813          
 T2               4898.082           1450.839          
