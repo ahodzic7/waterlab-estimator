@@ -3,17 +3,15 @@ import random
 import pandas as pd
 import matplotlib.pyplot as plt
 
-columns = ['tank1_depth',
+columns = ['time',
+           'tank1_depth',
            'pipe1_depth',
            'pipe2_depth',
            'pipe3_depth',
            'pipe4_depth',
-           'pump1_flow',
-           'pump3_flow']
-
+           'pump1_flow']
 network_df = pd.DataFrame(columns=columns)
 
-print(network_df)
 
 with Simulation('C:\Git\waterlab-estimator\system_identification\epa_network\project_network.inp') as sim:
     time_step = 30  # sec
@@ -33,6 +31,7 @@ with Simulation('C:\Git\waterlab-estimator\system_identification\epa_network\pro
     # Init sim
     count = 1
     on_time = 0
+    total_count = 0
     for idx, step in enumerate(sim):
         # Make sure the system is always supplied with water
         pump3.target_setting = 5
@@ -45,9 +44,13 @@ with Simulation('C:\Git\waterlab-estimator\system_identification\epa_network\pro
             pump1.target_setting = random.uniform(0, 1.5)
         else:
             count += 1
-        network_df = network_df.append(pd.Series([tank1.depth, pipe1.depth, pipe2.depth, pipe3.depth,
-                                                   pipe4.depth, pump1.flow,pump3.flow], index=network_df.columns),
+
+        # Add info to dataframe
+        elapsed_time = total_count*time_step
+        network_df = network_df.append(pd.Series([elapsed_time,tank1.depth, pipe1.depth, pipe2.depth, pipe3.depth,
+                                                   pipe4.depth, pump1.flow], index=network_df.columns),
                                                 ignore_index=True)
+        total_count += 1
         print(f"Progress {int(sim.percent_complete * 100)}%", end="\r")
 
     fig, axes = plt.subplots(nrows=2, ncols=1)
@@ -59,3 +62,4 @@ with Simulation('C:\Git\waterlab-estimator\system_identification\epa_network\pro
     network_df.plot(y='pump1_flow', ax=axes[1])
 
     plt.show()
+    network_df.to_csv(r'gen_data_output/no_backflow1.csv', index=False, header=True)
