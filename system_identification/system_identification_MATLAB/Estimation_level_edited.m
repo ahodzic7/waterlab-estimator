@@ -1,24 +1,29 @@
-clear all; 
+%clear all; 
 close all;
 clear path;
-clc;  
+clc; 
 %% ================================================ Prepare data ==============================================
 dataLoad;                                                                       % Load simulation data 
 
 startData = 1; 
-endData = size(g_level,2);
+%endData = size(g_level,2);
+endData = size(nobackflow1,2);
 
 Nx = 4;                                                                         % Select section number, i.e. pick number of level sensor data
 if Nx == 6
     h(1:Nx,:) = g_level(1:8:end-1,startData:endData);
 elseif Nx == 4
-    h(1:Nx,:) = g_level(6:12:end,startData:endData);
+    %h(1:Nx,:) = g_level(6:12:end,startData:endData);
+    h(1:Nx,:) = nobackflow1(3:1:6,startData:endData);
 elseif Nx == 8
     h(1:Nx,:) = g_level(1:6:end,startData:endData);
 end
 
-Q(1,:) = uConv(g_flow(1,startData:endData),'sTo10m');                           % Select in/outflow
-Q(2,:) = uConv(g_flow(end,startData:endData),'sTo10m');
+% Q(1,:) = uConv(g_flow(1,startData:endData),'sTo10m');                           % Select in/outflow
+% Q(2,:) = uConv(g_flow(end,startData:endData),'sTo10m');
+
+Q(1,:) = nobackflow1(8,startData:endData);
+Q(2,:) = nobackflow1(7,startData:endData);
 
 %% ============================================ Idata object ================================================ 
 Ts_data = 1;                                                                    % [10min] in simulation/control 
@@ -74,7 +79,7 @@ sys_init.SimulationOptions.Solver = 'ode4';                                     
 
 for i = 1:Nx
 sys_init.InitialStates(i).Minimum = 0.000001;                                       % States lower bound constraints
-sys_init.InitialStates(i).Maximum = 0.4; 
+%sys_init.InitialStates(i).Maximum = 0.4; 
 end
 
 %% ============================================= Solver options ============================================

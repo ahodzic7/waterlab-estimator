@@ -16,7 +16,7 @@ START_TIME           00:00:00
 REPORT_START_DATE    05/02/2020
 REPORT_START_TIME    00:00:00
 END_DATE             05/02/2020
-END_TIME             18:00:00
+END_TIME             06:00:00
 SWEEP_START          01/01
 SWEEP_END            12/31
 DRY_DAYS             0
@@ -49,9 +49,9 @@ DRY_ONLY         NO
 ;;Name           Elevation  MaxDepth   InitDepth  SurDepth   Aponded   
 ;;-------------- ---------- ---------- ---------- ---------- ----------
 N1               20         1          0          0          2         
-N2               18         1          0          0          0         
-N3               16         1          0          0          0         
-N4               14         1          0          0          0         
+N2               18         1          0          100        0         
+N3               16         1          0          100        0         
+N4               14         1          0          100        0         
 
 [OUTFALLS]
 ;;Name           Elevation  Type       Stage Data       Gated    Route To        
@@ -62,7 +62,7 @@ out              0          FREE                        NO
 ;;Name           Elev.    MaxDepth   InitDepth  Shape      Curve Name/Params            N/A      Fevap    Psi      Ksat     IMD     
 ;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
 T1               0        3          2.5        FUNCTIONAL 0         0         150      0        0       
-T2               11       2          0          FUNCTIONAL 0         0         200      0        0       
+T2               11       2          1          FUNCTIONAL 0         0         200      0        0       
 T3               0        1000       950        FUNCTIONAL 1000      0         0        0        0       
 
 [CONDUITS]
