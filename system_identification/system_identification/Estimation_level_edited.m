@@ -1,20 +1,28 @@
-%clear all; 
+clear all; 
 close all;
 clear path;
 clc; 
+
+% Estimated parameters:
+
+
+% No backflow model:
+% estParams = [0.2008    0.7489    0.0569    0.0165    0.1510];
+
+
 %% ================================================ Prepare data ==============================================
 dataLoad;                                                                       % Load simulation data 
 
 startData = 1; 
 %endData = size(g_level,2);
-endData = size(nobackflow1,2);
+endData = size(no_backflow,2);
 
 Nx = 4;                                                                         % Select section number, i.e. pick number of level sensor data
 if Nx == 6
     h(1:Nx,:) = g_level(1:8:end-1,startData:endData);
 elseif Nx == 4
     %h(1:Nx,:) = g_level(6:12:end,startData:endData);
-    h(1:Nx,:) = nobackflow1(3:1:6,startData:endData);
+    h(1:Nx,:) = no_backflow(3:1:6,startData:endData);
 elseif Nx == 8
     h(1:Nx,:) = g_level(1:6:end,startData:endData);
 end
@@ -22,13 +30,14 @@ end
 % Q(1,:) = uConv(g_flow(1,startData:endData),'sTo10m');                           % Select in/outflow
 % Q(2,:) = uConv(g_flow(end,startData:endData),'sTo10m');
 
-Q(1,:) = nobackflow1(8,startData:endData);
-Q(2,:) = nobackflow1(7,startData:endData);
+Q(1,:) = no_backflow(9,startData:endData);
+Q(2,:) = no_backflow(7,startData:endData);
+T2 = no_backflow(8,startData:endData);
 
 %% ============================================ Idata object ================================================ 
 Ts_data = 1;                                                                    % [10min] in simulation/control 
 
-input = Q(1,:)';
+input = [Q(1,:)' T2'];
 output = [h(1:1:end,:); Q(2,:)]';
 
 data = iddata(output,input,Ts_data);                                            % (y,u,Ts) (order)
@@ -37,13 +46,15 @@ data.TimeUnit = 'minutes';
 
 %% ===================================================== Model ============================================
 
-modelName = 'model_cont_diff_wave';
+modelName = 'model_cont_diff_wave_version2';
 Ts_model = 0;                                                                   % 0 - continuous model, 1,2,.. - discrete model 
 order = [size(output,2) size(input,2) Nx];                                      % [Ny Nu Nx] (order)
 
 switch(Nx)                                                                      % select initial parameters
     case 4
-      p = [0.01, 10, 0.2, 0.5, 2];
+      %p = [0.01, 10, 0.2, 0.5, 2];
+      p = [0.01, 0.10, 0.002, 0.005, 0.02];
+      %p = [0.2, 0.15, 0.0112, 0.0033, 0.03];
       %p = [0.02, 2.5, 0.005, -0.75, 1.77];                                          % for nonlinear model
     case 6
       p = [0.01, 40, 0.2, 0.1, 1.77];  
