@@ -26,3 +26,4 @@ load('.\data\g_level_7');
 
 g_flow = [g_flow_1, g_flow_2, g_flow_3, g_flow_4, g_flow_5, g_flow_6, g_flow_7];
 g_level = [g_level_1, g_level_2, g_level_3, g_level_4, g_level_5, g_level_6, g_level_7];
+no_backflow = readmatrix('.\data\no_backflow.csv')';
