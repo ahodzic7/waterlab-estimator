@@ -2,65 +2,36 @@ clear all;
 close all;
 clear path;
 clc; 
-
-% Estimated parameters:
-
-
-% No backflow model:
-% estParams = [0.2008    0.7489    0.0569    0.0165    0.1510];
-
-
 %% ================================================ Prepare data ==============================================
-dataLoad;                                                                       % Load simulation data 
+rawData = dataLoad('.\data\new_data.csv');                                    % Load simulation data 
+startDataIndex = 1; 
+endDataIndex = size(rawData,2);
 
-startData = 1; 
-%endData = size(g_level,2);
-endData = size(no_backflow,2);
+Nx = 4;                                                                    % Select section number, i.e. pick number of level sensor data
+h(1:Nx,:) = rawData(3:1:6,startDataIndex:endDataIndex);
 
-Nx = 4;                                                                         % Select section number, i.e. pick number of level sensor data
-if Nx == 6
-    h(1:Nx,:) = g_level(1:8:end-1,startData:endData);
-elseif Nx == 4
-    %h(1:Nx,:) = g_level(6:12:end,startData:endData);
-    h(1:Nx,:) = no_backflow(3:1:6,startData:endData);
-elseif Nx == 8
-    h(1:Nx,:) = g_level(1:6:end,startData:endData);
-end
+Q(1,:) = rawData(9,startDataIndex:endDataIndex);                              % Select in/outflows
+Q(2,:) = rawData(7,startDataIndex:endDataIndex);
 
-% Q(1,:) = uConv(g_flow(1,startData:endData),'sTo10m');                           % Select in/outflow
-% Q(2,:) = uConv(g_flow(end,startData:endData),'sTo10m');
-
-Q(1,:) = no_backflow(9,startData:endData);
-Q(2,:) = no_backflow(7,startData:endData);
-T2 = no_backflow(8,startData:endData);
+T2 = rawData(8,startDataIndex:endDataIndex);                                  % Select tanks
 
 %% ============================================ Idata object ================================================ 
-Ts_data = 1;                                                                    % [10min] in simulation/control 
+dataTimeStep = 1;                                                          % Time step size in seconds
 
 input = [Q(1,:)' T2'];
 output = [h(1:1:end,:); Q(2,:)]';
 
-data = iddata(output,input,Ts_data);                                            % (y,u,Ts) (order)
+ioData = iddata(output,input,dataTimeStep);                                % (y,u,Ts) (order)
 
-data.TimeUnit = 'minutes';
+ioData.TimeUnit = 'minutes';
 
 %% ===================================================== Model ============================================
 
-modelName = 'model_cont_diff_wave_version2';
-Ts_model = 0;                                                                   % 0 - continuous model, 1,2,.. - discrete model 
-order = [size(output,2) size(input,2) Nx];                                      % [Ny Nu Nx] (order)
+modelName = 'free_flow_model';
+Ts_model = dataTimeStep;                                                   % 0 - continuous model, 1,2,.. - discrete model 
+order = [size(output,2) size(input,2) Nx];                                 % [Ny Nu Nx] (order)
 
-switch(Nx)                                                                      % select initial parameters
-    case 4
-      p = [0.01, 0.10, 0.002, 0.005, 0.02];
-      %p = [0.01, 10, 0.2, 0.5, 2];
-      %p = [0.2, 0.15, 0.0112, 0.0033, 0.03];
-      %p = [0.02, 2.5, 0.005, -0.75, 1.77];                                          % for nonlinear model
-    case 6
-      p = [0.01, 40, 0.2, 0.1, 1.77];  
-    case 5
-      p = [0.01, 1.5, 0.2, 0.1, 1.77]; 
-end
+p = [0.01, 0.10, 0.002, 0.005, 0.02];                                      % select initial parameters
 
 params = [p, Nx];
 
@@ -104,7 +75,7 @@ opt.SearchOption.Tolerance = 1e-15;
 
 %% =============================================== Estimation =============================================
 tic 
-sys_final = nlgreyest(data,sys_init, opt)                                           % Parameter estimation START
+sys_final = nlgreyest(ioData,sys_init, opt)                                           % Parameter estimation START
 
 fprintf('\n\nThe search termination condition:\n')
 sys_final.Report.Termination
@@ -120,10 +91,10 @@ toc
 
 %% ========================================== Simulate model =============================================
 opt_init = simOptions('InitialCondition',initStates);                               % Simulate model on training data with initial parameters
-y_init = sim(sys_init,data,opt_init);
+y_init = sim(sys_init,ioData,opt_init);
 
 opt_final = simOptions('InitialCondition',finalStates);                             % Simulate model on training data with estimated parameters
-y_final = sim(sys_final,data,opt_final);
+y_final = sim(sys_final,ioData,opt_final);
 
 %% ========================================== Post - process ============================================
 estParams

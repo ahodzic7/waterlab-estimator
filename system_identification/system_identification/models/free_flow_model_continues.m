@@ -1,8 +1,9 @@
-function [dx, y] = model_cont_diff_wave_version2(t, x, u, p1, p2, p3, p4, p5, Nx, varargin)
+function [dx, y] = free_flow_model(t, x, u, p1, p2, p3, p4, p5, Nx, varargin)
 % Continuous time nlgreyest model for the kinematic wave level-based model. 
 tank_offset = 1;
 dx = zeros(Nx,1);
 y = zeros(Nx+1,1);
+
 %% State equation
 dx(1) =  p1 * u(1) - p2 * x(1) + p3*x(2)-p4; 
 
