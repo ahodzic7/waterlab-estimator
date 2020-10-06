@@ -52,8 +52,8 @@ order = [size(output,2) size(input,2) Nx];                                      
 
 switch(Nx)                                                                      % select initial parameters
     case 4
-      %p = [0.01, 10, 0.2, 0.5, 2];
       p = [0.01, 0.10, 0.002, 0.005, 0.02];
+      %p = [0.01, 10, 0.2, 0.5, 2];
       %p = [0.2, 0.15, 0.0112, 0.0033, 0.03];
       %p = [0.02, 2.5, 0.005, -0.75, 1.77];                                          % for nonlinear model
     case 6

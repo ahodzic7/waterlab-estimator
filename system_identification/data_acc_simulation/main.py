@@ -15,7 +15,7 @@ columns = ['time',
 network_df = pd.DataFrame(columns=columns)
 
 with Simulation(
-        r'C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\epa_network\project_network_for_backflow.inp') as sim:
+        r'C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\epa_network\project_network.inp') as sim:
     time_step = 30  # sec
     sim.step_advance(time_step)
 
@@ -35,21 +35,21 @@ with Simulation(
     count = 1
     on_time = 0
     total_count = 0
-    pump1_reference_flow = 1/2.7
+    pump_reference_flow = 1/2.7
     for idx, step in enumerate(sim):
         # Make sure the system is always supplied with water
         pump3.target_setting = 5
 
         # System identification setup:
         #
-        # pump2.target_setting = 1
+        pump2.target_setting = 0.5*pump_reference_flow
         # pump1.target_setting = 1*pump_reference_flow
 
         # Create simple random controller
         if count > on_time:
             count = 0
             on_time = random.randint(5, 15)
-            pump1.target_setting = random.uniform(0, 1)*pump1_reference_flow
+            pump1.target_setting = random.uniform(0, 1)*pump_reference_flow
         else:
             count += 1
 
@@ -73,4 +73,4 @@ with Simulation(
     network_df.plot(x='time', y='tank2_inflow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
     plt.show()
-    network_df.to_csv(r'gen_data_output/backflow.csv', index=False, header=True)
+    network_df.to_csv(r'gen_data_output/new_data.csv', index=False, header=True)
