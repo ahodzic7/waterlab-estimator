@@ -3,7 +3,8 @@ close all;
 clear path;
 clc; 
 %% ================================================ Prepare data ==============================================
-rawData = dataLoad('.\data\new_data.csv');                                    % Load simulation data 
+%rawData = dataLoad('.\data\new_data.csv');                                    % Load simulation data 
+rawData = readmatrix('.\data\no_backflow.csv')'; 
 startDataIndex = 1; 
 endDataIndex = size(rawData,2);
 
@@ -28,16 +29,15 @@ ioData.TimeUnit = 'minutes';
 %% ===================================================== Model ============================================
 
 modelName = 'free_flow_model';
-Ts_model = dataTimeStep;                                                   % 0 - continuous model, 1,2,.. - discrete model 
+Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
 order = [size(output,2) size(input,2) Nx];                                 % [Ny Nu Nx] (order)
 
-p = [0.01, 0.10, 0.002, 0.005, 0.02];                                      % select initial parameters
+parametersInitial = [0.01, 0.10, 0.002, 0.005, 0.02];                                      % select initial parameters
 
-params = [p, Nx];
+systemParamaters = [parametersInitial, Nx];
 
-initStates = 0.0001*ones(Nx, 1);                                                % assume no flow at t0
-sys_init = idnlgrey(modelName, order, params, initStates, Ts_model);            % create nlgreyest object
-
+initStates = 0.0001*ones(Nx, 1);                                           % assume no flow at t0
+sys_init = idnlgrey(modelName, order, systemParamaters, initStates, Ts_model);       % create nlgreyest object
 sys_init.TimeUnit = 'minutes';
 sys_init.Parameters(1).Name = 'p1';
 sys_init.Parameters(2).Name = 'p2';
@@ -45,23 +45,22 @@ sys_init.Parameters(3).Name = 'p3';
 sys_init.Parameters(4).Name = 'p4';
 sys_init.Parameters(5).Name = 'p5';
 sys_init.Parameters(6).Name = 'Nx';
-sys_init.Parameters(6).Fixed = true;                                            % number of sections fixed
+sys_init.Parameters(6).Fixed = true;                                       % number of sections fixed
 size(sys_init);
 
 sys_init.SimulationOptions.AbsTol = 1e-10;
 sys_init.SimulationOptions.RelTol = 1e-8;
 
-sys_init.SimulationOptions.Solver = 'ode4';                                         % 4th order Runge-Kutte solver - fixed-step size                 
+sys_init.SimulationOptions.Solver = 'ode4';                                % 4th order Runge-Kutte solver - fixed-step size                 
 
-% sys_init.Parameters(1).Minimum = 0.001;     sys_init.Parameters(1).Maximum = 0.5;   % Parameter constraints
+% Model Constarints 
+% sys_init.Parameters(1).Minimum = 0.001;     sys_init.Parameters(1).Maximum = 0.5;   
 % sys_init.Parameters(2).Minimum = 0.001;     sys_init.Parameters(2).Maximum = 10000;
 % sys_init.Parameters(3).Minimum = 0.001;     sys_init.Parameters(3).Maximum = 0.6;
 % sys_init.Parameters(4).Minimum = 0.001;     sys_init.Parameters(4).Maximum = 6;
 % sys_init.Parameters(5).Minimum = 0.001;     sys_init.Parameters(5).Maximum = 2;
-
 for i = 1:Nx
-sys_init.InitialStates(i).Minimum = 0.000001;                                       % States lower bound constraints
-%sys_init.InitialStates(i).Maximum = 0.4; 
+sys_init.InitialStates(i).Minimum = 0.000001;                             
 end
 
 %% ============================================= Solver options ============================================
@@ -101,15 +100,7 @@ estParams
 EstPlotter;
 
 %% Save params
-saveEnabler = 0;
-if saveEnabler == 1
-    switch Nx
-        case 4
-            p_grav_Nx4_T2_T3 = estParams;
-            save('data\p_grav_Nx4_T2_T3','p_grav_Nx4_T2_T3')
-        case 6
-            p_grav_Nx6_T2_T3 = estParams;
-            save('data\p_grav_Nx6_T2_T3','p_grav_Nx6_T2_T3')
-    end 
-end
+p_grav_Nx4 = estParams;
+save('data\p_grav_Nx4','p_grav_Nx4')
+
 
