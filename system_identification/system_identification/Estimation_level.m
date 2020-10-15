@@ -50,7 +50,7 @@ if ~isnan(tank_area)
         0.0192    phi_2]; 
 else
     parametersInitial = [0.0171    0.7898    0.8335   -2.7316 ...
-        0.0192    1.5835];
+        0.0192    1/200];
 end
 
 systemParamaters = [parametersInitial, N_states, N_optimization_variables];
