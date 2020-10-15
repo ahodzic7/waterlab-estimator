@@ -1,8 +1,17 @@
-function data = dataLoad()
-    addpath("data")
-    data = readmatrix('.\data\new_data_1.csv')'; 
-%     rawData = load('Simulation_data_1.mat');
-%     rawData = [rawData.ans.Time, rawData.ans.Data];
-%     rawData = rawData(200:size(rawData(:,1))-200,:);
-%     data = [rawData(:,1), zeros(size(rawData(:,1))), rawData(:,5:8), rawData(:,2), rawData(:,10), rawData(:,3)]';
+% Loading the data into a .mat file
+% 
+% The data must be in the following form:
+% 
+% [...
+% 1-Time; ... 
+% 2-tank1_depth; ...
+% 3-pipe1_height; 4-pipe2_height; 5-pipe3_height; 6-pipe4_depth; ...
+% 7-tank2_inflow; 8-tank2_depth; 
+% 9-pump1_flow; 10-pump2_flow; ...
+% 11-tank2_area ...
+% ]
+
+function data = dataLoad(filename)
+    addpath("data"); 
+    data = cell2mat(struct2cell(load(append('.\data\',filename))));
 end
