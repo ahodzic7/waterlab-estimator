@@ -27,7 +27,7 @@
   Ending Date .............. 05/02/2020 18:00:00
   Antecedent Dry Days ...... 0.0
   Report Time Step ......... 00:01:00
-  Routing Time Step ........ 30.00 sec
+  Routing Time Step ........ 60.00 sec
   Variable Time Step ....... YES
   Maximum Trials ........... 8
   Number of Threads ........ 1
@@ -42,13 +42,13 @@
   Groundwater Inflow .......         0.000         0.000
   RDII Inflow ..............         0.000         0.000
   External Inflow ..........         0.000         0.000
-  External Outflow .........         1.051        10.514
-  Flooding Loss ............        31.283       312.837
+  External Outflow .........         1.125        11.253
+  Flooding Loss ............        31.210       312.106
   Evaporation Loss .........         0.000         0.000
   Exfiltration Loss ........         0.000         0.000
   Initial Stored Volume ....        95.027       950.279
-  Final Stored Volume ......        62.694       626.946
-  Continuity Error (%) .....        -0.002
+  Final Stored Volume ......        62.690       626.911
+  Continuity Error (%) .....         0.001
   
   
   ***************************
@@ -66,12 +66,12 @@
   *************************
   Routing Time Step Summary
   *************************
-  Minimum Time Step           :    29.50 sec
-  Average Time Step           :    29.99 sec
-  Maximum Time Step           :    30.00 sec
+  Minimum Time Step           :    16.49 sec
+  Average Time Step           :    59.89 sec
+  Maximum Time Step           :    60.00 sec
   Percent in Steady State     :     0.00
-  Average Iterations per Step :     2.18
-  Percent Not Converging      :     0.05
+  Average Iterations per Step :     2.53
+  Percent Not Converging      :     0.28
   
   
   ******************
@@ -83,14 +83,14 @@
                                    Depth    Depth      HGL   Occurrence   Max Depth
   Node                 Type       Meters   Meters   Meters  days hr:min      Meters
   ---------------------------------------------------------------------------------
-  N1                   JUNCTION     0.25     0.47    20.47     0  17:41        0.47
-  N2                   JUNCTION     0.25     0.43    18.43     0  17:02        0.43
-  N3                   JUNCTION     0.25     0.42    16.42     0  17:06        0.42
-  N4                   JUNCTION     0.24     0.39    14.39     0  12:55        0.39
+  N1                   JUNCTION     0.26     1.00    21.00     0  00:02        0.99
+  N2                   JUNCTION     0.26     0.44    18.44     0  10:16        0.44
+  N3                   JUNCTION     0.26     0.44    16.44     0  03:54        0.44
+  N4                   JUNCTION     0.26     0.42    14.42     0  04:00        0.42
   out                  OUTFALL      0.00     0.00     0.00     0  00:00        0.00
-  T1                   STORAGE      3.00     3.00     3.00     0  00:01        3.00
-  T2                   STORAGE      0.41     1.00    12.00     0  02:38        1.00
-  T3                   STORAGE    788.20   950.00   950.00     0  00:00      949.88
+  T1                   STORAGE      3.00     3.00     3.00     0  00:02        3.00
+  T2                   STORAGE      0.50     1.00    12.00     0  03:34        1.00
+  T3                   STORAGE    788.27   950.00   950.00     0  00:00      949.94
   
   
   *******************
@@ -103,13 +103,13 @@
                                    Inflow   Inflow   Occurrence      Volume      Volume       Error
   Node                 Type           CMS      CMS  days hr:min    10^6 ltr    10^6 ltr     Percent
   -------------------------------------------------------------------------------------------------
-  N1                   JUNCTION     0.000    0.368     0  01:55           0        11.1       0.304
-  N2                   JUNCTION     0.000    0.367     0  17:01           0        11.1       0.450
-  N3                   JUNCTION     0.000    0.356     0  17:03           0          11       0.428
-  N4                   JUNCTION     0.000    0.346     0  17:06           0          11       0.447
-  out                  OUTFALL      0.000    0.185     0  00:23           0        10.5       0.000
-  T1                   STORAGE      0.000    5.000     0  00:01           0         324       0.009
-  T2                   STORAGE      0.000    0.329     0  12:56           0        10.9      -0.085
+  N1                   JUNCTION     0.000    0.367     0  14:34           0        12.2      -0.202
+  N2                   JUNCTION     0.000    0.370     0  10:14           0        12.3       0.190
+  N3                   JUNCTION     0.000    0.364     0  03:51           0        12.2       0.254
+  N4                   JUNCTION     0.000    0.362     0  03:55           0        12.2       0.367
+  out                  OUTFALL      0.000    0.185     0  00:14           0        11.3       0.000
+  T1                   STORAGE      0.000    5.000     0  00:02           0         324       0.040
+  T2                   STORAGE      0.000    0.351     0  04:01           0        12.2      -0.316
   T3                   STORAGE      0.000    0.000     0  00:00           0         950      -0.004
   
   
@@ -117,7 +117,13 @@
   Node Surcharge Summary
   **********************
   
-  No nodes were surcharged.
+  Surcharging occurs when water rises above the top of the highest conduit.
+  ---------------------------------------------------------------------
+                                               Max. Height   Min. Depth
+                                   Hours       Above Crown    Below Rim
+  Node                 Type      Surcharged         Meters       Meters
+  ---------------------------------------------------------------------
+  N1                   JUNCTION        0.07          0.500        0.000
   
   
   *********************
@@ -131,8 +137,9 @@
                         Hours       Rate    Occurrence      Volume     Depth
   Node                 Flooded       CMS   days hr:min    10^6 ltr    Meters
   --------------------------------------------------------------------------
-  T1                     17.99     5.000      0  14:32     312.655     0.000
-  T2                      0.91     0.140      0  17:10       0.254     0.000
+  N1                      0.02     0.005      0  00:02       0.000     0.000
+  T1                     17.98     4.999      0  10:46     311.317     0.000
+  T2                      2.47     0.165      0  14:53       0.932     0.000
   
   
   **********************
@@ -144,9 +151,9 @@
                           Volume    Pcnt  Pcnt  Pcnt        Volume    Pcnt     Occurrence    Outflow
   Storage Unit           1000 m3    Full  Loss  Loss       1000 m3    Full    days hr:min        CMS
   --------------------------------------------------------------------------------------------------
-  T1                       0.450     100     0     0         0.450     100       0  00:01      0.368
-  T2                       0.082      41     0     0         0.200     100       0  02:38      0.185
-  T3                     788.198      79     0     0       950.000      95       0  00:00      5.000
+  T1                       0.450     100     0     0         0.450     100       0  00:02      0.367
+  T2                       0.100      50     0     0         0.200     100       0  03:34      0.185
+  T3                     788.271      79     0     0       950.000      95       0  00:00      5.000
   
   
   ***********************
@@ -158,9 +165,9 @@
                          Freq      Flow      Flow      Volume
   Outfall Node           Pcnt       CMS       CMS    10^6 ltr
   -----------------------------------------------------------
-  out                   99.26     0.163     0.185      10.514
+  out                   99.63     0.174     0.185      11.253
   -----------------------------------------------------------
-  System                99.26     0.163     0.185      10.514
+  System                99.63     0.174     0.185      11.253
   
   
   ********************
@@ -172,13 +179,13 @@
                                   |Flow|   Occurrence   |Veloc|    Full    Full
   Link                 Type          CMS  days hr:min     m/sec    Flow   Depth
   -----------------------------------------------------------------------------
-  P1                   CONDUIT     0.367     0  17:01      4.44    1.06    0.87
-  P2                   CONDUIT     0.356     0  17:03      2.16    1.03    0.83
-  P3                   CONDUIT     0.346     0  17:06      2.23    1.00    0.79
-  P4                   CONDUIT     0.329     0  12:56      2.01    0.95    0.78
-  FP1                  PUMP        0.368     0  01:55              0.37
-  FP2                  PUMP        0.185     0  00:23              0.19
-  FP3                  PUMP        5.000     0  00:01              5.00
+  P1                   CONDUIT     0.370     0  10:14      2.35    1.07    0.89
+  P2                   CONDUIT     0.364     0  03:51      2.32    1.05    0.87
+  P3                   CONDUIT     0.362     0  03:55      2.41    1.04    0.84
+  P4                   CONDUIT     0.351     0  04:01      2.03    1.01    0.82
+  FP1                  PUMP        0.367     0  14:34              0.37
+  FP2                  PUMP        0.185     0  00:14              0.19
+  FP3                  PUMP        5.000     0  00:02              5.00
   
   
   ***************************
@@ -190,9 +197,9 @@
                        /Actual         Up    Down  Sub   Sup   Up    Down  Norm  Inlet 
   Conduit               Length    Dry  Dry   Dry   Crit  Crit  Crit  Crit  Ltd   Ctrl  
   -------------------------------------------------------------------------------------
-  P1                      1.00   0.00  0.00  0.00  0.17  0.83  0.00  0.00  0.54  0.00
-  P2                      1.00   0.00  0.00  0.00  0.04  0.96  0.00  0.00  0.54  0.00
-  P3                      1.00   0.00  0.00  0.00  0.03  0.97  0.00  0.00  0.52  0.00
+  P1                      1.00   0.00  0.00  0.00  0.16  0.83  0.00  0.00  0.67  0.00
+  P2                      1.00   0.00  0.00  0.00  0.07  0.92  0.00  0.00  0.61  0.00
+  P3                      1.00   0.00  0.00  0.00  0.07  0.93  0.00  0.00  0.53  0.00
   P4                      1.00   0.00  0.00  0.00  0.00  0.00  0.00  1.00  0.00  0.00
   
   
@@ -205,8 +212,10 @@
                          --------- Hours Full --------   Above Full   Capacity
   Conduit                Both Ends  Upstream  Dnstream   Normal Flow   Limited
   ----------------------------------------------------------------------------
-  P1                          0.01      0.01      0.01      0.57         0.01
-  P2                          0.01      0.01      0.01      0.17         0.01
+  P1                          0.01      0.02      0.01      0.80         0.01
+  P2                          0.01      0.01      0.01      0.55         0.01
+  P3                          0.01      0.01      0.01      0.48         0.01
+  P4                          0.01      0.01      0.01      0.25         0.01
   
   
   ***************
@@ -218,11 +227,11 @@
                         Percent   Number of      Flow      Flow      Flow    Volume     Usage    Pump Curve
   Pump                 Utilized   Start-Ups       CMS       CMS       CMS  10^6 ltr     Kw-hr    Low   High
   ---------------------------------------------------------------------------------------------------------
-  FP1                     99.95           1      0.00      0.17      0.37    11.100    522.97    0.0  100.0
-  FP2                     99.30           1      0.00      0.16      0.19    10.517    328.47    0.0   73.2
-  FP3                    100.00           1      0.00      5.00      5.00   323.844 692256.54    0.0  100.0
+  FP1                     99.91           1      0.00      0.19      0.37    12.233    576.81    0.0  100.0
+  FP2                     99.72           2      0.00      0.17      0.19    11.259    353.54    0.0   86.6
+  FP3                    100.00           1      0.00      4.99      5.00   323.724 692039.76    0.0  100.0
   
 
-  Analysis begun on:  Wed Oct 14 13:43:13 2020
-  Analysis ended on:  Wed Oct 14 13:43:16 2020
+  Analysis begun on:  Thu Oct 15 14:35:48 2020
+  Analysis ended on:  Thu Oct 15 14:35:51 2020
   Total elapsed time: 00:00:03

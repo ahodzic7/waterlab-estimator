@@ -12,12 +12,13 @@ columns = ['time',
            'tank2_inflow',
            'tank2_depth',
            'pump1_flow',
-           'pump2_flow']
+           'pump2_flow',
+           'tank_area']
 network_df = pd.DataFrame(columns=columns)
 
-with Simulation(
-        r'C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\epa_network\project_network.inp') as sim:
-    time_step = 30  # sec
+with Simulation(r'../epa_network/project_network.inp') as sim:
+
+    time_step = 1  # number of ROUTING_STEP's to be simulated before returning to python
     sim.step_advance(time_step)
 
     # Control input
@@ -33,6 +34,7 @@ with Simulation(
     tank2 = Nodes(sim)["T2"]
 
     # Init sim
+    tank_area = 200;
     count = 1
     on_time = 0
     total_count = 0
@@ -55,11 +57,10 @@ with Simulation(
             count += 1
 
         # Add info to dataframe
-        elapsed_time = total_count * time_step
+        elapsed_time = total_count
         network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe1.depth, pipe2.depth, pipe3.depth,
-                                                  pipe4.depth, tank2.total_inflow, tank2.depth, pump1.flow, pump2.flow],
-                                                 index=network_df.columns),
-                                       ignore_index=True)
+                                                  pipe4.depth, tank2.total_inflow, tank2.depth, pump1.flow, pump2.flow,
+                                                  tank_area], index=network_df.columns), ignore_index=True)
         total_count += 1
         print(f"Progress {int(sim.percent_complete * 100)}%", end="\r")
 
@@ -72,7 +73,7 @@ with Simulation(
 
     network_df.plot(x='time', y='pump1_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_inflow', ax=axes[1])
+    network_df.plot(x='time', y='pump2_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
-    network_df.plot(x='time', y='pump2_flow', ax=axes[2])
     plt.show()
-    network_df.to_csv(r'gen_data_output/new_data.csv', index=False, header=True)
+    network_df.to_csv(r'gen_data_output/new_data2.csv', index=False, header=True)
