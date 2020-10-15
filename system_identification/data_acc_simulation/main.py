@@ -11,7 +11,8 @@ columns = ['time',
            'pipe4_depth',
            'tank2_inflow',
            'tank2_depth',
-           'pump1_flow']
+           'pump1_flow',
+           'pump2_flow']
 network_df = pd.DataFrame(columns=columns)
 
 with Simulation(
@@ -56,7 +57,7 @@ with Simulation(
         # Add info to dataframe
         elapsed_time = total_count * time_step
         network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe1.depth, pipe2.depth, pipe3.depth,
-                                                  pipe4.depth, tank2.total_inflow, tank2.depth, pump1.flow],
+                                                  pipe4.depth, tank2.total_inflow, tank2.depth, pump1.flow, pump2.flow],
                                                  index=network_df.columns),
                                        ignore_index=True)
         total_count += 1
@@ -72,5 +73,6 @@ with Simulation(
     network_df.plot(x='time', y='pump1_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_inflow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
+    network_df.plot(x='time', y='pump2_flow', ax=axes[2])
     plt.show()
     network_df.to_csv(r'gen_data_output/new_data.csv', index=False, header=True)
