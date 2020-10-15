@@ -4,7 +4,7 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('epa_swmm_data_0_no_tank_inflow.mat');                                    % Load simulation data 
+data = dataLoad('epa_swmm_test_after_timefix_flow.mat');                                    % Load simulation data 
 startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
@@ -46,8 +46,8 @@ order = [size(output,2) size(input,2) N_states];                                
 
 if ~isnan(tank_area)
     phi_2 = 1/tank_area;
-    parametersInitial = [0.0171    0.7898    0.8335   -2.7316 ...          % select initial parameters
-        0.0192    phi_2]; 
+    parametersInitial = [0.0171    0.7898    0.8335...      % select initial parameters
+        -2.7316 0.0192    phi_2]; 
 else
     parametersInitial = [0.0171    0.7898    0.8335   -2.7316 ...
         0.0192    1/200];
