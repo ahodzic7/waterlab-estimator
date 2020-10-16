@@ -4,7 +4,7 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('epa_swmm_test_1_hour_noflow.mat');                                    % Load simulation data 
+data = dataLoad('epa_swmm_test_5_hour_noflow.mat');                                    % Load simulation data 
 startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
@@ -48,8 +48,10 @@ if ~isnan(tank_area)
     phi_2 = 1/tank_area;
 %     parametersInitial = (1/60)*[0.0171    0.7898    0.8335...      % select initial parameters
 %         -2.7316 0.0192    60*phi_2];
-    parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
-    0.008858893835 phi_2];
+    parametersInitial = [5*10^(-7) 0.0020471 0.00093481 -0.15695 ...
+    
+                 theta__5 := 0.000008858893835
+ phi_2];
 else
     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
         0.008858893835 1/200];

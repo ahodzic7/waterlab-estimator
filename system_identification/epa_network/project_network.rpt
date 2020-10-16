@@ -1,5 +1,5 @@
 
-  EPA STORM WATER MANAGEMENT MODEL - VERSION 5.1 (Build 5.1.014)
+  EPA STORM WATER MANAGEMENT MODEL - VERSION 5.1 (Build 5.3.0.dev0)
   --------------------------------------------------------------
 
   
@@ -24,10 +24,10 @@
   Flow Routing Method ...... DYNWAVE
   Surcharge Method ......... EXTRAN
   Starting Date ............ 05/02/2020 00:00:00
-  Ending Date .............. 05/02/2020 18:00:00
+  Ending Date .............. 05/02/2020 07:00:00
   Antecedent Dry Days ...... 0.0
   Report Time Step ......... 00:01:00
-  Routing Time Step ........ 30.00 sec
+  Routing Time Step ........ 60.00 sec
   Variable Time Step ....... YES
   Maximum Trials ........... 8
   Number of Threads ........ 1
@@ -42,13 +42,21 @@
   Groundwater Inflow .......         0.000         0.000
   RDII Inflow ..............         0.000         0.000
   External Inflow ..........         0.000         0.000
-  External Outflow .........         0.000         0.000
-  Flooding Loss ............         6.472        64.718
+  External Outflow .........         0.145         1.448
+  Flooding Loss ............        12.365       123.649
   Evaporation Loss .........         0.000         0.000
   Exfiltration Loss ........         0.000         0.000
   Initial Stored Volume ....        95.027       950.279
-  Final Stored Volume ......        88.556       885.568
-  Continuity Error (%) .....        -0.001
+  Final Stored Volume ......        82.504       825.053
+  Continuity Error (%) .....         0.014
+  
+  
+  *************************
+  Highest Continuity Errors
+  *************************
+  Node N4 (3.22%)
+  Node N3 (1.65%)
+  Node N2 (1.33%)
   
   
   ***************************
@@ -66,12 +74,12 @@
   *************************
   Routing Time Step Summary
   *************************
-  Minimum Time Step           :    29.50 sec
-  Average Time Step           :    29.99 sec
-  Maximum Time Step           :    30.00 sec
+  Minimum Time Step           :    58.50 sec
+  Average Time Step           :    59.86 sec
+  Maximum Time Step           :    60.00 sec
   Percent in Steady State     :     0.00
-  Average Iterations per Step :     2.00
-  Percent Not Converging      :     0.00
+  Average Iterations per Step :     2.35
+  Percent Not Converging      :     0.24
   
   
   ******************
@@ -83,14 +91,14 @@
                                    Depth    Depth      HGL   Occurrence   Max Depth
   Node                 Type       Meters   Meters   Meters  days hr:min      Meters
   ---------------------------------------------------------------------------------
-  N1                   JUNCTION     0.00     0.00    20.00     0  00:00        0.00
-  N2                   JUNCTION     0.00     0.00    18.00     0  00:00        0.00
-  N3                   JUNCTION     0.00     0.00    16.00     0  00:00        0.00
-  N4                   JUNCTION     0.00     0.00    14.00     0  00:00        0.00
+  N1                   JUNCTION     0.13     0.27    20.27     0  06:39        0.27
+  N2                   JUNCTION     0.14     0.27    18.27     0  02:19        0.27
+  N3                   JUNCTION     0.14     0.28    16.28     0  02:23        0.28
+  N4                   JUNCTION     0.14     0.25    14.25     0  01:04        0.25
   out                  OUTFALL      0.00     0.00     0.00     0  00:00        0.00
-  T1                   STORAGE      3.00     3.00     3.00     0  00:01        3.00
-  T2                   STORAGE      0.00     0.00    11.00     0  00:00        0.00
-  T3                   STORAGE    917.60   950.00   950.00     0  00:00      949.94
+  T1                   STORAGE      3.00     3.00     3.00     0  00:02        3.00
+  T2                   STORAGE      0.69     1.00    12.00     0  01:42        1.00
+  T3                   STORAGE    887.37   950.00   950.00     0  00:00      949.94
   
   
   *******************
@@ -103,13 +111,13 @@
                                    Inflow   Inflow   Occurrence      Volume      Volume       Error
   Node                 Type           CMS      CMS  days hr:min    10^6 ltr    10^6 ltr     Percent
   -------------------------------------------------------------------------------------------------
-  N1                   JUNCTION     0.000    0.000     0  00:00           0           0       0.000 ltr
-  N2                   JUNCTION     0.000    0.000     0  00:00           0           0       0.000 ltr
-  N3                   JUNCTION     0.000    0.000     0  00:00           0           0       0.000 ltr
-  N4                   JUNCTION     0.000    0.000     0  00:00           0           0       0.000 ltr
-  out                  OUTFALL      0.000    0.000     0  00:00           0           0       0.000 ltr
-  T1                   STORAGE      0.000    1.000     0  00:00           0        65.2       0.000
-  T2                   STORAGE      0.000    0.000     0  00:00           0           0       0.000 ltr
+  N1                   JUNCTION     0.000    0.191     0  02:11           0         1.8       0.274
+  N2                   JUNCTION     0.000    0.196     0  02:16           0        1.79       1.345
+  N3                   JUNCTION     0.000    0.196     0  02:20           0        1.77       1.681
+  N4                   JUNCTION     0.000    0.196     0  02:24           0        1.74       3.324
+  out                  OUTFALL      0.000    0.060     0  00:23           0        1.45       0.000
+  T1                   STORAGE      0.000    5.000     0  00:02           0         126       0.107
+  T2                   STORAGE      0.000    0.179     0  01:04           0        1.69      -0.094
   T3                   STORAGE      0.000    0.000     0  00:00           0         950      -0.001
   
   
@@ -131,7 +139,8 @@
                         Hours       Rate    Occurrence      Volume     Depth
   Node                 Flooded       CMS   days hr:min    10^6 ltr    Meters
   --------------------------------------------------------------------------
-  T1                     17.98     1.000      0  00:01      64.733     0.000
+  T1                      6.98     5.000      0  01:37     123.760     0.000
+  T2                      0.43     0.088      0  06:59       0.042     0.000
   
   
   **********************
@@ -143,9 +152,9 @@
                           Volume    Pcnt  Pcnt  Pcnt        Volume    Pcnt     Occurrence    Outflow
   Storage Unit           1000 m3    Full  Loss  Loss       1000 m3    Full    days hr:min        CMS
   --------------------------------------------------------------------------------------------------
-  T1                       0.450     100     0     0         0.450     100       0  00:01      0.000
-  T2                       0.000       0     0     0         0.000       0       0  00:00      0.000
-  T3                     917.603      92     0     0       950.000      95       0  00:00      1.000
+  T1                       0.450     100     0     0         0.450     100       0  00:02      0.191
+  T2                       0.138      69     0     0         0.200     100       0  01:42      0.060
+  T3                     887.366      89     0     0       950.000      95       0  00:00      5.000
   
   
   ***********************
@@ -157,9 +166,9 @@
                          Freq      Flow      Flow      Volume
   Outfall Node           Pcnt       CMS       CMS    10^6 ltr
   -----------------------------------------------------------
-  out                    0.00     0.000     0.000       0.000
+  out                   98.10     0.059     0.060       1.448
   -----------------------------------------------------------
-  System                 0.00     0.000     0.000       0.000
+  System                98.10     0.059     0.060       1.448
   
   
   ********************
@@ -171,13 +180,13 @@
                                   |Flow|   Occurrence   |Veloc|    Full    Full
   Link                 Type          CMS  days hr:min     m/sec    Flow   Depth
   -----------------------------------------------------------------------------
-  P1                   CONDUIT     0.000     0  00:00      0.00    0.00    0.00
-  P2                   CONDUIT     0.000     0  00:00      0.00    0.00    0.00
-  P3                   CONDUIT     0.000     0  00:00      0.00    0.00    0.00
-  P4                   CONDUIT     0.000     0  00:00      0.00    0.00    0.00
-  FP1                  PUMP        0.000     0  00:00              0.00
-  FP2                  PUMP        0.000     0  00:00              0.00
-  FP3                  PUMP        1.000     0  00:00              1.00
+  P1                   CONDUIT     0.196     0  02:16      2.29    0.56    0.54
+  P2                   CONDUIT     0.196     0  02:20      1.95    0.56    0.54
+  P3                   CONDUIT     0.196     0  02:24      2.05    0.57    0.52
+  P4                   CONDUIT     0.179     0  01:04      1.78    0.51    0.51
+  FP1                  PUMP        0.191     0  02:11              0.19
+  FP2                  PUMP        0.060     0  00:23              0.06
+  FP3                  PUMP        5.000     0  00:02              5.00
   
   
   ***************************
@@ -189,10 +198,10 @@
                        /Actual         Up    Down  Sub   Sup   Up    Down  Norm  Inlet 
   Conduit               Length    Dry  Dry   Dry   Crit  Crit  Crit  Crit  Ltd   Ctrl  
   -------------------------------------------------------------------------------------
-  P1                      1.00   1.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
-  P2                      1.00   1.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
-  P3                      1.00   1.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
-  P4                      1.00   1.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+  P1                      1.00   0.00  0.00  0.00  0.30  0.69  0.00  0.00  0.66  0.00
+  P2                      1.00   0.00  0.00  0.00  0.27  0.72  0.00  0.00  0.67  0.00
+  P3                      1.00   0.00  0.00  0.00  0.29  0.71  0.00  0.00  0.59  0.00
+  P4                      1.00   0.01  0.00  0.00  0.00  0.00  0.00  0.99  0.00  0.00
   
   
   *************************
@@ -211,11 +220,11 @@
                         Percent   Number of      Flow      Flow      Flow    Volume     Usage    Pump Curve
   Pump                 Utilized   Start-Ups       CMS       CMS       CMS  10^6 ltr     Kw-hr    Low   High
   ---------------------------------------------------------------------------------------------------------
-  FP1                      0.00           0      0.00      0.00      0.00     0.000      0.00    0.0    0.0
-  FP2                      0.00           0      0.00      0.00      0.00     0.000      0.00    0.0    0.0
-  FP3                    100.00           1      0.00      1.00      1.00    64.793 161354.61    0.0  100.0
+  FP1                     67.86           6      0.00      0.11      0.19     1.800     84.31    0.0  100.0
+  FP2                     98.33           2      0.00      0.06      0.06     1.450     46.26    0.0   96.1
+  FP3                    100.00           1      0.00      4.98      5.00   125.740 302691.71    0.0  100.0
   
 
-  Analysis begun on:  Thu Oct 15 13:38:25 2020
-  Analysis ended on:  Thu Oct 15 13:38:25 2020
-  Total elapsed time: < 1 sec
+  Analysis begun on:  Fri Oct 16 09:56:37 2020
+  Analysis ended on:  Fri Oct 16 09:56:38 2020
+  Total elapsed time: 00:00:01

@@ -14,9 +14,10 @@ columns = ['time',
            'pump1_flow',
            'pump2_flow',
            'tank_area']
+
 network_df = pd.DataFrame(columns=columns)
 
-with Simulation(r'../epa_network/project_network.inp') as sim:
+with Simulation(r'../epa_network/toSt.inp') as sim:
 
     time_step = 1  # number of ROUTING_STEP's to be simulated before returning to python
     sim.step_advance(time_step)
