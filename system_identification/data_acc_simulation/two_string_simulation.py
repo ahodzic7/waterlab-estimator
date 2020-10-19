@@ -17,32 +17,49 @@ columns = ['time',
 
 network_df = pd.DataFrame(columns=columns)
 
-with Simulation(r'../epa_network/toSt.inp') as sim:
+with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
 
     time_step = 1  # number of ROUTING_STEP's to be simulated before returning to python
     sim.step_advance(time_step)
 
-    # Control input
-    pump1 = Links(sim)["FP1"]
-    pump2 = Links(sim)["FP2"]
-    pump3 = Links(sim)["FP3"]
-    # States
-    tank1 = Nodes(sim)["T1"]
-    pipe1 = Links(sim)["P1"]
-    pipe2 = Links(sim)["P2"]
-    pipe3 = Links(sim)["P3"]
-    pipe4 = Links(sim)["P4"]
-    tank2 = Nodes(sim)["T2"]
+    # Network layout
+    tank1 = Nodes(sim)["B2334099PSA256"]
+    pump1 = Links(sim)["P1"]
+    tank1_area = 6.539
+    pipe1 = Links(sim)["L2747"]
+    pipe2 = Links(sim)["L2746"]
+    pipe3 = Links(sim)["L2745"]
+    pipe4 = Links(sim)["L2921"]
+    pipe5 = Links(sim)["L2797"]
+    pipe6 = Links(sim)["L2798"]
+    pipe7 = Links(sim)["L2799"]
+    pipe8 = Links(sim)["L2793"]
+    pipe9 = Links(sim)["L2792"]
+    pipe10 = Links(sim)["L2791"]
+    pipe11 = Links(sim)["L2379"]
+    pipe12 = Links(sim)["L2378"]
+    pipe13 = Links(sim)["L2377"]
+    pipe14 = Links(sim)["L2374"]
+    psudo_pipe = Nodes(sim)["B2323037O398"]
+    psudo_pipe_area = 7.011
+    pipe15 = Links(sim)["L2373"]
+    pipe16 = Links(sim)["L6497"]
+    pipe17 = Links(sim)["L2390"]
+    pipe18 = Links(sim)["L2354"]
+    pipe19 = Links(sim)["L2418"]
+    tank2 = Nodes(sim)["B2323069"]
+    tank2_area = 10.011
+    pump2 = Links(sim)["P2"]
+
 
     # Init sim
-    tank_area = 200;
     count = 1
     on_time = 0
     total_count = 0
-    pump_reference_flow = 1/5
+    pump_reference_flow = 1/7
+    tank1.generated_inflow(5)
     for idx, step in enumerate(sim):
         # Make sure the system is always supplied with water
-        pump3.target_setting = 5
 
         # System identification setup:
         #
@@ -52,8 +69,9 @@ with Simulation(r'../epa_network/toSt.inp') as sim:
         # Create simple random controller
         if count > on_time:
             count = 0
-            on_time = random.randint(5, 15)
-            pump1.target_setting = random.uniform(0, 1)*pump_reference_flow
+            on_time = random.randint(5, 10)
+            pump1.target_setting = random.randint(0, 1) * pump_reference_flow
+            # pump1.target_setting = random.uniform(0, 1)*pump_reference_flow
         if tank2.depth > 0.9:
             pump1.target_setting = 0
         else:
@@ -61,10 +79,10 @@ with Simulation(r'../epa_network/toSt.inp') as sim:
 
         # Add info to dataframe
         total_outflow_tank2 = pump2.flow + tank2.flooding
-        elapsed_time = total_count
-        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe1.depth, pipe2.depth, pipe3.depth,
-                                                  pipe4.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
-                                                  tank_area], index=network_df.columns), ignore_index=True)
+        elapsed_stime = total_count
+        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe4.depth, pipe6.depth, pipe11.depth,
+                                                  pipe17.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
+                                                  tank2_area], index=network_df.columns), ignore_index=True)
         total_count += 1
         print(f"Progress {int(sim.percent_complete * 100)}%", end="\r")
 

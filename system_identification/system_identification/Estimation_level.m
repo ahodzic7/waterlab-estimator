@@ -4,7 +4,7 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('epa_swmm_test_1_hour_noflow.mat');                                    % Load simulation data 
+data = dataLoad('epa_swmm_frederecia_initial.mat');                                    % Load simulation data 
 startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
