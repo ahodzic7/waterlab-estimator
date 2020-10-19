@@ -1,32 +1,25 @@
-function [dx, y] = free_flow_model(t, x, u, p1, p2, p3, p4, p5, Nx, varargin)
-% Discrete time nlgreyest model for the kinematic wave level-based model. 
+function [dx, y] = free_flow_model(t, x, u, p1, p2, p3, p4, p5, p6,N_states , N_optimization_variables, varargin)
+% Continous time nlgreyest model for the diffusion wave gravity pipe with the tank in the end of the pipe. 
 
-dx = zeros(Nx,1);
-y = zeros(Nx+1,1);
+dx = zeros(N_states,1);
+y = zeros(N_optimization_variables,1);
 
-%% State equation
+%% State equations
 dx(1) =  p1 * u(1) - p2 * x(1) + p3*x(2)-p4; 
 
-for i = 2:Nx-1 %:Nx-1
+for i = 2:N_states-2
      dx(i) =  p2*x(i-1) - (p2+p3)*x(i) + p3*x(i+1); 
-     %disturbace model:
-     %( a1* cos(w*t) + b1* sin(w*t) + a2* cos(2*w*t) + b2* sin(2*w*t)+...
-     %    a3* cos(3*w*t) + b3* sin(3*w*t)+ a4* cos(4*w*t) + b4* sin(4*w*t));
 end
 
-% Linear discharge free flow(comment out one)
-dx(Nx) = p2 * x(Nx-1) - p3*x(Nx) + p4 -  p5*(x(Nx));
-% Submerged flow (comment out)
-% dx(Nx) = p1*p2 * x(Nx-1) - p1*p3*x(Nx)+ p1*p4 -  p5*(x(Nx)-u(2)+tank_offset);
-% Offset flow
-%dx(Nx) = p1*p2 * x(Nx-1) - (p2+p3)*x(Nx) + p1*p3*(u(2)-tank_offset);
-% Nonlinear discharge
-%dx(Nx) = p1*p2 * x(Nx-1) - p1*p3*x(Nx) + p1*p4 -  p5*(x(Nx)^(2/3));
-%% Output equations
-y(1:Nx) = x(1:Nx);
-y(Nx+1) = p5/p1*(x(Nx));        %linear free flow
-%y(Nx+1) = p5/p1*(x(Nx)-u(2)+tank_offset);        %submerged flow
-%y(Nx+1) = p2*x(Nx)-p3*(u(2)-tank_offset)+p4;                   %offset flow
-%y(Nx+1) = p5/p1*(x(Nx)^(2/3));  %nonlinear
+dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+
+%% Tank equation
+dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
+
+%% Output equation
+y(1:N_states) = x(1:N_states);
+if N_optimization_variables > N_states
+    y(N_optimization_variables) = p5/p1*(x(N_states-1));
+end
 
 end

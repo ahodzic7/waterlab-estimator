@@ -1,6 +1,6 @@
 function [dx, y] = free_flow_model(t, x, u, p1, p2, p3, p4, p5, Nx, varargin)
 % Continuous time nlgreyest model for the kinematic wave level-based model. 
-tank_offset = 1;
+tank_area = 1.25^2*pi; %[dm^2]
 dx = zeros(Nx,1);
 y = zeros(Nx+1,1);
 

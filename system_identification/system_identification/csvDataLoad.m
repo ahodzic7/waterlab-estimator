@@ -11,7 +11,8 @@
 % 11-tank2_area ...
 % ]
 
-function data = dataLoad(filename)
+function data = csvDataLoad(filename)
     addpath("data"); 
-    data = cell2mat(struct2cell(load(append('.\data\',filename))));
+    dataT = readmatrix(append('\data\',filename));
+    data = dataT';
 end
