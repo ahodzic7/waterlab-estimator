@@ -13,5 +13,16 @@
 
 function data = dataLoad(filename)
     addpath("data"); 
-    data = cell2mat(struct2cell(load(append('.\data\',filename))));
+    no_flow_data = 1;
+    if contains(filename, ".mat")
+        dataT = cell2mat(struct2cell(load(append('.\data\',filename))));
+    elseif contains(filename, ".csv")
+        dataT = readmatrix(append('\data\',filename))';
+    end
+    
+    if no_flow_data
+        dataT(7,:) = NaN;
+    end
+    
+    data = dataT;
 end

@@ -79,4 +79,4 @@ with Simulation(r'../epa_network/project_network.inp') as sim:
     network_df.plot(x='time', y='pump2_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
     plt.show()
-    network_df.to_csv(r'gen_data_output/new_data2.csv', index=False, header=True)
+    network_df.to_csv(r'gen_data_output/new_data_222.csv', index=False, header=True)
