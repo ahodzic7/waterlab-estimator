@@ -22,12 +22,16 @@ data = [data.Time, data.Data];
 data = [data(:,1),data(:,3),data(:,5),data(:,2),data(:,6)]';
 %%
 figure
-plot(data(1,:), data(2,:));
+plot(data(1,:)*0.5, data(2,:));
 hold on;
-plot(data(1,:), data(3,:));
+plot(data(1,:)*0.5, data(3,:));
 legend('Pump flow','Pump percentage');
 xlabel('Time (s)');
 ylabel('flow L/min; pecentage %');
+input = data(3,:)';
+input = input(1:100);
+output = data(2,:)';
+output = output(1:100);
 %%
 figure
 plot(data(1,:), data(4,:));
@@ -36,3 +40,5 @@ plot(data(1,:), data(5,:));
 legend('Pump flow','Pump percentage');
 xlabel('Time (s)');
 ylabel('flow L/min; pecentage %');
+input = data(5,:)';
+output = data(4,:)';
