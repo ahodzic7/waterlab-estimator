@@ -17,26 +17,35 @@ clc;
 % 11-tank2_area ...
 % ]
 
-data = load('Pump1_PI.mat').ans;
+data = load('Pump2_PI.mat').ans;
 data = [data.Time, data.Data];
 data = [data(:,1),data(:,3),data(:,5),data(:,2),data(:,6)]';
 %%
-figure
-plot(data(1,:)*0.5, data(2,:));
-hold on;
-plot(data(1,:)*0.5, data(3,:));
-legend('Pump flow','Pump percentage');
-xlabel('Time (s)');
-ylabel('flow L/min; pecentage %');
+T = data(1,1:60)*0.5;
 input = data(3,:)';
+input(input==0)=45;
 input = input(1:60);
 output = data(2,:)';
 output = output(1:60);
-%%
 figure
-plot(data(1,:), data(4,:));
+plot(T, input);
 hold on;
-plot(data(1,:), data(5,:));
+plot(T, output);
+legend('Pump flow','Pump percentage');
+xlabel('Time (s)');
+ylabel('flow L/min; pecentage %');
+
+%%
+T = data(1,:);
+input = data(5,:)';
+input(input==100)=100-54;
+
+output = data(4,:)';
+
+figure
+plot(T, output);
+hold on;
+plot(T, input);
 legend('Pump flow','Pump percentage');
 xlabel('Time (s)');
 ylabel('flow L/min; pecentage %');
