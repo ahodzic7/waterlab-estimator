@@ -29,9 +29,9 @@ legend('Pump flow','Pump percentage');
 xlabel('Time (s)');
 ylabel('flow L/min; pecentage %');
 input = data(3,:)';
-input = input(1:100);
+input = input(1:60);
 output = data(2,:)';
-output = output(1:100);
+output = output(1:60);
 %%
 figure
 plot(data(1,:), data(4,:));
