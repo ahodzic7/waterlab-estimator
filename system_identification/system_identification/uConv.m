@@ -18,6 +18,8 @@ help = u;
                     help = 60*help;
                 case '1/sTo1/min'
                     help = 60*help;
+                case '1/minTo1/s'
+                    help = (1/60)*help;
                 case '10minTos'
                     help = (1/600)*help;
                 case '10minToh'
@@ -40,6 +42,24 @@ help = u;
                     help = 100*help;
                 case 'mTomm'
                     help = 1000*help;
+                case 'mmTom'
+                    help = (1/1000)*help; 
+                case 'mmTocm'
+                    help = (1/10)*help;
+                case 'mmTodm'
+                    help = (1/100)*help;
+                case 'LTomm^3'
+                    help = (100^3)*help;
+                case 'LTom^3'
+                    help = (1/1000)*help;
+                case 'LTocm^3'
+                    help = (1000)*help;
+                case 'mm^2Tom^2'
+                    help = ((1/1000)^2)*help;
+                case 'mm^2Todm^2'
+                    help = ((1/100)^2)*help;
+                case 'mm^2Tocm^2'
+                    help = ((1/10)^2)*help;
             end 
         catch 
             fprintf('Error in unit conversion');

@@ -1,4 +1,23 @@
 %% Initial system comparison
+if data_procesing_plot
+    Nx = N_sensors + 1;
+    figure
+    for i = 1:1:Nx
+        ax(i) = subplot(size(output,2),1,i);
+        plot(output(:,i),'b','LineWidth',0.5)
+        hold on
+        if i == Nx
+            ylabel(['$h_{T2}$'  '[$m$]'],'interpreter','latex');  
+        else
+            ylabel(['$h$' num2str(i) '[$m$]'],'interpreter','latex');
+        end
+        if i == 1
+            title('Data - pipe heights and tank 2 height','interpreter','latex')
+        end
+    end
+    xlabel('Time [s]','interpreter','latex');
+linkaxes(ax, 'x')
+else
 plotEnbaler = 1;
 if plotEnbaler == 1
     Nx = N_sensors + 1;
@@ -65,5 +84,5 @@ if Nx<N_optimization_variables
     set(leg, 'Interpreter', 'latex');
     title('Estimated model - flow','interpreter','latex')
 end
-
+end
 % 

@@ -4,22 +4,26 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('new_data_3.csv');                                    % Load simulation data 
-startDataIndex = 1; 
+data = dataLoad('Simulation_data_short.mat');                                    % Load simulation data 
+startDataIndex = 31; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1;                                                  % Number of states +1 -> tank 2
 N_optimization_variables = N_states;
-h(1:N_sensors,:) = uConv(data(3:1:6,startDataIndex:endDataIndex), []);
+h(1:N_sensors,:) = uConv(data(3:1:6,startDataIndex:endDataIndex), ["mmTodm"]);
+
+% Remove the outliers:
+h(1,:) = hampel(h(1,:),5);
+
 output = [h(1:1:end,:)'];
 
-Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), []);                   % Select in/outflows
-Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), []); 
+Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["1/minTo1/s"]);                   % Select in/outflows
+Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["1/minTo1/s"]); 
 input = [Q(1,:)' Q(2,:)'];
 
-T2 = uConv(data(8,startDataIndex:endDataIndex), []);                       % Select tanks
+T2 = uConv(data(8,startDataIndex:endDataIndex), ["mmTodm"]);                       % Select tanks
 output = [output T2'];
 
 if ~isnan(data(7,:))
@@ -29,10 +33,10 @@ if ~isnan(data(7,:))
 end
  
 
-tank_area = data(11,1);
+tank_area = uConv(data(11,1),["mm^2Todm^2"]);
 
 %% ============================================ Iddata object ================================================ 
-dataTimeStep = 60;                                                          % Time step size in seconds
+dataTimeStep = 0.5;                                                          % Time step size in seconds
 
 ioData = iddata(output,input,dataTimeStep);                                % (y,u,Ts) (order)
 
@@ -46,10 +50,13 @@ order = [size(output,2) size(input,2) N_states];                                
 
 if ~isnan(tank_area)
     phi_2 = 1/tank_area;
-%     parametersInitial = (1/60)*[0.0171    0.7898    0.8335...      % select initial parameters
-%         -2.7316 0.0192    60*phi_2];
-    parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
-    0.008858893835 phi_2];
+    % Initial parameters for simulation
+%     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
+%     0.008858893835];
+%     parametersInitial = [parametersInitial phi_2];
+    % Initial parameters for the lab
+    parametersInitial = [0.0800 0.1092063882 3.907941840*10^(-8) -0.002793645908 ...
+    0.4482285133 phi_2];
 else
     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
         0.008858893835 1/200];
@@ -75,7 +82,7 @@ sys_init.Parameters(7).Fixed = true;                                       % num
 sys_init.Parameters(8).Name = 'Nopt_var';
 sys_init.Parameters(8).Fixed = true; 
 
-%sys_init = setinit(sys_init, 'Fixed', false(N_states,1));
+sys_init = setinit(sys_init, 'Fixed', false(N_states,1));
 
 sys_init.SimulationOptions.AbsTol = 1e-10;
 sys_init.SimulationOptions.RelTol = 1e-8;
@@ -118,6 +125,7 @@ y_final = sim(sys_final,ioData,opt_final);
 
 %% =========================== Post processing ============================
 estParams
+data_procesing_plot = 0;
 EstPlotter;
 
 %% Save params
