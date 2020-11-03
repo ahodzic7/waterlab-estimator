@@ -1,4 +1,4 @@
-function [dx, y] = free_flow_model(t, x, u, p1, p2, p3, p4, p5, p6,N_states , N_optimization_variables, varargin)
+function [dx, y] = altered_free_flow_model(t, x, u, p1, p2, p3, p4, p5, p6,N_states , N_optimization_variables,p9,p10, varargin)
 % Continous time nlgreyest model for the diffusion wave gravity pipe with the tank in the end of the pipe. 
 
 dx = zeros(N_states,1);
@@ -7,12 +7,12 @@ y = zeros(N_optimization_variables,1);
 %% State equations
 dx(1) =  p1 * u(1) - p2 * x(1) + p3*x(2)-p4; 
 
-for i = 2:N_states-2
-     dx(i) =  p2*x(i-1) - (p2+p3)*x(i) + p3*x(i+1); 
-end
 
-if N_states > 2
-dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+dx(2) =  p2*x(1) - (p2+p3)*x(2) + p9*x(3);
+dx(3) =  p10*x(2) - (p2+p3)*x(3) + p3*x(4);
+
+
+dx(4) = p2 * x(3) - p3*x(4) + p4 -  p5*(x(4));
 
 %% Tank equation
 dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
