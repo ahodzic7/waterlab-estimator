@@ -4,7 +4,7 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('Simulation_data_short.mat');                                    % Load simulation data 
+data = dataLoad('exp_3_11.mat');                                    % Load simulation data 
 startDataIndex = 31; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
@@ -115,7 +115,9 @@ estParams = [sys_final.Parameters(1).Value...
              sys_final.Parameters(3).Value...
              sys_final.Parameters(4).Value...
              sys_final.Parameters(5).Value...
-             sys_final.Parameters(6).Value];
+             sys_final.Parameters(6).Value...
+             sys_final.Parameters(9).Value...
+             sys_final.Parameters(10).Value];
 
 finalStates = sys_final.Report.Parameters.X0                               % estimated initial states
 toc
