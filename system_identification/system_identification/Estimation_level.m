@@ -4,8 +4,8 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('Simulation_data_short.mat');                                    % Load simulation data 
-startDataIndex = 31; 
+data = dataLoad('exp_3_11.mat');                                    % Load simulation data 
+startDataIndex = 200; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
