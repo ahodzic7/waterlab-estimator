@@ -1,16 +1,13 @@
-Kp = 7.4304;
-Ki = 30.1148;
+Kp = 0.20276;
+Ki = 0.017453;
 
 s = tf('s');
 
 a = tf1*(Ki/s+Kp);
 b = 1;
 sys = a/(1+a*b);
-percent = sys/tf1;
-flow = ones(100,1)*2;
+flow = ones(10,1)*2;
 flow(1:10,1) = 0;
-flow = [flow; ones(100,1)*6; ones(100,1)*3; ones(100,1)*0; ones(100,1)*10];
+flow = [flow; ones(800,1)*12; ];
 figure
-lsim(sys,flow,1:500);
-figure
-lsim(percent,flow,1:500);
+lsim(sys,flow,1:810);

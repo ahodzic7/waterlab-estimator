@@ -5,7 +5,7 @@ clc;
 
 %% ================================================ Load Data ================================================
 data = dataLoad('exp_3_11.mat');                                    % Load simulation data 
-startDataIndex = 200; 
+startDataIndex = 31; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
@@ -43,7 +43,7 @@ ioData.TimeUnit = 'seconds';
 
 %% ===================================================== Model ============================================
 addpath("models"); 
-modelName = 'free_flow_model';
+modelName = 'altered_free_flow_model';
 Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
 order = [size(output,2) size(input,2) N_states];                                 % [Ny Nu Nx] (order)
 
@@ -62,8 +62,9 @@ else
     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
         0.008858893835 1/200];
 end
-
-systemParamaters = [parametersInitial, N_states, N_optimization_variables];
+p9 = 0.002;
+p10 = 0.002;
+systemParamaters = [parametersInitial, N_states, N_optimization_variables, p9, p10];
 
 initStates = 0.0001*ones(N_states, 1);                                     
 
@@ -82,6 +83,8 @@ sys_init.Parameters(7).Name = 'Nx';
 sys_init.Parameters(7).Fixed = true;                                       % number of sections fixed
 sys_init.Parameters(8).Name = 'Nopt_var';
 sys_init.Parameters(8).Fixed = true; 
+sys_init.Parameters(9).Name = 'theta_9';
+sys_init.Parameters(10).Name = 'theta_10';
 
 sys_init = setinit(sys_init, 'Fixed', false(N_states,1));
 
@@ -112,7 +115,9 @@ estParams = [sys_final.Parameters(1).Value...
              sys_final.Parameters(3).Value...
              sys_final.Parameters(4).Value...
              sys_final.Parameters(5).Value...
-             sys_final.Parameters(6).Value];
+             sys_final.Parameters(6).Value...
+             sys_final.Parameters(9).Value...
+             sys_final.Parameters(10).Value];
 
 finalStates = sys_final.Report.Parameters.X0                               % estimated initial states
 toc
