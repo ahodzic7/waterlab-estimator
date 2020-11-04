@@ -80,8 +80,8 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
         # Add info to dataframe
         total_outflow_tank2 = pump2.flow + tank2.flooding
         elapsed_stime = total_count
-        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe4.depth, pipe6.depth, pipe11.depth,
-                                                  pipe17.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
+        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe2.depth, pipe5.depth, pipe10.depth,
+                                                  pipe16.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
                                                   tank2_area], index=network_df.columns), ignore_index=True)
         total_count += 1
         print(f"Progress {int(sim.percent_complete * 100)}%", end="\r")
