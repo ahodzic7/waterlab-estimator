@@ -4,22 +4,24 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('Sim_data_911_2.mat');                                    % Load simulation data 
-startDataIndex = 2; 
+data = dataLoad('Lab_data_1.mat');                                    % Load simulation data 
+startDataIndex = 80; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
-N_states = N_sensors + 1;                                                  % Number of states +1 -> tank 2
+N_states = N_sensors + 1; % Number of states +1 -> tank 2
+N_augmented_states = 1;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
 
 % Remove the outliers:
-h(1,:) = hampel(h(1,:),8);
-h(2,:) = hampel(h(2,:),8);
+%h(1,:) = hampel(h(1,:),8);
+%h(2,:) = hampel(h(2,:),8);
 
 output = [h(1:1:end,:)'];
-Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["", "1/minTo1/s"]);                   % Select in/outflows
+Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["", "1/minTo1/s"]); % Select in/outflows
+%Q(1,:) = circshift(Q(1,:), 7);
 Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["", "1/minTo1/s"]); 
 input = [Q(1,:)' Q(2,:)'];
 
@@ -33,7 +35,7 @@ if ~isnan(data(7,:))
 end
  
 
-tank_area = uConv(data(11,1),["mm^2Todm^2"])/4;
+tank_area = uConv(data(11,1),["mm^2Todm^2"]);
 
 %% ============================================ Iddata object ================================================ 
 dataTimeStep = 0.5;                                                         % Time step size in seconds
@@ -44,9 +46,9 @@ ioData.TimeUnit = 'seconds';
 
 %% ===================================================== Model ============================================
 addpath("models"); 
-modelName = 'free_flow_model';
+modelName = 'free_flow_model_augmented';
 Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
-order = [size(output,2) size(input,2) N_states];                                 % [Ny Nu Nx] (order)
+order = [size(output,2) size(input,2) N_states+N_augmented_states];                                 % [Ny Nu Nx] (order)
 
 if ~isnan(tank_area)
     phi_2 = 1/tank_area;
@@ -66,9 +68,9 @@ else
     parametersInitial = [1.69447431123557e-05,0.320175333789196,0.0787718089115809,-0.571330480925316,0.160463185400725,8.14873308630504e-05];
 end
 
-systemParamaters = [parametersInitial, N_states, N_optimization_variables];
+systemParamaters = [parametersInitial, N_states, N_optimization_variables, N_augmented_states];
 
-initStates = 0.0001*ones(N_states, 1);                                     
+initStates = 0.0001*ones(N_states+N_augmented_states, 1);                                     
 
 sys_init = idnlgrey(modelName, order, systemParamaters, initStates, Ts_model);       % create nlgreyest object
 sys_init.TimeUnit = 'seconds';
@@ -85,6 +87,8 @@ sys_init.Parameters(7).Name = 'Nx';
 sys_init.Parameters(7).Fixed = true;                                       % number of sections fixed
 sys_init.Parameters(8).Name = 'Nopt_var';
 sys_init.Parameters(8).Fixed = true; 
+sys_init.Parameters(9).Name = 'Naug_states';
+sys_init.Parameters(9).Fixed = true;
 
 if ~isnan(tank_area)
     sys_init = setinit(sys_init, 'Fixed', false(N_states,1));
