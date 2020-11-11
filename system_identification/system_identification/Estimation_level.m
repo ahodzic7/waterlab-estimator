@@ -4,14 +4,14 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('Lab_data_1.mat');                                    % Load simulation data 
-startDataIndex = 80; 
+data = dataLoad('Long_exp_2h.mat');                                    % Load simulation data 
+startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 1;
+N_augmented_states = 16;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
 
@@ -46,7 +46,12 @@ ioData.TimeUnit = 'seconds';
 
 %% ===================================================== Model ============================================
 addpath("models"); 
-modelName = 'free_flow_model_augmented';
+if N_augmented_states > 0
+modelName = convertStringsToChars('free_flow_model_augmented_'+string(N_augmented_states/4))
+else
+    modelName = 'free_flow_model'
+end
+    
 Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
 order = [size(output,2) size(input,2) N_states+N_augmented_states];                                 % [Ny Nu Nx] (order)
 
