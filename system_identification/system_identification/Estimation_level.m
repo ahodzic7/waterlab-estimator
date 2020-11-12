@@ -11,7 +11,7 @@ endDataIndex = size(data,2);
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 16;
+N_augmented_states = 4;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
 
@@ -19,10 +19,12 @@ h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["
 %h(1,:) = hampel(h(1,:),8);
 %h(2,:) = hampel(h(2,:),8);
 
+
 output = [h(1:1:end,:)'];
 Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["", "1/minTo1/s"]); % Select in/outflows
-%Q(1,:) = circshift(Q(1,:), 7);
-Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["", "1/minTo1/s"]); 
+% Q(1,:) = circshift(Q(1,:), 30);
+% Q(1,1:20) = 0;
+Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["", "1/minTo1/s"]);
 input = [Q(1,:)' Q(2,:)'];
 
 T2 = uConv(data(8,startDataIndex:endDataIndex), ["mmTodm"]);                       % Select tanks
@@ -47,7 +49,8 @@ ioData.TimeUnit = 'seconds';
 %% ===================================================== Model ============================================
 addpath("models"); 
 if N_augmented_states > 0
-modelName = convertStringsToChars('free_flow_model_augmented_'+string(N_augmented_states/4))
+    %modelName = convertStringsToChars('free_flow_model_augmented_'+string(N_augmented_states))
+    modelName = 'free_flow_model_augmented'
 else
     modelName = 'free_flow_model'
 end

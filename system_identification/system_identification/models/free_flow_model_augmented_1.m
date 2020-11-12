@@ -8,17 +8,13 @@ y = zeros(N_optimization_variables,1);
 dx(N_states + 1) = p1 * u(1) - p2 * x(N_states + 1) + p3*x(1)-p4;
 
 %% State equations
-dx(1) =  p2*x(N_states+1) - (p2+p3)*x(1) + p3*x(N_states + 2);
+dx(1) =  p2*x(N_states+1) - (p2+p3)*x(1) + p3*x(2);
 
-dx(N_states + 2) = p2*x(1) - (p2+p3)*x(N_states + 2) + p3*x(2);
-dx(2) =  p2*x(N_states + 2) - (p2+p3)*x(2) + p3*x(N_states + 3); 
+dx(2) =  p2*x(1) - (p2+p3)*x(2) + p3*x(3); 
 
-dx(N_states + 3) = p2*x(2) - (p2+p3)*x(N_states + 3) + p3*x(3);
-dx(3) =  p2*x(N_states + 3) - (p2+p3)*x(3) + p3*x(N_states + 4); 
+dx(3) =  p2*x(2) - (p2+p3)*x(3) + p3*x(4); 
 
-if N_states > 2
-    dx(N_states + 4) = p2*x(3) - (p2+p3)*x(N_states + 4) + p3*x(4);
-    dx(N_states-1) = p2 * x(N_states+4) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+dx(4) = p2 * x(3) - p3*x(4) + p4 -  p5*(x(4));
 
 %% Tank equation
 dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));

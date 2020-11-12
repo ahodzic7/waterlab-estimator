@@ -4,7 +4,6 @@ function [dx, y] = free_flow_model_augmented_4(t, x, u, p1, p2, p3, p4, p5, p6,N
 dx = zeros(N_states+N_aug_states,1);
 y = zeros(N_optimization_variables,1);
 %% Augmented states
-
 dx(N_states + 1) = p1 * u(1) - p2 * x(N_states + 1) + p3*x(N_states + 2)-p4;
 dx(N_states + 2) = p2*x(N_states+1) - (p2+p3)*x(N_states + 2) + p3*x(N_states + 3);
 dx(N_states + 3) = p2*x(N_states+2) - (p2+p3)*x(N_states + 3) + p3*x(N_states + 4);
@@ -25,12 +24,12 @@ dx(N_states + 11) = p2*x(N_states+10) - (p2+p3)*x(N_states + 11) + p3*x(N_states
 dx(N_states + 12) = p2*x(N_states + 11) - (p2+p3)*x(N_states + 12) + p3*x(3);
 dx(3) =  p2*x(N_states + 12) - (p2+p3)*x(3) + p3*x(N_states + 13); 
 
-if N_states > 2
-    dx(N_states + 13) = p2*x(3) - (p2+p3)*x(N_states + 13) + p3*x(N_states + 14);
-    dx(N_states + 14) = p2*x(N_states+13) - (p2+p3)*x(N_states + 14) + p3*x(N_states + 15);
-    dx(N_states + 15) = p2*x(N_states+14) - (p2+p3)*x(N_states + 15) + p3*x(N_states + 16);
-    dx(N_states + 16) = p2*x(N_states + 15) - (p2+p3)*x(N_states + 16) + p3*x(4);
-    dx(N_states-1) = p2 * x(N_states+16) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+
+dx(N_states + 13) = p2*x(3) - (p2+p3)*x(N_states + 13) + p3*x(N_states + 14);
+dx(N_states + 14) = p2*x(N_states+13) - (p2+p3)*x(N_states + 14) + p3*x(N_states + 15);
+dx(N_states + 15) = p2*x(N_states+14) - (p2+p3)*x(N_states + 15) + p3*x(N_states + 16);
+dx(N_states + 16) = p2*x(N_states + 15) - (p2+p3)*x(N_states + 16) + p3*x(4);
+dx(N_states-1) = p2 * x(N_states+16) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
 
 %% Tank equation
 dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
