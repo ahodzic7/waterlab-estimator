@@ -59,16 +59,43 @@ if plotEnbaler == 1
         plot(output(:,i),'b','LineWidth',0.5)
         hold on
         plot(y_final.OutputData(:,i),'r','LineWidth',0.5)
-        leg = legend('Data','Model','Location','NorthEast');
+        leg = legend('HF Model','Lin. Model','Location','NorthEast');
         set(leg, 'Interpreter', 'latex');
-        ylabel(['$h$' num2str(i) '[$m$]'],'interpreter','latex');
-        if i == 1
-            title('Estimated model - level','interpreter','latex')
+        set(leg,'color','none');
+        if i == Nx
+            ylabel(['$h_{T2}$' '[$m$]'],'interpreter','latex');
+        else
+            ylabel(['$h$' num2str(i) '[$m$]'],'interpreter','latex');
         end
+        if i == 1
+            title('Estimated model','interpreter','latex')
+        end
+        grid on;
     end
-    xlabel('Time [s]','interpreter','latex');
+    xlabel('Time [min]','interpreter','latex');
 end
 linkaxes(ax, 'x')
+
+figure
+    for i = 1:1:2
+        ax(i) = subplot(size(input,2),1,i);
+        plot(input(:,i),'b','LineWidth',0.5)
+        hold on
+        if i == 1
+            leg = legend('Pipe inflow','Location','NorthEast');
+        else
+            leg = legend('Tank outflow','Location','NorthEast');
+        end
+        set(leg, 'Interpreter', 'latex');
+        ylabel(['$Q$' num2str(i) '[$\frac{m^3}{s}$]'],'interpreter','latex');
+        if i == 1
+            title('Flow inputs','interpreter','latex')
+        end
+        grid on;
+    end
+    xlabel('Time [min]','interpreter','latex');
+linkaxes(ax, 'x')
+
 
 if Nx<N_optimization_variables
 

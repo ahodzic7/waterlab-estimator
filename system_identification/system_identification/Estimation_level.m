@@ -4,16 +4,16 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('Long_exp_2h.mat');                                    % Load simulation data 
-startDataIndex = 1; 
+data = dataLoad('Lab_data_1.mat');                                    % Load simulation data 
+startDataIndex = 10; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 4;
+N_augmented_states = 0;
 N_optimization_variables = N_states;
-h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
+h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), [""]);
 
 % Remove the outliers:
 %h(1,:) = hampel(h(1,:),8);
@@ -21,13 +21,13 @@ h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["
 
 
 output = [h(1:1:end,:)'];
-Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["", "1/minTo1/s"]); % Select in/outflows
+Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["LTomm^3", "1/minTo1/s"]); % Select in/outflows
 % Q(1,:) = circshift(Q(1,:), 30);
 % Q(1,1:20) = 0;
-Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["", "1/minTo1/s"]);
+Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["LTomm^3", "1/minTo1/s"]);
 input = [Q(1,:)' Q(2,:)'];
 
-T2 = uConv(data(8,startDataIndex:endDataIndex), ["mmTodm"]);                       % Select tanks
+T2 = uConv(data(8,startDataIndex:endDataIndex), [""]);                       % Select tanks
 output = [output T2'];
 
 if ~isnan(data(7,:))
@@ -37,7 +37,7 @@ if ~isnan(data(7,:))
 end
  
 
-tank_area = uConv(data(11,1),["mm^2Todm^2"]);
+tank_area = uConv(data(11,1),[""]);
 
 %% ============================================ Iddata object ================================================ 
 dataTimeStep = 0.5;                                                         % Time step size in seconds
@@ -146,7 +146,6 @@ estParams
 %% =========================== Post processing ============================
 data_procesing_plot = 0;
 EstPlotter;
-
 %% Save params
 save('data\p_grav_Nx4','estParams')
 
