@@ -5,7 +5,7 @@ if plotEnbaler == 1
     j=0;
     figure
     for i = 1:1:Nx
-        ax(i) = subplot(size(output,2),2,i+j);
+        ax(i) = subplot(size(output,2),1,i);
         plot(0:0.5:size(output(:,1),1)/2-0.5,output(:,i),'b','LineWidth',0.5)
         hold on
         plot(0:0.5:size(output(:,1),1)/2-0.5,y_final.OutputData(:,i),'r','LineWidth',0.5)
@@ -26,8 +26,8 @@ if plotEnbaler == 1
     xlabel('Time [s]','interpreter','latex');
 end
 %linkaxes(ax, 'x')
-
-ax(1) = subplot(size(output,2),2,[2 4]);
+figure
+ax(1) = subplot(size(output,2),1,[1 2]);
 plot(0:0.5:size(output(:,1),1)/2-0.5,input(:,1),'b','LineWidth',0.5)
 hold on
 leg = legend('Pipe inflow','Location','NorthEast');
@@ -38,7 +38,7 @@ title('Flow inputs','interpreter','latex')
 grid on;
 xlabel('Time [s]','interpreter','latex');
 
-ax(2) = subplot(size(output,2),2,[8 10]);
+ax(2) = subplot(size(output,2),1,[4 5]);
 plot(0:0.5:size(output(:,1),1)/2-0.5,input(:,2),'b','LineWidth',0.5)
 hold on
 %leg = legend('Pipe inflow','Location','NorthEast');

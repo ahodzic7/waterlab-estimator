@@ -23,13 +23,13 @@ DRY_DAYS             0
 REPORT_STEP          00:05:00
 WET_STEP             00:05:00
 DRY_STEP             01:00:00
-ROUTING_STEP         00:00:10
+ROUTING_STEP         0:01:00 
 RULE_STEP            00:00:00
 
 INERTIAL_DAMPING     PARTIAL
 NORMAL_FLOW_LIMITED  BOTH
 FORCE_MAIN_EQUATION  H-W
-VARIABLE_STEP        0.00
+VARIABLE_STEP        0.75
 LENGTHENING_STEP     0
 MIN_SURFAREA         1.167
 MAX_TRIALS           8
@@ -77,7 +77,7 @@ Renseanlaeg      0          FREE                        NO
 ;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
 B2334099PSA256   -2.437   5.240      0          FUNCTIONAL 0         0         6.539    0        0       
 B2323037O398     -2.067   2.850      0          FUNCTIONAL 0         0         7.011    0        0       
-B2323069         -3.787   5.697      0          FUNCTIONAL 0         0         10.011   0        0       
+B2323069         -3.787   5.697      0          FUNCTIONAL 0         0         100.11   0        0
 
 [CONDUITS]
 ;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow   
@@ -3860,5 +3860,5 @@ B2323069         37.450             225.130
 
 
 [BACKDROP]
-FILE       "C:\Git\waterlab-estimator\system_identification\epa_network\EPA_Backgorund.jpg"
+FILE       "C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\epa_network\EPA_Backgorund.jpg"
 DIMENSIONS -20000.000 -5155.836 11000.000 11155.836

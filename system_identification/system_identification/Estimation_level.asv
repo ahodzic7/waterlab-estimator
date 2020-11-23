@@ -5,7 +5,7 @@ clc;
 
 %% ================================================ Load Data ================================================
 data = dataLoad('resampled_data.mat');                                    % Load simulation data 
-startDataIndex = 1; 
+startDataIndex = 60; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
@@ -60,7 +60,7 @@ order = [size(output,2) size(input,2) N_states+N_augmented_states];             
 
 if ~isnan(tank_area)
     phi_2 = 1/tank_area;
-    %     Initial parameters for simulation
+    Initial parameters for simulation
     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
     0.008858893835];
     parametersInitial = [parametersInitial phi_2];

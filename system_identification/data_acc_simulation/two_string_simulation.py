@@ -1,4 +1,5 @@
 from pyswmm import Simulation, Nodes, Links
+from datetime import datetime
 import random
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,12 +14,12 @@ columns = ['time',
            'tank2_depth',
            'pump1_flow',
            'pump2_flow',
-           'tank_area']
+           'tank_area',
+           'simulation_time']
 
 network_df = pd.DataFrame(columns=columns)
 
 with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
-
     time_step = 1  # number of ROUTING_STEP's to be simulated before returning to python
     sim.step_advance(time_step)
 
@@ -48,7 +49,7 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     pipe18 = Links(sim)["L2354"]
     pipe19 = Links(sim)["L2418"]
     tank2 = Nodes(sim)["B2323069"]
-    tank2_area = 10.011
+    tank2_area = 100.11
     pump2 = Links(sim)["P2"]
 
 
@@ -56,33 +57,44 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     count = 1
     on_time = 0
     total_count = 0
-    pump_reference_flow = 1/7
+    pump_reference_flow = 1                         # [m^3/s]
     tank1.generated_inflow(5)
     for idx, step in enumerate(sim):
         # Make sure the system is always supplied with water
 
         # System identification setup:
         #
-        pump2.target_setting = 0.3*pump_reference_flow
-        # pump1.target_setting = 1*pump_reference_flow
+
+        # Outflow pump simple control in operating range:
+
+        if tank2.depth > 1:
+            pump2.target_setting = 1*pump_reference_flow
+        elif tank2.depth > 1.5:
+            pump2.target_setting = 1.3 * pump_reference_flow
+        elif tank2.depth < 0.2:
+            pump2.target_setting = 0
 
         # Create simple random controller
         if count > on_time:
             count = 0
-            on_time = random.randint(5, 10)
+            on_time = random.randint(50, 100)
             pump1.target_setting = random.randint(0, 1) * pump_reference_flow
             # pump1.target_setting = random.uniform(0, 1)*pump_reference_flow
-        if tank2.depth > 0.9:
-            pump1.target_setting = 0
+        # if tank2.depth > 0.9:
+        #     pump1.target_setting = 0
         else:
             count += 1
 
         # Add info to dataframe
         total_outflow_tank2 = pump2.flow + tank2.flooding
         elapsed_time = total_count
+
+        time_now = sim.current_time
+        duration = time_now - sim.report_start
+        duration_in_s = duration.total_seconds()
         network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe2.depth, pipe5.depth, pipe10.depth,
                                                   pipe16.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
-                                                  tank2_area], index=network_df.columns), ignore_index=True)
+                                                  tank2_area, duration_in_s], index=network_df.columns), ignore_index=True)
         total_count += 1
         print(f"Progress {int(sim.percent_complete * 100)}%", end="\r")
 
@@ -94,7 +106,7 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     network_df.plot(x='time', y='pipe4_depth', ax=axes[0])
 
     network_df.plot(x='time', y='pump1_flow', ax=axes[1])
-    network_df.plot(x='time', y='tank2_inflow', ax=axes[1])
+    # network_df.plot(x='time', y='tank2_inflow', ax=axes[1])
     network_df.plot(x='time', y='pump2_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
     plt.show()

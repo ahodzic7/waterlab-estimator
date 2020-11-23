@@ -1,0 +1,33 @@
+clear all; 
+close all;
+clear path;
+clc; 
+
+%% ================================================ Load Data ================================================
+data = dataLoad('new_data_3.csv');                                    % Load simulation data 
+startDataIndex = 1; 
+endDataIndex = size(data,2);
+%% ================================================ Prepare Data =============================================
+hours = data(12,;
+sample_time_in_s = 60;
+N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
+
+N_states = N_sensors + 1; % Number of states +1 -> tank 2
+N_augmented_states = 0;
+N_optimization_variables = N_states;
+
+real_time = data(12,:);
+h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), [""]);
+
+Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["", ""]); % Select in/outflows
+
+Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["", ""]);
+
+T2 = uConv(data(8,startDataIndex:endDataIndex), [""]);                       % Select tanks
+
+tank_area = uConv(data(11,1),[""]);
+
+resampled_data = interp1(real_time ,data(2:11,:)',0:sample_time_in_s:hours*3600-1)';
+new_data = [0:1:hours*60-1;resampled_data];
+
+save('data\resampled_data','new_data')

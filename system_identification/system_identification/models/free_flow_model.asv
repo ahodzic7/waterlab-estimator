@@ -13,23 +13,21 @@ end
 
 %% Last pipe exuation
 if N_states > 2
-%dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+
 % Submerged flow (comment out)
-%dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1)+ p4 -  p5*(x(N_states-1)-x(N_states)+tank_offset);
-% Submerged flow_v2 (comment out)
-dx(N_states-1) = p2 * x(N_states-2) - (p2+p3)*x(N_states-1) + p3*x(N_states);
+% dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1)+ p4 -  p5*(x(N_states-1)-x(N_states)+tank_offset);
 
 %% Tank equation
-%dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
+dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
 % Submerged flow (comment out)
-%dx(N_states) = p6*(p5/p1*(x(N_states-1)-x(N_states))-u(2));
 dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
 
 %% Output equation
 y(1:N_states) = x(1:N_states);
 if N_optimization_variables > N_states
     y(N_optimization_variables) = p5/p1*(x(N_states-1));
-    %y(N_optimization_variables) = p5/p1*(x(N_states-1)-x(N_states)+tank_offset);        %submerged flow
+    %y(Nx+1) = p5/p1*(x(Nx)-u(2)+tank_offset);        %submerged flow
 end
 
 end
