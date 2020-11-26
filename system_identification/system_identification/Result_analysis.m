@@ -1,11 +1,14 @@
 %% Residual plots
 figure
-j = 0;
 residuals = [];
 for i = 1:1:Nx
-    ax(i) = subplot(size(output,2),2,i+j);
-    residual = (output(1:end,i)-y_final.OutputData(1:end,i))*100/max(output(:,i));
-    plot(0:0.5:size(output(:,1),1)/2-0.5,residual,'b','LineWidth',1);
+    ax(i) = subplot(size(output,2),1,i);
+    if i == Nx
+        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/6;
+    else
+        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/0.5;
+    end
+    plot(residual,'b','LineWidth',1);
     hold on;
     yline(0,'k','LineWidth',1.5);
     residuals = [residuals residual];
@@ -26,8 +29,8 @@ for i = 1:1:Nx
     j = j+1;
 end
 xlabel('Time [min]','interpreter','latex');
-
-ax(1) = subplot(size(output,2),2,[4 6 8]);
+figure
+ax(1) = subplot(size(output,2),1,[2 3 4]);
 histogram(residuals,20,'Normalization','probability');
 hold on
 %leg = legend('Pipe inflow','Location','NorthEast');

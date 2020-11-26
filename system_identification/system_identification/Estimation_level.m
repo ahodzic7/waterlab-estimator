@@ -4,8 +4,8 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('resampled_data.mat');                                    % Load simulation data 
-startDataIndex = 1; 
+data = dataLoad('resampled_fredericia_v2_backflow_6.mat');                                    % Load simulation data 
+startDataIndex = 3; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
@@ -40,7 +40,7 @@ end
 tank_area = uConv(data(11,startDataIndex),[""]);
 
 %% ============================================ Iddata object ================================================ 
-dataTimeStep = 60;                                                         % Time step size in seconds
+dataTimeStep = 10;                                                         % Time step size in seconds
 
 ioData = iddata(output,input,dataTimeStep);                                % (y,u,Ts) (order)
 
@@ -50,7 +50,8 @@ ioData.TimeUnit = 'seconds';
 addpath("models"); 
 if N_augmented_states > 0
     %modelName = convertStringsToChars('free_flow_model_augmented_'+string(N_augmented_states))
-    modelName = 'free_flow_model_augmented'
+    %modelName = 'free_flow_model_augmented'
+    modelName = 'backflow_more_states'
 else
     modelName = 'free_flow_model'
 end

@@ -19,7 +19,7 @@ columns = ['time',
 
 network_df = pd.DataFrame(columns=columns)
 
-with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
+with Simulation(r'../epa_network/altered_two_string_simple_network.inp') as sim:
     time_step = 1  # number of ROUTING_STEP's to be simulated before returning to python
     sim.step_advance(time_step)
 
@@ -47,10 +47,10 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     pipe16 = Links(sim)["L6497"]
     pipe17 = Links(sim)["L2390"]
     pipe18 = Links(sim)["L2354"]
-    pipe19 = Links(sim)["L2418"]
     tank2 = Nodes(sim)["B2323069"]
-    tank2_area = 10.011
+    tank2_area = 29.9432
     pump2 = Links(sim)["P2"]
+    tank_offset = 1.1
 
 
     # Init sim
@@ -67,11 +67,11 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
 
         # Outflow pump simple control in operating range:
 
-        if tank2.depth > 1.5:
+        if tank2.depth > tank_offset+1.5:
             pump2.target_setting = 1*pump_reference_flow
-        elif tank2.depth > 1.8:
+        elif tank2.depth > tank_offset+1.8:
             pump2.target_setting = 1.3 * pump_reference_flow
-        elif tank2.depth < 0.2:
+        elif tank2.depth < tank_offset+0.2:
             pump2.target_setting = 0
 
         # Create simple random controller
@@ -92,8 +92,8 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
         time_now = sim.current_time
         duration = time_now - sim.report_start
         duration_in_s = duration.total_seconds()
-        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe2.depth, pipe5.depth, pipe10.depth,
-                                                  pipe18.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
+        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe1.depth, pipe5.depth, pipe10.depth,
+                                                  pipe17.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
                                                   tank2_area, duration_in_s], index=network_df.columns), ignore_index=True)
         total_count += 1
         print(f"Progress {int(sim.percent_complete * 100)}%", end="\r")
@@ -110,4 +110,4 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     network_df.plot(x='time', y='pump2_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
     plt.show()
-    network_df.to_csv(r'gen_data_output/new_data_3.csv', index=False, header=True)
+    network_df.to_csv(r'gen_data_output/fredericia_v2_backflow_6.csv', index=False, header=True)
