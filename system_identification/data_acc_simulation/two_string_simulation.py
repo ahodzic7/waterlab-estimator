@@ -49,8 +49,9 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     pipe18 = Links(sim)["L2354"]
     pipe19 = Links(sim)["L2418"]
     tank2 = Nodes(sim)["B2323069"]
-    tank2_area = 10.011
+    tank2_area = 29.9432
     pump2 = Links(sim)["P2"]
+    tank_offset = 1.1
 
 
     # Init sim
@@ -67,11 +68,11 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
 
         # Outflow pump simple control in operating range:
 
-        if tank2.depth > 1.5:
+        if tank2.depth > tank_offset+1.5:
             pump2.target_setting = 1*pump_reference_flow
-        elif tank2.depth > 1.8:
+        elif tank2.depth > tank_offset+1.8:
             pump2.target_setting = 1.3 * pump_reference_flow
-        elif tank2.depth < 0.2:
+        elif tank2.depth < tank_offset+0.2:
             pump2.target_setting = 0
 
         # Create simple random controller
@@ -110,4 +111,4 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     network_df.plot(x='time', y='pump2_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
     plt.show()
-    network_df.to_csv(r'gen_data_output/new_data_3.csv', index=False, header=True)
+    network_df.to_csv(r'gen_data_output/nonlinear_tank_2.csv', index=False, header=True)

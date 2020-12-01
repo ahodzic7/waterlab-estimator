@@ -77,7 +77,7 @@ Renseanlaeg      0          FREE                        NO
 ;;-------------- -------- ---------- ----------- ---------- ---------------------------- -------- --------          -------- --------
 B2334099PSA256   -2.437   5.240      0          FUNCTIONAL 0         0         6.539    0        0       
 B2323037O398     -2.067   2.850      0          FUNCTIONAL 0         0         7.011    0        0       
-B2323069         -3.787   5.697      0          FUNCTIONAL 0         0         10.011   0        0
+B2323069         -3.787   5.697      1.1        FUNCTIONAL 0         0         10.011   0        0
 
 [CONDUITS]
 ;;Name           From Node        To Node          Length     Roughness  InOffset   OutOffset  InitFlow   MaxFlow   

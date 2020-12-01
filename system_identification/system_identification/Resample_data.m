@@ -4,7 +4,7 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('fredericia_v2_backflow_6.csv');                                    % Load simulation data 
+data = dataLoad('nonlinear_tank_2.csv');                                    % Load simulation data 
 startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
@@ -31,4 +31,4 @@ resampled_data = interp1(real_time ,data(2:11,:)',0:sample_time_in_s:sim_length_
 new_data = [0:1:sim_length_s/sample_time_in_s;resampled_data;0:sample_time_in_s:sim_length_s];
 new_data(11,:) = tank_area;
 
-save('data\resampled_fredericia_v2_backflow_6','new_data')
+save('data\resampled_fredericia_nonlinear_2','new_data')
