@@ -8,7 +8,7 @@ T2 = uConv(data(8,startDataIndex:endDataIndex), ["mmTodm"]);                    
 
 %% ================================================ Run Kalman =============================================
 EstimatedX = [h(1:end,1); T2(1)];
-ErrorCo = 5;
+ErrorCo = 1;
 ControlInput = [Q(1,1), Q(2,1)];
 X = zeros(size(EstimatedX,1),size(h,2));
 
@@ -43,10 +43,10 @@ plot(X(4,:));
 function [EstimatedX,ErrorCo,KalmanGain] = KalmanFilterForLab(SystemMeas,PrevEstimatedX,PrevErrorCo,ControlInput)
 %System Parameters
     DeltaT = 0.5;
-    p = [0.0368    0.0546   -0.0069   -0.0021    0.0366];
-    phi = [1,0.2037];
-    Q = eye(5)*1;
-    R = eye(4)*1;
+    p = [0.0057    0.0046    0.0010   -0.0001    0.0031    0.0050];
+    phi = [1,1/200];
+    Qm = eye(5)*0.003;      %Covariance of model noise
+    Rm = eye(4)*0;          %Covariance of messurment noise
     
 %System Model
 NumberOfStates = 5;
@@ -60,10 +60,10 @@ C(4,5) = 1;
 
 %Prediction Step
     PredictedX = A * PrevEstimatedX + B * ControlInput;
-    PredictedP = A * PrevErrorCo * A' + Q;
+    PredictedP = A * PrevErrorCo * A' + Qm;
     
 %Compute KalmanGain
-    KalmanGain = PredictedP * C' /(C * PredictedP * C' + R);
+    KalmanGain = PredictedP * C' /(C * PredictedP * C' + Rm);
 
 %Compute EstimatedX
     EstimatedX = PredictedX + KalmanGain * (SystemMeas - C * PredictedX);
