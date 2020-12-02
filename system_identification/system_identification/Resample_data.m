@@ -4,12 +4,12 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('nonlinear_tank_2.csv');                                    % Load simulation data 
+data = dataLoad('node_mes_1.csv');                                    % Load simulation data 
 startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 sim_length_s = data(12,size(data,2));
-sample_time_in_s = 10;
+sample_time_in_s = 60;
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
@@ -31,4 +31,4 @@ resampled_data = interp1(real_time ,data(2:11,:)',0:sample_time_in_s:sim_length_
 new_data = [0:1:sim_length_s/sample_time_in_s;resampled_data;0:sample_time_in_s:sim_length_s];
 new_data(11,:) = tank_area;
 
-save('data\resampled_fredericia_nonlinear_2','new_data')
+save('data\resampled_node_mes_60_sec','new_data')

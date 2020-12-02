@@ -4,14 +4,14 @@ clear path;
 clc; 
 
 %% ================================================ Load Data ================================================
-data = dataLoad('resampled_fredericia_nonlinear_2.mat');                                    % Load simulation data 
+data = dataLoad('resampled_node_mes_1.mat');                                    % Load simulation data 
 startDataIndex = 3; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 0;
+N_augmented_states = 84;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), [""]);
 
@@ -49,9 +49,7 @@ ioData.TimeUnit = 'seconds';
 %% ===================================================== Model ============================================
 addpath("models"); 
 if N_augmented_states > 0
-    %modelName = convertStringsToChars('free_flow_model_augmented_'+string(N_augmented_states))
-    %modelName = 'free_flow_model_augmented'
-    modelName = 'backflow_more_states'
+    modelName = 'fredericia_augmented_model'
 else
     modelName = 'free_flow_model'
 end

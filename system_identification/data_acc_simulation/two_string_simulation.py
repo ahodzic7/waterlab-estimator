@@ -49,6 +49,10 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     pipe18 = Links(sim)["L2354"]
     pipe19 = Links(sim)["L2418"]
     tank2 = Nodes(sim)["B2323069"]
+    sensor1 = Nodes(sim)["M2341119"]
+    sensor2 = Nodes(sim)["M2341060"]
+    sensor3 = Nodes(sim)["M2323042"]
+    sensor4 = Nodes(sim)["M2323036"]
     tank2_area = 29.9432
     pump2 = Links(sim)["P2"]
     tank_offset = 1.1
@@ -93,12 +97,14 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
         time_now = sim.current_time
         duration = time_now - sim.report_start
         duration_in_s = duration.total_seconds()
-        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe2.depth, pipe5.depth, pipe10.depth,
-                                                  pipe18.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
+        # network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, pipe2.depth, pipe5.depth, pipe10.depth,
+        #                                           pipe18.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
+        #                                           tank2_area, duration_in_s], index=network_df.columns), ignore_index=True)
+        network_df = network_df.append(pd.Series([elapsed_time, tank1.depth, sensor1.depth, sensor2.depth, sensor3.depth,
+                                                  sensor4.depth, tank2.total_inflow, tank2.depth, pump1.flow, total_outflow_tank2,
                                                   tank2_area, duration_in_s], index=network_df.columns), ignore_index=True)
         total_count += 1
         print(f"Progress {int(sim.percent_complete * 100)}%", end="\r")
-
     fig, axes = plt.subplots(nrows=3, ncols=1)
 
     network_df.plot(x='time', y='pipe1_depth', ax=axes[0])
@@ -111,4 +117,4 @@ with Simulation(r'../epa_network/two_string_simple_network.inp') as sim:
     network_df.plot(x='time', y='pump2_flow', ax=axes[1])
     network_df.plot(x='time', y='tank2_depth', ax=axes[2])
     plt.show()
-    network_df.to_csv(r'gen_data_output/nonlinear_tank_2.csv', index=False, header=True)
+    network_df.to_csv(r'gen_data_output/node_mes_4.csv', index=False, header=True)

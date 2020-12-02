@@ -4,9 +4,9 @@ residuals = [];
 for i = 1:1:Nx
     ax(i) = subplot(size(output,2),1,i);
     if i == Nx
-        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/2.7;
+        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/1;
     else
-        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/1.6;
+        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/0.5;
     end
     plot(0:dataTimeStep:size(output(:,1),1)*dataTimeStep-dataTimeStep-1,residual,'b','LineWidth',1);
     hold on;
@@ -47,7 +47,7 @@ new_residuals = [0 residuals(:,1)'];
 % for i = 2:5
 %     new_residuals = [new_residuals residuals(:,i)'];
 % end
-histogram(new_residuals,30,'Normalization','probability');
+histogram(new_residuals,10,'Normalization','probability');
 hold on;
 [muHat,sigmaHat] = normfit(new_residuals)
 x = -30:30;
