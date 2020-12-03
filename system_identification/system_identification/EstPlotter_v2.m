@@ -1,6 +1,30 @@
-
-%% Estimated system comparison
+%% Initial model
 plotEnbaler = 1;
+if plotEnbaler == 1
+    j=0;
+    figure
+    for i = 1:1:Nx
+        ax(i) = subplot(size(output,2),1,i);
+        plot(0:dataTimeStep:size(output(:,1),1)*dataTimeStep-dataTimeStep,output(:,i),'b','LineWidth',0.5)
+        hold on
+        plot(0:dataTimeStep:size(output(:,1),1)*dataTimeStep-dataTimeStep,y_init.OutputData(:,i),'r','LineWidth',0.5)
+        leg = legend('HF Model','Lin. Model','Location','NorthEast');
+        set(leg, 'Interpreter', 'latex');
+        set(leg,'color','none');
+        if i == Nx
+            ylabel(['$h_{T2}$' '[$m$]'],'interpreter','latex');
+        else
+            ylabel(['$h$' num2str(i) '[$m$]'],'interpreter','latex');
+        end
+        if i == 1
+            title('Initial model','interpreter','latex')
+        end
+        grid on;
+        j = j+1;
+    end
+    xlabel('Time [s]','interpreter','latex');
+end
+%% Estimated system comparison
 if plotEnbaler == 1
     j=0;
     figure
