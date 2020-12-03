@@ -1,6 +1,5 @@
 function B = BuildB(NumberOfStates,p,phi,DeltaT)
-%BUILDB Returns the B matrix for the two tank topology with NumberOfStates
-%-1 pipe sections
+%BUILDB Returns the B matrix for the two tank topology
 %The first tank is not included in the B matrix
 B = zeros(NumberOfStates,2);
 B(1,:) = [p(1) * DeltaT, 0];
