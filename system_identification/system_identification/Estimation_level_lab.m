@@ -3,17 +3,17 @@ close all;
 clear path;
 clc; 
 %% For validation
-clear h
-clear Q
-clear T2
-clear output
-clear input
-clear ioData
-clear y_final
-finalStates = [0.02 0.01 0.02 0.02 6.49]';  %initial states for validation
+% clear h
+% clear Q
+% clear T2
+% clear output
+% clear input
+% clear ioData
+% clear y_final
+% finalStates = [0.02 0.01 0.02 0.02 6.49]';  %initial states for validation
 
 %% ================================================ Load Data ================================================
-data = dataLoad('Lab_data_1.mat');                                    % Load simulation data 
+data = dataLoad('Long_test_1h.mat');                                    % Load simulation data 
 startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
@@ -116,12 +116,12 @@ end
 sys_init.SimulationOptions.AbsTol = 1e-10;
 sys_init.SimulationOptions.RelTol = 1e-8;
 
-sys_init.SimulationOptions.Solver = 'ode4';                                % 4th order Runge-Kutte solver - fixed-step size                 
+sys_init.SimulationOptions.Solver = 'ode1';                                % 4th order Runge-Kutte solver - fixed-step size                 
 
-sys_init.Parameters(1).Minimum = 0.0001;       % Parameter constraints
-sys_init.Parameters(2).Minimum = 0.0001;    
-sys_init.Parameters(3).Minimum = 0.0001; 
-sys_init.Parameters(5).Minimum = 0.0001;
+% sys_init.Parameters(1).Minimum = 0.0001;       % Parameter constraints
+% sys_init.Parameters(2).Minimum = 0.0001;    
+% sys_init.Parameters(3).Minimum = 0.0001; 
+% sys_init.Parameters(5).Minimum = 0.0001;
 %% ============================================= Solver options ============================================
 
 opt = nlgreyestOptions;

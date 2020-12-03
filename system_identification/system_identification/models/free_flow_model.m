@@ -13,14 +13,14 @@ end
 
 %% Last pipe equation
 %if N_states > 2
-% dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
 % Submerged flow (comment out)
-dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1)+ p4 -  p5*(x(N_states-1)-x(N_states)+tank_offset);
+% dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1)+ p4 -  p5*(x(N_states-1)-x(N_states)+tank_offset);
 
 %% Tank equation
-% dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
+dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
 % Tank with Submerged flow (comment out)
-dx(N_states) = p6*(p5/p1*(x(N_states-1)-x(N_states)+tank_offset)-u(2));
+% dx(N_states) = p6*(p5/p1*(x(N_states-1)-x(N_states)+tank_offset)-u(2));
 
 
 %% Output equation
