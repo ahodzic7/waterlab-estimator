@@ -10,9 +10,9 @@ clear output
 clear input
 clear ioData
 clear y_final
-finalStates = [zeros(1,4) 1.1]';  %initial states for validation
+finalStates = [0 0 0 0 1.1]';  %initial states for validation
 %% ================================================ Load Data ================================================
-data = dataLoad('resampled_node_mes_1.mat');                                    % Load simulation data 
+data = dataLoad('resampled_node_mes_2.mat');                                    % Load simulation data 
 startDataIndex = 3; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================

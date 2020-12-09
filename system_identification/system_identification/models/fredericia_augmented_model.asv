@@ -11,7 +11,7 @@ y = zeros(N_optimization_variables,1);
 N1 = 4;
 N2 = 5;
 N3 = 5;
-N4 = 2;
+N4 = 4;
 N5 = 0;
 %% Augmented states
 if N1 > 1

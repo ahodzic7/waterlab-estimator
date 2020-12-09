@@ -4,11 +4,11 @@ residuals = [];
 for i = 1:1:Nx
     ax(i) = subplot(size(output,2),1,i);
     if i == Nx
-        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/1;
+        residual = (output(1:end,i)-y_final.OutputData(1:end,i))*100/1.6;
     else
-        residual = (output(2:end,i)-y_final.OutputData(2:end,i))*100/0.5;
+        residual = (output(1:end,i)-y_final.OutputData(1:end,i))*100/1.6;
     end
-    plot(0:dataTimeStep:size(output(:,1),1)*dataTimeStep-1,residual,'b','LineWidth',1);
+    plot(0:dataTimeStep:size(output(:,1),1)*dataTimeStep-dataTimeStep,residual,'b','LineWidth',1);
     hold on;
     yline(0,'k','LineWidth',1.5);
     residuals = [residuals residual];
