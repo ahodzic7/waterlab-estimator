@@ -15,7 +15,7 @@ ErrorCo
 KalmanGain
 
 
-figure(1)
+figure
 subplot(5,1,1)
 plot(h(1,:));
 hold on

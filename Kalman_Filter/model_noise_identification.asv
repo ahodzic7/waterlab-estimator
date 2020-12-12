@@ -174,7 +174,7 @@ for i = 1:1:Nx-1
     subplot(Nx-1,1,i);
     histogram(noise_residual,200,'Normalization','probability');
     xlabel(['$r$' num2str(i) ' $[dm]$' ],'interpreter','latex');
-    axis([-0.03 0.03 0 0.8])
+    axis([-3 3 0 0.8])
     ylabel(['$P[R$' num2str(i) '$= r$' num2str(i) '$_{k}]$'],'interpreter','latex');
     grid on;
     %plot(t,pdf);
