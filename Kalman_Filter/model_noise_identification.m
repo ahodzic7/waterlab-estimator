@@ -70,7 +70,6 @@ end
 figure
 state_muHat = [];
 state_sigmaHat = [];
- Nx = Nx;
 for i = 1:1:Nx
     %Approximate distribution
     [muHat,sigmaHat] = normfit(residual(:,i));
@@ -120,9 +119,9 @@ for i = 1:1:Nx
     t = -0.08:0.0001:0.08;
     pdf = normpdf(t,muHat,sigmaHat)/100;
     
-    %Plot
-    hold on;
+    %Plot 
     subplot(Nx,1,i);
+    hold on;
     if i == Nx
         histogram(model_residual,200,'Normalization','probability');
         xlabel(['$r_{T2} [dm]$'],'interpreter','latex');
@@ -170,14 +169,14 @@ for i = 1:1:Nx-1
     pdf = normpdf(t,muHat,sigmaHat)/100;
     
     %Plot
-    hold on;
     subplot(Nx-1,1,i);
+    plot(t,pdf);
+    hold on;
     histogram(noise_residual,200,'Normalization','probability');
-    xlabel(['$r$' num2str(i) ' $[dm]$' ],'interpreter','latex');
-    axis([-0.03 0.03 0 0.8])
-    ylabel(['$P[R$' num2str(i) '$= r$' num2str(i) '$_{k}]$'],'interpreter','latex');
+    xlabel(['$v$' num2str(i) '$_k [dm]$' ],'interpreter','latex');
+    axis([-0.025 0.025 0 0.8])
+    ylabel(['$P[V$' num2str(i) '$= v$' num2str(i) '$_{k}]$'],'interpreter','latex');
     grid on;
-    %plot(t,pdf);
 end
 noise_muHat 
 noise_sigmaHat 
@@ -203,26 +202,31 @@ for i = 1:1:Nx
     
     %Approximate distribution
     [muHat,sigmaHat] = normfit(model_residual);
-    model_muHat = [model_muHat, muHat];
+    model_muHat = [model_muHat, muHat];     
     model_sigmaHat = [model_sigmaHat, sigmaHat];
     t = -0.08:0.0001:0.08;
-    pdf = normpdf(t,muHat,sigmaHat)/100;
     
+    if i == Nx
+    pdf = normpdf(t,muHat,sigmaHat)/10;
+    else
+    pdf = normpdf(t,muHat,sigmaHat)/1000;
+    end
+        
     %Plot
-    hold on;
     subplot(Nx,1,i);
+    plot(t,pdf);
+    hold on;
     if i == Nx
         histogram(model_residual,200,'Normalization','probability');
-        xlabel(['$r_{T2} [dm]$'],'interpreter','latex');
-        axis([-0.05 0.05 0 0.9])
+        xlabel(['$w_{T2} [dm]$'],'interpreter','latex');
+        axis([-0.08 0.08 0 1.5])
     else
-        histogram(model_residual,20,'Normalization','probability');
-        xlabel(['$r$' num2str(i) ' $[dm]$' ],'interpreter','latex');
-        axis([-0.005 0.005 0 0.4])
+        histogram(model_residual,10,'Normalization','probability');
+        xlabel(['$w$' num2str(i) ' $_k[dm]$' ],'interpreter','latex');
+        axis([-0.004 0.004 0 1])
     end
-    ylabel(['$P[R$' num2str(i) '$= r$' num2str(i) '$_{k}]$'],'interpreter','latex');
+    ylabel(['$P[W$' num2str(i) '$= w$' num2str(i) '$_{k}]$'],'interpreter','latex');
     grid on;
-    %plot(t,pdf);
 end
 model_muHat 
 model_sigmaHat
