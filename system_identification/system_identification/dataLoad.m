@@ -2,14 +2,19 @@
 % 
 % The data must be in the following form:
 % 
-% [...
-% 1-Time; ... 
-% 2-tank1_depth; ...
-% 3-pipe1_height; 4-pipe2_height; 5-pipe3_height; 6-pipe4_depth; ...
-% 7-tank2_inflow; 8-tank2_depth; 
-% 9-pump1_flow; 10-pump2_flow; ...
-% 11-tank2_area ...
-% ]
+% """
+% 1     : time steps 
+% 2:5   : pipe levels
+% 6     : NAN (tank2 inflow) 
+% 7     : tank2 level
+% 8     : Gravity pipe inflow (input) 
+% 9     : tank2 outflow 
+% 10    : tank2 area 
+% 11    : real time 
+% 12    : lateral inflow (disturbance)
+% 13    : inflow to tank1 
+% 14:17 : [pump1_ref(inflow), pump2_ref(outflow), inflow to tank1_ref, lateral inflow_ref]
+% """
 
 function data = dataLoad(filename)
     addpath("data"); 
