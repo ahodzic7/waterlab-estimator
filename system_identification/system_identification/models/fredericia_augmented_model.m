@@ -8,10 +8,10 @@ y = zeros(N_optimization_variables,1);
 % N3 = 2;
 % N4 = 1;
 
-N1 = 4;
-N2 = 5;
-N3 = 5;
-N4 = 2;
+N1 = 1;
+N2 = 2;
+N3 = 1;
+N4 = 0;
 N5 = 0;
 %% Augmented states
 if N1 > 1

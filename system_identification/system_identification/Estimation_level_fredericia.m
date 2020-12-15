@@ -3,14 +3,15 @@ close all;
 clear path;
 clc; 
 %% For validation
-clear h
-clear Q
-clear T2
-clear output
-clear input
-clear ioData
-clear y_final
-finalStates = [zeros(1,4) 1.1]';  %initial states for validation
+% clear h
+% clear Q
+% clear T2
+% clear output
+% clear input
+% clear ioData
+% clear y_final
+% finalStates = [zeros(1,4) 1.1]';  %initial states for validation
+% finalStates = [0.280114406770345;-0.144776638339650;0.0436368962744539;0.198248061957953;1.23589075404847];
 %% ================================================ Load Data ================================================
 data = dataLoad('resampled_node_mes_1.mat');                                    % Load simulation data 
 startDataIndex = 3; 
@@ -19,7 +20,7 @@ endDataIndex = size(data,2);
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 16;
+N_augmented_states = 0;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), [""]);
 
@@ -56,7 +57,7 @@ ioData.TimeUnit = 'seconds';
 
 %% ===================================================== Model ============================================
 addpath("models"); 
-if N_augmented_states >= 0
+if N_augmented_states > 0
     modelName = 'fredericia_augmented_model'
 else
     modelName = 'free_flow_model'
@@ -114,7 +115,7 @@ end
 sys_init.SimulationOptions.AbsTol = 1e-10;
 sys_init.SimulationOptions.RelTol = 1e-8;
 
-sys_init.SimulationOptions.Solver = 'ode4';                                % 4th order Runge-Kutte solver - fixed-step size                 
+sys_init.SimulationOptions.Solver = 'ode1';                                % 4th order Runge-Kutte solver - fixed-step size                 
 
 
 %% ============================================= Solver options ============================================
@@ -146,7 +147,7 @@ toc
 %% ============================ Simulate model ============================
 opt_init = simOptions('InitialCondition',initStates);                      % Simulate model on training data with initial parameters
 y_init = sim(sys_init,ioData,opt_init);
-
+%%
 opt_final = simOptions('InitialCondition',finalStates);                    % Simulate model on training data with estimated parameters
 y_final = sim(sys_final,ioData,opt_final);
 estParams

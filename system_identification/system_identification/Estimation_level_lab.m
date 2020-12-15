@@ -20,7 +20,7 @@ endDataIndex = size(data,2);
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 0;
+N_augmented_states = 8;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
 
@@ -58,9 +58,8 @@ ioData.TimeUnit = 'seconds';
 %% ===================================================== Model ============================================
 addpath("models"); 
 if N_augmented_states > 0
-    %modelName = convertStringsToChars('free_flow_model_augmented_'+string(N_augmented_states))
-    %modelName = 'free_flow_model_augmented'
-    modelName = 'backflow_more_states'
+    %modelName = convertStringsToChars('free_flow_model_augmented_'+string(N_augmented_states/4))
+    modelName = 'free_flow_model_augmented'
 else
     modelName = 'free_flow_model'
 end
@@ -76,8 +75,9 @@ if ~isnan(tank_area)
 %     parametersInitial = [parametersInitial phi_2];
 
 %     % Initial parameters for the lab
-    parametersInitial = [0.0800 0.1092063882 3.907941840*10^(-1) -0.002793645908 ...
-    0.4482285133];
+    parametersInitial = [0.0367815377915248,0.0546308635442872,-0.00685599772690394,-0.00209121684418040,0.0365705383994406];
+%     [0.0800 0.1092063882 3.907941840*10^(-1) -0.002793645908 ...
+%     0.4482285133];
     parametersInitial = [parametersInitial phi_2];
 else
 %     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
@@ -116,12 +116,12 @@ end
 sys_init.SimulationOptions.AbsTol = 1e-10;
 sys_init.SimulationOptions.RelTol = 1e-8;
 
-sys_init.SimulationOptions.Solver = 'ode1';                                % 4th order Runge-Kutte solver - fixed-step size                 
+sys_init.SimulationOptions.Solver = 'ode4';                                % 4th order Runge-Kutte solver - fixed-step size                 
 
-sys_init.Parameters(1).Minimum = 0.0001;       % Parameter constraints
-sys_init.Parameters(2).Minimum = 0.0001;    
-sys_init.Parameters(3).Minimum = 0.0001; 
-sys_init.Parameters(5).Minimum = 0.0001;
+% sys_init.Parameters(1).Minimum = 0.0001;       % Parameter constraints
+% sys_init.Parameters(2).Minimum = 0.0001;    
+% sys_init.Parameters(3).Minimum = 0.0001; 
+% sys_init.Parameters(5).Minimum = 0.0001;
 %% ============================================= Solver options ============================================
 
 opt = nlgreyestOptions;

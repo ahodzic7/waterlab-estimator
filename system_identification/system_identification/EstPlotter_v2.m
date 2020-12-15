@@ -35,11 +35,10 @@ if plotEnbaler == 1
         plot(0:dataTimeStep:size(output(:,1),1)*dataTimeStep-dataTimeStep,y_final.OutputData(:,i),'r','LineWidth',0.5)
         leg = legend('HF Model','Lin. Model','Location','NorthEast');
         set(leg, 'Interpreter', 'latex');
-        set(leg,'color','none');
         if i == Nx
-            ylabel(['$h_{T2}$' '[$m$]'],'interpreter','latex');
+            ylabel(['$h_{T2}$' '[$dm$]'],'interpreter','latex');
         else
-            ylabel(['$h$' num2str(i) '[$m$]'],'interpreter','latex');
+            ylabel(['$h$' num2str(i) '[$dm$]'],'interpreter','latex');
         end
         if i == 1
             title('Estimated model','interpreter','latex')

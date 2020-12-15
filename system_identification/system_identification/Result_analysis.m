@@ -4,15 +4,15 @@ residuals = [];
 for i = 1:1:Nx
     ax(i) = subplot(size(output,2),1,i);
     if i == Nx
-        residual = (output(1:end,i)-y_final.OutputData(1:end,i))*100/1.6;
+        residual = (output(1:end,i)-y_final.OutputData(1:end,i))*100/6.5;
     else
-        residual = (output(1:end,i)-y_final.OutputData(1:end,i))*100/1.6;
+        residual = (output(1:end,i)-y_final.OutputData(1:end,i))*100/0.5;
     end
     plot(0:dataTimeStep:size(output(:,1),1)*dataTimeStep-dataTimeStep,residual,'b','LineWidth',1);
     hold on;
     yline(0,'k','LineWidth',1.5);
     residuals = [residuals residual];
-    %hold on
+%     hold on
 %     plot(y_final.OutputData(:,i),'r','LineWidth',0.5)
 %     leg = legend('HF Model','Lin. Model','Location','NorthEast');
 %     set(leg, 'Interpreter', 'latex');
@@ -28,18 +28,19 @@ for i = 1:1:Nx
     grid on;
     j = j+1;
 end
-% xlabel('Time [s]','interpreter','latex');
-% figure
-% ax(1) = subplot(size(output,2),1,[2 3 4]);
-% histogram(residuals,100,'Normalization','probability');
+xlabel('Time [s]','interpreter','latex');
+figure
+ax(1) = subplot(size(output,2),1,[2 3 4]);
+histogram(residuals,50,'Normalization','probability');
 % hold on
 % leg = legend('Pipe inflow','Location','NorthEast');
 % leg = legend('Tank outflow','Location','NorthEast');
 % set(leg, 'Interpreter', 'latex');
-% ylabel(['[$\%$]'],'interpreter','latex');
-% title('Distribution of residuals','interpreter','latex')
-% grid on;
-% xlabel('Residuals [$\%$]','interpreter','latex');
+xlim([-20 20])
+ylabel(['[$\%$]'],'interpreter','latex');
+title('Distribution of residuals','interpreter','latex')
+grid on;
+xlabel('Residuals [$\%$]','interpreter','latex');
 
 %%
 figure
