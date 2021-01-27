@@ -20,7 +20,7 @@ endDataIndex = size(data,2);
 N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 8;
+N_augmented_states = 0;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
 
@@ -126,7 +126,7 @@ sys_init.SimulationOptions.Solver = 'ode4';                                % 4th
 
 opt = nlgreyestOptions;
 %Search methods: 'gn' | 'gna' | 'lm' | 'grad' | 'lsqnonlin' | 'auto'
-opt.SearchMethod = 'gna'; 
+opt.SearchMethod = 'grad'; 
 opt.Display = 'on';
 opt.SearchOption.MaxIter = 200;
 opt.SearchOption.Tolerance = 1e-15;

@@ -1,23 +1,38 @@
-
+%% for the lab
 
 figure
 for i = 1:1:Nx-1
     ax(i) = subplot(size(output,2)-1,1,i);
-    plot(500:dataTimeStep:1000-0.5,output(1000:2000-1,i),'b','LineWidth',2)
+    plot(500:dataTimeStep:1000-dataTimeStep,output(1000:2000-1,i),'b','LineWidth',2)
     hold on
-    plot(500:dataTimeStep:1000-0.5,four_states.OutputData(1000:2000-1,i),'r-','LineWidth',1)
+    plot(500:dataTimeStep:1000-dataTimeStep,four_states.OutputData(1000:2000-1,i),'r-','LineWidth',1)
     hold on
-    plot(500:dataTimeStep:1000-0.5,eight_states.OutputData(1000:2000-1,i),'g','LineWidth',1)
+    plot(500:dataTimeStep:1000-dataTimeStep,eight_states.OutputData(1000:2000-1,i),'g','LineWidth',1)
     hold on;
-    plot(500:dataTimeStep:1000-0.5,twenty_states.OutputData(1000:2000-1,i),'k','LineWidth',1)
+    plot(500:dataTimeStep:1000-dataTimeStep,twenty_states.OutputData(1000:2000-1,i),'k','LineWidth',1)
     leg = legend('Data','Nx = 4','Nx = 8', 'Nx = 20','Location','NorthEast');
     set(leg, 'Interpreter', 'latex');
-    set(leg,'color','none');
+    %set(leg,'color','none');
+    ylabel(['$h$' num2str(i) '[$dm$]'],'interpreter','latex');
+
+    grid on;
+end
+xlabel('Time [s]','interpreter','latex');
+%% for Fredericia
+figure
+for i = 1:1:Nx-1
+    ax(i) = subplot(size(output,2)-1,1,i);
+    plot(50:dataTimeStep:2000-dataTimeStep,output(5:200-1,i),'b','LineWidth',2)
+    hold on
+    plot(50:dataTimeStep:2000-dataTimeStep,four_states.OutputData(5:200-1,i),'r-','LineWidth',1)
+    hold on
+    plot(50:dataTimeStep:2000-dataTimeStep,eight_states.OutputData(5:200-1,i),'g','LineWidth',1)
+    hold on;
+    plot(50:dataTimeStep:2000-dataTimeStep,twenty_states.OutputData(5:200-1,i),'k','LineWidth',1)
+    leg = legend('Data','Nx = 4','Nx = 8', 'Nx = 20','Location','NorthEast');
+    set(leg, 'Interpreter', 'latex');
+    %set(leg,'color','none');
     ylabel(['$h$' num2str(i) '[$m$]'],'interpreter','latex');
-    
-    if i == 1
-        title('Model accuracy for different Nx','interpreter','latex')
-    end
     grid on;
 end
 xlabel('Time [s]','interpreter','latex');
