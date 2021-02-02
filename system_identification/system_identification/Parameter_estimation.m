@@ -1,26 +1,17 @@
 clear all; 
 close all;
 clear path;
-clc; 
-%% For validation
-% clear h
-% clear Q
-% clear T2
-% clear output
-% clear input
-% clear ioData
-% clear y_final
-% finalStates = [0.02 0.01 0.02 0.02 6.49]';  %initial states for validation
 
 %% ================================================ Load Data ================================================
-data = dataLoad('Long_test_1h.mat');                                    % Load simulation data 
+uiopen('.mat');
+data = dataStructure.data;
 startDataIndex = 1; 
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
-N_sensors = 4;                                                             % Select section number, i.e. pick number of level sensor data
+N_sensors = dataStructure.number_of_sensors;                               % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2
-N_augmented_states = 4;
+N_augmented_states = dataStructure.number_of_augmented_states;
 N_optimization_variables = N_states;
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
 
@@ -48,7 +39,7 @@ end
 tank_area = uConv(data(11,startDataIndex),["mm^2Todm^2"]);
 
 %% ============================================ Iddata object ================================================ 
-dataTimeStep = 0.5;                                                        % Time step size in seconds
+dataTimeStep = dataStructure.data_time_step;                                                        % Time step size in seconds
 
 ioData = iddata(output,input,dataTimeStep);                                % (y,u,Ts) (order)
 
@@ -73,7 +64,7 @@ if ~isnan(tank_area)
 %     parametersInitial = [parametersInitial phi_2];
 
 %     % Initial parameters for the lab
-    parametersInitial = [0.0367815377915248,0.0546308635442872,0.00685599772690394,-0.00209121684418040,0.0365705383994406];
+    parametersInitial = dataStructure.initial_parameters;%[0.0367815377915248,0.0546308635442872,0.00685599772690394,-0.00209121684418040,0.0365705383994406];
 %     [0.0800 0.1092063882 3.907941840*10^(-1) -0.002793645908 ...
 %     0.4482285133];
     parametersInitial = [parametersInitial phi_2];
@@ -159,5 +150,3 @@ data_procesing_plot = 0;
 EstPlotter;
 %% Save params
 save('data\p_grav_Nx4','estParams')
-
-

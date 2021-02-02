@@ -1,6 +1,6 @@
-close all;
-clear
-clc
+% close all;
+% clear
+% clc
 %% Calculate one step residuals
 % Setup Model
 NumberOfStates = 5;
