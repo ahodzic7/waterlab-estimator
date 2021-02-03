@@ -1,56 +1,96 @@
 clear all; 
 close all;
 clear path;
+clc;
 
+addpath('miscellaneous');
+addpath('models');
 %% ================================================ Load Data ================================================
-uiopen('.mat');
+while ~exist('dataStructure','var')
+    [structureName, filePath] = uigetfile('*.mat','Select data structure');
+    fullPath = fullfile(filePath, structureName);
+
+ 
+    if exist(fullPath, 'file')
+        load(fullPath);
+        if ~exist('dataStructure','var')
+            warningMessage = sprintf('Warning: wrong file:\n%s\n%s', fullPath, 'Choose data structure!');
+            uiwait(errordlg(warningMessage));
+        end
+    else
+        warningMessage = sprintf('Warning: mat file does not exist:\n%s', fullPath);
+        uiwait(errordlg(warningMessage));
+        return;
+    end
+end
+
 data = dataStructure.data;
-startDataIndex = 1; 
+for i=1:1:size(data,2)
+    if ~isnan(data(3:6,i))
+        startDataIndex = i;
+        break;
+    end
+end
 endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = dataStructure.number_of_sensors;                               % Select section number, i.e. pick number of level sensor data
 
-N_states = N_sensors + 1; % Number of states +1 -> tank 2
+N_states = N_sensors + 1; % Number of states +1 -> tank 2 // Used to evaluate the Qout form the pipe
 N_augmented_states = dataStructure.number_of_augmented_states;
 N_optimization_variables = N_states;
-h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ["mmTodm"]);
+
+% Load the level measurements and convert
+h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ...
+    [convertCharsToStrings(append(dataStructure.level_units,'To',dataStructure.level_convert_to))]);
 
 % Remove the outliers:
 %h(1,:) = hampel(h(1,:),8);
 %h(2,:) = hampel(h(2,:),8);
 
-
 output = [h(1:1:end,:)'];
-Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ["", "1/minTo1/s"]); % Select in/outflows
 
-Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ["", "1/minTo1/s"]);
+% Select in/outflows
+Q(1,:) = uConv(data(9,startDataIndex:endDataIndex), ...
+    [convertCharsToStrings(append(dataStructure.flow_units,'To',dataStructure.flow_convert_to))]);
+
+Q(2,:) = uConv(data(10,startDataIndex:endDataIndex), ...
+    [convertCharsToStrings(append(dataStructure.flow_units,'To',dataStructure.flow_convert_to))]);
 input = [Q(1,:)' Q(2,:)'];
 
-T2 = uConv(data(8,startDataIndex:endDataIndex), ["mmTodm"]);                       % Select tanks
+T2 = uConv(data(8,startDataIndex:endDataIndex), ...
+    [convertCharsToStrings(append(dataStructure.level_units,'To',dataStructure.level_convert_to))]);                       % Select tanks
 output = [output T2'];
 
 if ~isnan(data(7,:))
-    Q(3,:) = uConv(data(7,startDataIndex:endDataIndex), []);               % Pump_2 flow
+    Q(3,:) = uConv(data(7,startDataIndex:endDataIndex), ...
+        [convertCharsToStrings(append(dataStructure.flow_units,'To',dataStructure.flow_convert_to))]);               % Pump_2 flow
     output = [output Q(3,:)'];
     N_optimization_variables = N_states+1;
 end
  
 
-tank_area = uConv(data(11,startDataIndex),["mm^2Todm^2"]);
+tank_area = uConv(data(11,startDataIndex),...
+    [convertCharsToStrings(append(dataStructure.level_units, '^2' ,'To',dataStructure.level_convert_to, '^2'))]);
 
 %% ============================================ Iddata object ================================================ 
-dataTimeStep = dataStructure.data_time_step;                                                        % Time step size in seconds
+dataTimeStep = dataStructure.data_time_step;                               % Time step size in seconds
 
 ioData = iddata(output,input,dataTimeStep);                                % (y,u,Ts) (order)
 
-ioData.TimeUnit = 'seconds';
-
+switch dataStructure.data_time_unit
+    case 's'
+        ioData.TimeUnit = 'seconds';
+    case 'min'
+        ioData.TimeUnit = 'minutes';
+    case 'h'
+        ioData.TimeUnit = 'hours';
+end
 %% ===================================================== Model ============================================
 addpath("models"); 
 if N_augmented_states > 0
-    modelName = 'free_flow_model_augmented'
+    modelName = append(dataStructure.boundary_condition, '_model_augmented')
 else
-    modelName = 'free_flow_model'
+    modelName = append(dataStructure.boundary_condition, '_model')
 end
     
 Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
@@ -58,28 +98,18 @@ order = [size(output,2) size(input,2) N_states+N_augmented_states];        % [Ny
 
 if ~isnan(tank_area)
     phi_2 = 1/tank_area;
-    %     Initial parameters for simulation
-%     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
-%     0.008858893835];
-%     parametersInitial = [parametersInitial phi_2];
-
-%     % Initial parameters for the lab
-    parametersInitial = dataStructure.initial_parameters;%[0.0367815377915248,0.0546308635442872,0.00685599772690394,-0.00209121684418040,0.0365705383994406];
-%     [0.0800 0.1092063882 3.907941840*10^(-1) -0.002793645908 ...
-%     0.4482285133];
+    parametersInitial = dataStructure.initial_parameters;
     parametersInitial = [parametersInitial phi_2];
 else
-%     parametersInitial = [0.005 0.014860 0.00045921 -0.0031593 ...
-%         0.008858893835 1/200];
-    % Initial parameters for the lab
-    parametersInitial = [1.69447431123557e-05,0.320175333789196,0.0787718089115809,-0.571330480925316,0.160463185400725,8.14873308630504e-05];
+    parametersInitial = dataStructure.initial_parameters;
+    parametersInitial = [parametersInitial 1/200];
 end
 
 systemParamaters = [parametersInitial, N_states, N_optimization_variables, N_augmented_states];
 
-initStates = 0.0001*ones(N_states+N_augmented_states, 1);                                     
+initialStates = 0.0001*ones(N_states+N_augmented_states, 1);                                     
 
-sys_init = idnlgrey(modelName, order, systemParamaters, initStates, Ts_model);       % create nlgreyest object
+sys_init = idnlgrey(modelName, order, systemParamaters, initialStates, Ts_model);       % create nlgreyest object
 sys_init.TimeUnit = 'seconds';
 sys_init.Parameters(1).Name = 'theta_1';
 sys_init.Parameters(2).Name = 'theta_2';
@@ -127,26 +157,44 @@ sys_final = nlgreyest(ioData,sys_init, opt)                                % Par
 fprintf('\n\nThe search termination condition:\n')
 sys_final.Report.Termination
 
-estParams = [sys_final.Parameters(1).Value...
+estimatedParameters = [sys_final.Parameters(1).Value...
              sys_final.Parameters(2).Value...
              sys_final.Parameters(3).Value...
              sys_final.Parameters(4).Value...
              sys_final.Parameters(5).Value...
              sys_final.Parameters(6).Value];
 
-finalStates = sys_final.Report.Parameters.X0                               % estimated initial states
+estimatedInitialStates = sys_final.Report.Parameters.X0                               % estimated initial states
 toc
 
 %% ============================ Simulate model ============================
-opt_init = simOptions('InitialCondition',initStates);                      % Simulate model on training data with initial parameters
+opt_init = simOptions('InitialCondition',initialStates);                   % Simulate model on training data with initial parameters
 y_init = sim(sys_init,ioData,opt_init);
 
-opt_final = simOptions('InitialCondition',finalStates);                    % Simulate model on training data with estimated parameters
+opt_final = simOptions('InitialCondition',estimatedInitialStates);         % Simulate model on training data with estimated parameters
 y_final = sim(sys_final,ioData,opt_final);
-estParams
+estimatedParameters
 
 %% =========================== Post processing ============================
-data_procesing_plot = 0;
-EstPlotter;
-%% Save params
-save('data\p_grav_Nx4','estParams')
+EstimatedModelPlotter;
+%% Save session
+FileName = append('.\results\',erase(structureName,'.mat'),date);
+[fPath, fName, fExt] = fileparts(FileName);
+
+if isempty(fExt)  % No '.mat' in FileName
+  fExt     = '.mat';
+  FileName = fullfile(fPath, [fName, fExt]);
+end
+if exist(FileName, 'file')
+    % Get number of files:
+    fDir     = dir(fullfile(fPath, [fName, '*', fExt]));
+    fStr     = convertCharsToStrings(sprintf('%s*', fDir.name));
+    fNum     = sscanf(fStr, [fName,'(', '%d',')', fExt, '*']);
+    if isempty(fNum)
+        newNum   = 1;
+    else
+        newNum   = max(fNum) + 1;
+    end
+    FileName = fullfile(fPath, [fName, sprintf('(%d)', newNum), fExt]);
+end
+save(FileName);
