@@ -1,0 +1,12 @@
+name: system_identification
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pandas
+  - matplotlib
+  - pip
+  - pip:
+      - -r file:pip_requirements.txt
+prefix: C:\ProgramData\Anaconda3\envs\system_identification
+
