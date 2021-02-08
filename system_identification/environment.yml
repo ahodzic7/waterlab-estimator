@@ -1,4 +1,4 @@
-name: system_identification
+name: system_identificationv
 channels:
   - defaults
 dependencies:
@@ -7,6 +7,7 @@ dependencies:
   - matplotlib
   - pip
   - pip:
-      - -r file:pip_requirements.txt
+      - casadi
+      - pyswmm
 prefix: C:\ProgramData\Anaconda3\envs\system_identification
 
