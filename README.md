@@ -1,5 +1,5 @@
 # Stochastic Model Predictive Control for Combined Sewer Overflows in Urban Drainage Networks
-This repo has the objective of covering the "code" produced as part of Adis and Caspers Mater Thesis at Aalborg University.
+This repo has the objective of covering the "code" produced as part of Adis and Caspers Master Thesis at Aalborg University.
 The repo may include snippets of code from a previous project: https://github.com/dmicha16/waterlab_mpc
 
 Futhermore some code may have been provided by our supervisors:
