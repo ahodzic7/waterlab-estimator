@@ -1,24 +1,26 @@
 clearvars; clc; close all
 
 % ************ Change to own Casadi path ************
-addpath('C:\Users\adish\OneDrive\Documents\MATLAB\CasADi')
+addpath('C:\Users\74647\OneDrive - Grundfos\MATLAB\CasAdi')
 % ***************************************************
 import casadi.*
+
+rand('seed', 1);
 
 %% ============================================== Sim. setup ===================================
 Hp = 24;                                % prediction horizon   
 nS = 1;                                 % number of states
 opti = casadi.Opti();                   % opti stack 
-N = 96;                                 % number of simulation steps
+N = 500;                                 % number of simulation steps
 warmStartEnabler = 1;                   % warmstart 
-intMethod = 2;                          % integration method
+intMethod = 1;                          % integration method
 
 %% ============================================ Constraint limits ==============================
-U_ub   = 0.008;                         % input
+U_ub   = 0.02;                         % input
 U_lb   = 0;
-X_ub   = 2.5*ones(1,Hp+1);              % state
-X_lb   = 0*ones(1,Hp+1);
-deltaU = [-0.005; 0.005]*ones(1,Hp);    % slew rate (inactive if set to high values)
+X_ub   = 2.2*ones(1,Hp+1);              % state
+X_lb   = 0.1*ones(1,Hp+1);
+deltaU = [-0.025; 0.025]*ones(1,Hp);    % slew rate (inactive if set to high values)
 
 %% ========================================= Optimization variables ============================
 X  = opti.variable(nS,Hp+1);            % state - volume 
@@ -101,15 +103,33 @@ elseif warmStartEnabler == 0
 end
   
 %% ================================= MPC closed-loop sim. ==================================
-% random disturbance signal
-disturbance = (1/360)*[1,0,2,3,5,1,0,0,0,6,4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2,1,0,2,3,5,1,0,0,0,6,...
-     4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2,1,0,2,3,5,1,0,0,0,6,4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,...
-     0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2,1,0,2,3,5,1,0,0,0,6,4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2];
+% random disturbance signal generation
+t_dist = 0:(N+Hp);
+smax =  1.5;
+smin = -1;
 
+std = 0.003;
+
+disturbance_mean = 0.05*abs(smooth(smooth(smin + (smax-smin)*rand(1,length(t_dist)))))';
+disturbance_rand = disturbance_mean + std.*randn(N+Hp+1,1)';
+disturbance_rand(disturbance_rand <= 0) = 0;
+
+% figure
+% plot(disturbance_mean)
+% hold on
+% plot(disturbance_rand)
+
+%%
+% disturbance = (1/200)*[1,0,2,3,5,1,0,0,0,6,4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2,1,0,2,3,5,1,0,0,0,6,...
+%      4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2,1,0,2,3,5,1,0,0,0,6,4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,...
+%      0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2,1,0,2,3,5,1,0,0,0,6,4,2,0,0,2,0,2,5,3,0,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,2,5,3,0,0,1,1,2];
+ 
+ %%
+ 
 X_sim(:,1) = 1;                                                             % init. state value     
 lam_g = 0;                                                                  % init. multiplier for WARM START
 x_init = 1;                                                                 % prev. state for WARM START
-dt_sim = 600;                                                               % sampling time [s]
+dt_sim = 60;                                                               % sampling time [s]
 
 tic
 disp('MPC running with Casadi')
@@ -117,13 +137,13 @@ for i = 1:1:N
     
     if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    [U_sim(:,i), S_sim(:,i), lam_g, x_init] = (OCP(X_sim(:,i), disturbance(:,i:i+Hp-1), lam_g, x_init, dt_sim));
+    [U_sim(:,i), S_sim(:,i), lam_g, x_init] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), lam_g, x_init, dt_sim));
     elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [U_sim(:,i), S_sim(:,i)] = (OCP(X_sim(:,i), disturbance(:,i:i+Hp-1), dt_sim));
+    [U_sim(:,i), S_sim(:,i)] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), dt_sim));
     end
     % Simulate dynamics
-    X_sim(:,i+1) = full(F_integral(X_sim(:,i), U_sim(:,i), disturbance(:,i), dt_sim ));        
+    X_sim(:,i+1) = full(F_integral(X_sim(:,i), U_sim(:,i), disturbance_rand(:,i), dt_sim ));        
     
 end
 toc
@@ -140,7 +160,9 @@ figure
 subplot(2,1,1)
 stairs(U_sim(1,:),'blue')
 hold on
-plot(disturbance(1,1:N),'black')
+plot(disturbance_mean(1,1:N),'black--')
+hold on
+plot(disturbance_rand(1,1:N),'black')
 hold on
 plot(U_ub(1)*ones(N,1),'color',[0 0.7 0],'linestyle','--')
 xlim([1,N+1])
