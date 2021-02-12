@@ -11,7 +11,7 @@ nS = 1;                                 % number of states
 opti = casadi.Opti();                   % opti stack 
 N = 96;                                 % number of simulation steps
 warmStartEnabler = 1;                   % warmstart 
-intMethod = 1;                          % integration method
+intMethod = 2;                          % integration method
 
 %% ============================================ Constraint limits ==============================
 U_ub   = 0.008;                         % input
