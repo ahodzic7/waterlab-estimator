@@ -1,4 +1,4 @@
-name: system_identificatio
+name: system_identification
 channels:
   - defaults
 dependencies:
@@ -8,6 +8,6 @@ dependencies:
   - pip
   - pip:
       - casadi
-      - pyswmm
+      - pyswmm==0.6.2
 prefix: C:\ProgramData\Anaconda3\envs\system_identification
 
