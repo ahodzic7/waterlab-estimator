@@ -1,7 +1,7 @@
 clearvars; clc; close all
 
 % ************ Change to own Casadi path ************
-addpath('C:\Users\74647\OneDrive - Grundfos\MATLAB\CasAdi')
+addpath('C:\Users\adish\OneDrive\Documents\MATLAB\CasADi')
 % ***************************************************
 import casadi.*
 
@@ -40,7 +40,7 @@ S_sim  = casadi.DM.zeros(nS,N);
 sigma_X_sim  = casadi.DM.zeros(N,Hp+1);
 
 %% =========================================== Objective =======================================
-objective = 0.0001*sumsqr(X) + 100*sum(S) + 40*sumsqr(U) + (10)*sum(sigma_X);
+objective = 0.01*sumsqr(X-R) + 100*sum(S) + 40*sumsqr(U) + (10)*sum(sigma_X);
 %sum(S) + 100*sumsqr(U) + 0.0001*sumsqr(X);
 opti.minimize(objective); 
 
@@ -76,7 +76,7 @@ end
 
 %% ==================================== Physical constraints ===============================
 for k = 1:1:nS
-    opti.subject_to(X_lb(k,:) + S(k,:) <= X(k,:) <= X_ub(k,:)+ S(k,:) - sqrt(sigma_X(k,:))*norminv(0.95) )%- sqrt(sigma_X(k,:))*norminv(0.95)           % Soft constraint on state - volume 
+    opti.subject_to(X_lb(k,:) - S(k,:) <= X(k,:) <= X_ub(k,:)+ S(k,:) - sqrt(sigma_X(k,:))*norminv(0.95) )%- sqrt(sigma_X(k,:))*norminv(0.95)           % Soft constraint on state - volume 
     %opti.subject_to(-X(k,:) <= -X_lb(k,:) + sqrt(sigma_X(k,:))*norminv(0.95) - S(k,:));
     %X_lb(k,:) + S(k,:)<= X(k,:)
     
@@ -159,6 +159,7 @@ for i = 1:1:N
     % Simulate dynamics
     X_sim(:,i+1) = full(F_integral(X_sim(:,i), U_sim(:,i), disturbance_rand(:,i), dt_sim ));        
     progressbar(i/N) 
+    OCP_results{i} = get_stats(OCP);
 end
 toc
 
@@ -219,3 +220,16 @@ sigmaX(k+1) = sigmaX(k) + (sigma_dist);
 end
 
 tightening = sqrt(sigmaX)*norminv(0.95);
+%%
+
+fail_OCP_count = 0;
+fail_OCP_where = 0;
+T_mpc = 1;
+len = N;
+for i = T_mpc:T_mpc:len
+if strcmp(OCP_results{i}.return_status,'Solve_Succeeded') == 0
+fail_OCP_count = fail_OCP_count + 1;
+fail_OCP_where(fail_OCP_count) = i;
+end
+end
+fprintf('The solver found infeasibility: %d(%%) \n',int16((fail_OCP_count/len)*100))
