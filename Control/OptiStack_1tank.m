@@ -16,7 +16,7 @@ intMethod = 1;                          % integration method
 %% ============================================ Constraint limits ==============================
 U_ub   = 0.03;                         % input
 U_lb   = 0;
-X_ub   = 7*ones(1,Hp+1);       % 3.5       % state
+X_ub   = 5*ones(1,Hp+1);       % 3.5       % state
 X_lb   = 2*ones(1,Hp+1);          %0.5
 deltaU = [-0.03; 0.03]*ones(1,Hp);    % slew rate (inactive if set to high values)
 
