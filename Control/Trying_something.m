@@ -150,6 +150,7 @@ sigma_D_sim = sigma_dist*1;
 
 tic
 disp('MPC running with Casadi')
+plotting = true;
 figure
 for i = 1:1:N
     
@@ -165,18 +166,38 @@ for i = 1:1:N
     [U_sim_single_step(:,:), S_sim_single_step(:,:), sigma_X_sim(i,:)] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), dt_sim, R_sim, sigma_D_sim));
     end
     % MPC prediction:
-    plot(0:1:i-1,full(X_sim(:,1:i)),'b');
-    hold on;
+    if plotting
+        ax(1) = subplot(2,1,1);
+        plot(0:1:i-1,full(X_sim(:,1:i)),'b');
+        hold on;
+    end
     X_prediction(:,1) = X_sim(:,i);
     for j=2:1:Hp
         X_prediction(:,j+1) = full(F_integral(X_prediction(:,j), U_sim_single_step(:,j), disturbance_mean(:,i+j-2), dt_sim ));
     end
-    plot(i-1:1:Hp-1+i,full(X_prediction),'g');
-    hold off;
+    if plotting
+        plot(i-1:1:Hp-1+i,full(X_prediction),'g');
+        hold off;
+        leg = legend('Past state', 'Predicted state');
+        set(leg,'Interpreter','latex');
+    end
     % Simulate dynamics
     X_sim(:,i+1) = full(F_integral(X_sim(:,i), U_sim_single_step(:,1), disturbance_rand(:,i), dt_sim ));        
     %progressbar(i/N) 
     OCP_results{i} = get_stats(OCP);
+    % plot the inputs
+    if plotting
+        ax(2) = subplot(2,1,2);
+        stairs(0:1:i-1,full(U_sim(:,1:i)),'b');
+        hold on;
+        plot(i-1:1:i,[full(U_sim_single_step(:,1)),full(U_sim_single_step(:,1))],'r');
+        hold on;
+        stairs(i:1:Hp-2+i,full(U_sim_single_step(:,2:end)),'g');
+        hold off;
+        leg = legend('Past input','Implemented input','Predicted action');
+        set(leg,'Interpreter','latex');
+        pause(1);
+    end
 end
 toc
 %%
