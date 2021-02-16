@@ -23,7 +23,8 @@ deltaU = [-0.03; 0.03]*ones(1,Hp);    % slew rate (inactive if set to high value
 %% ========================================= Optimization variables ============================
 X  = opti.variable(nS,Hp+1);            % state - volume 
 U  = opti.variable(nS,Hp);              % input - pumpflow 
-S  = opti.variable(nS,Hp+1);            % slack - overflow volume
+S_of  = opti.variable(nS,Hp+1);            % slack - overflow volume
+S_uf  = opti.variable(nS,Hp+1);            % slack - for relaxing lower bound
 sigma_X = opti.variable(nS,Hp+1);       % state variance - volume
 
 %% ========================================= Optimization parameters ===========================
@@ -36,14 +37,16 @@ sigma_D = opti.parameter(nS);           % disturbance variance - rain inflow
 %% =========================================== Simulation variables  ===========================
 X_sim  = zeros(nS,N); 
 U_sim = casadi.DM.zeros(nS,N);
-S_sim  = casadi.DM.zeros(nS,N);
+S_of_sim  = casadi.DM.zeros(nS,N);
+S_uf_sim  = casadi.DM.zeros(nS,N);
 X_prediction = casadi.DM.zeros(nS,Hp+1);
 U_sim_single_step  = casadi.DM.zeros(nS,Hp);
-S_sim_single_step  = casadi.DM.zeros(nS,Hp);
+S_of_sim_single_step  = casadi.DM.zeros(nS,Hp);
+S_uf_sim_single_step  = casadi.DM.zeros(nS,Hp);
 sigma_X_sim  = casadi.DM.zeros(N,Hp+1);
 
 %% =========================================== Objective =======================================
-objective = 0.01*sumsqr(X-R) + 100*sum(S) + 40*sumsqr(U) + (10)*sum(sigma_X);
+objective = 0.01*sumsqr(X-R) + 100*sum(S_of) + 100*sum(S_uf) + 40*sumsqr(U) + (10)*sum(sigma_X);
 %sum(S) + 100*sumsqr(U) + 0.0001*sumsqr(X);
 opti.minimize(objective); 
 
@@ -79,12 +82,13 @@ end
 
 %% ==================================== Physical constraints ===============================
 for k = 1:1:nS
-    opti.subject_to(X_lb(k,:) - S(k,:) <= X(k,:) <= X_ub(k,:)+ S(k,:) - sqrt(sigma_X(k,:))*norminv(0.95) )%- sqrt(sigma_X(k,:))*norminv(0.95)           % Soft constraint on state - volume 
+    opti.subject_to(X_lb(k,:) - S_uf(k,:) <= X(k,:) <= X_ub(k,:)+ S_of(k,:) - sqrt(sigma_X(k,:))*norminv(0.95) )%- sqrt(sigma_X(k,:))*norminv(0.95)           % Soft constraint on state - volume 
     %opti.subject_to(-X(k,:) <= -X_lb(k,:) + sqrt(sigma_X(k,:))*norminv(0.95) - S(k,:));
     %X_lb(k,:) + S(k,:)<= X(k,:)
     
     
-    opti.subject_to(S(k,:) >= zeros(1,Hp+1));                                 % Slack variable is always positive - Vof >= 0
+    opti.subject_to(S_of(k,:) >= zeros(1,Hp+1));                                 % Slack variable is always positive - Vof >= 0
+    opti.subject_to(X_lb >= S_uf(k,:) >= zeros(1,Hp+1));  
 end
 opti.subject_to(U_lb <= U <= U_ub);                                           % Bounded input  
 
@@ -103,7 +107,8 @@ end
 
 %% ====================================== Solver settings ==================================
 %opti.set_initial(X, 1);                                                    % first guess
-opti.set_initial(S, 0);
+opti.set_initial(S_of, 0);
+opti.set_initial(S_uf, 0);
 opti.set_initial(U, 0);
 
 opts = struct;
@@ -115,10 +120,10 @@ opti.solver('ipopt',opts);
 
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    OCP = opti.to_function('OCP',{X0,D,opti.lam_g,opti.x,T,R,sigma_D},{U(:,:),S(:,:),opti.lam_g,opti.x,sigma_X(:,:)},{'x0','d','lam_g','x_init','dt','r','sigma_d'},{'u_opt','s_opt','lam_g','x_init','sigma_x'});
+    OCP = opti.to_function('OCP',{X0,D,opti.lam_g,opti.x,T,R,sigma_D},{U(:,:),S_of(:,:), S_uf(:,:),opti.lam_g,opti.x,sigma_X(:,:)},{'x0','d','lam_g','x_init','dt','r','sigma_d'},{'u_opt','s_of_opt','s_uf_opt','lam_g','x_init','sigma_x'});
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    OCP = opti.to_function('OCP',{X0,D,T,R,sigma_D},{U(:,:),S(:,:),sigma_X(:,:)},{'x0','d','dt','r','sigma_d'},{'u_opt','s_opt','sigma_x'});
+    OCP = opti.to_function('OCP',{X0,D,T,R,sigma_D},{U(:,:),S_of(:,:),S_uf(:,:),sigma_X(:,:)},{'x0','d','dt','r','sigma_d'},{'u_opt','s_of_opt','s_uf_opt','sigma_x'});
 end
   
 %% ================================= MPC closed-loop sim. ==================================
@@ -156,14 +161,15 @@ for i = 1:1:N
     
     if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    [U_sim_single_step, S_sim_single_step, lam_g, x_init, sigma_X_sim(i,:)] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), lam_g, x_init, dt_sim, R_sim, sigma_D_sim));
+    [U_sim_single_step, S_of_sim_single_step,S_uf_sim_single_step, lam_g, x_init, sigma_X_sim(i,:)] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), lam_g, x_init, dt_sim, R_sim, sigma_D_sim));
 %     plot(i-1:1:Hp-2+i,full(U_sim_single_step))
 %     hold on;
     U_sim(:,i) = U_sim_single_step(:,1);
-    S_sim(:,i) =  S_sim_single_step(:,1);
+    S_of_sim(:,i) =  S_of_sim_single_step(:,1);
+    S_uf_sim(:,i) =  S_uf_sim_single_step(:,1);
     elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [U_sim_single_step(:,:), S_sim_single_step(:,:), sigma_X_sim(i,:)] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), dt_sim, R_sim, sigma_D_sim));
+    [U_sim_single_step(:,:), S_of_sim_single_step(:,:),S_uf_sim_single_step, sigma_X_sim(i,:)] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), dt_sim, R_sim, sigma_D_sim));
     end
     % MPC prediction:
     if plotting
@@ -203,7 +209,8 @@ toc
 %%
 % Retrieve simulation variables
 U_sim = full(U_sim);
-S_sim = full(S_sim);
+S_of_sim = full(S_of_sim);
+S_uf_sim = full(S_uf_sim);
 lam_g = full(lam_g);
 sigma_X_sim = full(sigma_X_sim);
 
@@ -227,7 +234,9 @@ set(leg,'Interpreter','latex');
 ax(2) = subplot(2,1,2);
 plot(X_sim(1,:),'red')
 hold on
-plot(S_sim(1,:),'magenta')
+plot(S_of_sim(1,:),'magenta')
+hold on
+plot(S_uf_sim(1,:),'cyan')
 hold on
 plot(X_ub(1)*ones(N,1),'color',[0 0.7 0],'linestyle','--')
 hold on
@@ -235,7 +244,7 @@ plot(R_sim*ones(N,1),'black')
 hold on
 plot(X_lb(1)*ones(N,1),'color',[0 0.7 0],'linestyle','--')
 xlim([1,N+1])
-leg = legend('State','Slack','Reference','State limit');
+leg = legend('State','Slack of','Slack uf','State limit','Reference');
 set(leg,'Interpreter','latex');
 
 linkaxes(ax, 'x')
