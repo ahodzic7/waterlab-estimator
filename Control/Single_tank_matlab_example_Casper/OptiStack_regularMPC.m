@@ -112,6 +112,7 @@ for step = 1:1:N
     for i = 1:Hp-1
         X_predict(:,i+1) = F_Euler(X_predict(:,i), U_out(:,i) + S_out(:,i), dist_forcast(:,step+i-1), dT);
     end
+    
     %Advance simulation and save values
     X_sim(:,step+1) = F_Euler(X_sim(:,step), U_out(:,1) + S_out(:,1), dist(:,step), dT);
     U_sim(:,step) = U_out(:,1);
@@ -132,6 +133,8 @@ for step = 1:1:N
     X_predict_num = full(X_predict);
     U_sim_num = full(U_sim);
     S_sim_num = full(S_sim);
+    
+    
     clf
     subplot(2,1,1)
     % Time elapsed in simulation
