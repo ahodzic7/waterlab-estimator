@@ -10,7 +10,7 @@ Hp = 24;                                % prediction horizon
 nS = 1;                                 % number of states
 opti = casadi.Opti();                   % opti stack 
 N = 500;                                % number of simulation steps
-warmStartEnabler = 1;                   % warmstart 
+warmStartEnabler = 0;                   % warmstart 
 intMethod = 2;                          % integration method
 
 %% ============================================ Constraint limits ==============================
