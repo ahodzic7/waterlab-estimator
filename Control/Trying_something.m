@@ -178,8 +178,8 @@ for i = 1:1:N
         hold on;
     end
     X_prediction(:,1) = X_sim(:,i);
-    for j=2:1:Hp
-        X_prediction(:,j+1) = full(F_integral(X_prediction(:,j), U_sim_single_step(:,j), disturbance_mean(:,i+j-2), dt_sim ));
+    for j=1:1:Hp-1
+        X_prediction(:,j+1) = full(F_integral(X_prediction(:,j), U_sim_single_step(:,j), disturbance_mean(:,i+j-1), dt_sim ));
     end
     if plotting
         plot(i-1:1:Hp-1+i,full(X_prediction),'g');
