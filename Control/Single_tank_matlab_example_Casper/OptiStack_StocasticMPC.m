@@ -9,10 +9,11 @@ pause on
 nS = 1;                                 % Number of System sates
 nU = nS;                                % Number of System Inputs
 dT = 1;                                 % Sampling time
-initial_state = 10;
+initial_state = 2.5;
+sigma_D = 0.1;
 
 % System model:
-dt = casadi.MX.sym('dt',1);              % state
+dt = casadi.MX.sym('dt',1);             % state
 x = casadi.MX.sym('x',nS);              % state
 u = casadi.MX.sym('u',nS);              % input
 d = casadi.MX.sym('d',nS);              % disturbance
@@ -26,14 +27,19 @@ Hu = Hp;                                % Control horizon
 % Paramteres (Known)
 D  = opti.parameter(nS, Hp);            % Known disturbance - Rain inflow
 X0 = opti.parameter(nS);                % Initial state - volume
+sigma_X = opti.parameter(nS,Hp);
+
 % Optimization variables (to be optimized)
 X  = opti.variable(nS, Hp);             % System state - volume 
 U  = opti.variable(nU, Hu);             % Control input - pumpflow 
 S  = opti.variable(nU, Hu);             % 'slack' - overflow volume
+S_ub = opti.variable(nS, Hu);
 
 %% ========================= Objective Function ======================== %%
 % Weights
-P = eye(nU * Hu,nU * Hu) * 100000;
+Decreasing_cost = diag((nU*Hu):-1:1)*10000;
+sum_vector = zeros(nU * Hu,1)+1;
+P = eye(nU * Hu,nU * Hu) * 10000000000 + Decreasing_cost;
 Q = eye(nS * Hp,nS * Hp) * 1000;
 R = eye(nU * Hu,nU * Hu) * 100;
 
@@ -41,25 +47,32 @@ R = eye(nU * Hu,nU * Hu) * 100;
 X_obj = vertcatComplete(X);
 U_obj = vertcatComplete(U);
 S_obj = vertcatComplete(S);
-objective = X_obj'*Q*X_obj +U_obj'*R*U_obj+S_obj'*P*S_obj;
-opti.minimize(objective); 
 
+objective = X_obj'*Q*X_obj +U_obj'*R*U_obj+S_obj'*P*sum_vector + 10000*sum(S_ub);
+opti.minimize(objective); 
 %% ============================ Constraints =========================== %%
 % Adding system dynamics - Where outflow is "Input + Slack" 
 % Note this would change to two for loops if Hu != Hp
+U_lb = 0;
+U_ub = 0.03;
+
+X_lb = 2;
+X_ub = 5;
+dU_lb = -0.015;
+dU_ub = 0.015;
+
+opti.subject_to(X(:,1)==X0);                    % Initial state constraints 
+
 for i = 1:Hp-1                             
-   opti.subject_to(X(:,i+1)==F_Euler(X(:,i), U(:,i) + S(:,i), D(:,i), dT));  
+   opti.subject_to(X(:,i+1)==F_Euler(X(:,i), U(:,i) + S(:,i), D(:,i), dT));
+   
+   opti.subject_to(X_lb <= X(:,i));
+   opti.subject_to(X <= X_ub + S_ub(:,i) - sqrt(sigma_X(:,i))*norminv(0.95));
 end
-
-opti.subject_to(X(:,1)==X0);                    % Initial state constraint
-
-X_lb = 0;
-X_ub = 25;
-dU_lb = -1;
-dU_ub = 1;
 
 for i = 1:Hp
     opti.subject_to(X_lb<=X(:,i)<=X_ub);        % Tank size constriant
+    opti.subject_to(U_lb <= U <= U_ub);    
 end
 
 for i = 2:1:Hp                             
@@ -68,6 +81,7 @@ end
 
 for i = 1:1:Hp
     opti.subject_to(S(:,i)>=zeros(nU,1));      % Slack variable is always positive - Vof >= 0
+    opti.subject_to(zeros(1,Hp) <= S_ub(:,i) <= sqrt(sigma_X(:,i))*norminv(0.95));                                 % Slack variable is always positive - Vof >= 0
 end
 
 %% ========================== Solver settings ========================== %%
@@ -83,29 +97,44 @@ opts.expand = true;                     % makes function evaluations faster
 opti.solver('ipopt',opts);
 
 % Define optimization problem:
-MPC = opti.to_function('MPC',{X0,D},{U,S},{'x0','d'},{'u_opt','s_opt'});
+MPC = opti.to_function('MPC',{X0,D,sigma_X},{U,S,S_ub},{'x0','d','sigma_x'},{'u_opt','s_opt','S_ub_opt'});
 
 %% ========================== Solver settings ========================== %%
 N = 96;                                 % number of simulation steps
+t_dist = 0:(N+Hp);
+smax =  1.5;
+smin = -1;
 
-% Import forcast, add noise and set initial state
-forast_raw = readmatrix('test_disturbance.csv');
-dist_forcast = forast_raw(:,1:(N+Hp));
-dist = dist_forcast + normrnd(0,0.1,size(dist_forcast));
-dist(dist < 0) = 0;
+% % Import forcast, add noise and set initial state
+% forast_raw = readmatrix('test_disturbance.csv');
+% dist_forcast = forast_raw(:,1:(N+Hp));
+% dist = dist_forcast + normrnd(0,sigma_D,size(dist_forcast));
+% dist(dist < 0) = 0;
+% stochastic disturbance
+sigma_dist = 0.0065^2; %0.0045^2;
+dist_forcast = 0.15*abs(smooth(smooth(smooth(smin + (smax-smin)*rand(1,length(t_dist))))))';
+dist = dist_forcast + sqrt(sigma_dist).*randn(N+Hp+1,1)';
+dist(dist <= 0) = 0;
+
+% Precompute sigma_X for chance constraint
+sigma = zeros(nS,Hp);
+sigma(:,1) = sigma_dist; 
+for i = 1:Hp-1
+    sigma(:,i+1) = sigma(:,i) + sigma_D;
+end
 
 X_sim = casadi.DM.zeros(nS, N+1); 
 X_sim(:,1) = initial_state;
 U_sim = casadi.DM.zeros(nU, N+1); 
 S_sim = casadi.DM.zeros(nU, N+1); 
-
+S_ub_sim = casadi.DM.zeros(nS, N+1);
 X_predict = casadi.DM.zeros(nS, Hp); 
 
 figure
 %Run Closed loop mpc
 for step = 1:1:N
     %Open loop predicition
-    [U_out, S_out] = (MPC(X_sim(:,step), dist_forcast(:,step:step+Hp-1)));
+    [U_out, S_out, S_ub_out] = (MPC(X_sim(:,step), dist_forcast(:,step:step+Hp-1),sigma));
     %Predict comming states:
     
     X_predict(:,1) = X_sim(step);
@@ -114,9 +143,10 @@ for step = 1:1:N
     end
     
     %Advance simulation and save values
-    X_sim(:,step+1) = F_Euler(X_sim(:,step), U_out(:,1) + S_out(:,1), dist(:,step), dT);
+    X_sim(:,step+1) = F_Euler(X_sim(:,step), U_out(:,1), dist(:,step), dT);
     U_sim(:,step) = U_out(:,1);
     S_sim(:,step) = S_out(:,1);
+    S_ub_sim(:,step) = S_ub_out(:,1);
     
     X_sim_num = full(X_sim);
     if X_sim_num(:,step+1) > X_ub 
@@ -130,9 +160,11 @@ for step = 1:1:N
     %Get numerical values
     U_out_num = full(U_out);
     S_out_num = full(S_out);
+    S_ub_out_num = full(S_ub_out);
     X_predict_num = full(X_predict);
     U_sim_num = full(U_sim);
     S_sim_num = full(S_sim);
+    S_ub_sim_num = full(S_ub_sim);
     
     
     clf
@@ -158,28 +190,20 @@ for step = 1:1:N
     % Time elapsed in simulation
     elapsed_time = 1:step;
     plot(elapsed_time, U_sim_num(1,1:step),'b')
+    plot(elapsed_time, S_sim_num(1,1:step),'g')
+    plot(elapsed_time, S_ub_sim_num(1,1:step),'y')
     hold on
+    
     % Current step
     plot(step, U_sim_num(1,step),'r*');
+    plot(step, S_sim_num(1,step),'r*');
+    plot(step, S_ub_sim_num(1,step),'r*');
     hold on
     % Future predicitions
     future_time = elapsed_time(end):(elapsed_time(end)+Hp-1 );
-    plot(future_time ,U_out_num,'g');
+    plot(future_time ,U_out_num,'b--');
+    plot(future_time ,S_out_num,'g--');
+    plot(future_time ,S_ub_out_num,'y--');
     xlim([1,N+Hp])
-    %pause(0.25);
-    
-    
-    OCP_results{i} = get_stats(MPC);
+    pause(0.25);
 end
-
-fail_OCP_count = 0;
-fail_OCP_where = 0;
-T_mpc = 1;
-len = N;
-for i = T_mpc:T_mpc:len
-if strcmp(OCP_results{i}.return_status,'Solve_Succeeded') == 0
-fail_OCP_count = fail_OCP_count + 1;
-fail_OCP_where(fail_OCP_count) = i;
-end
-end
-fprintf('The solver found infeasibility: %d(%%) \n',int16((fail_OCP_count/len)*100))

@@ -8,7 +8,7 @@ API reference for functions
 [SystemStruct]=setup_affine_linear_uncertain_system_model_simple_model()
 
 [SystemStruct]=setup_affine_linear_uncertain_system_model_fredericia()
-% % x(n+1) = A x(n) + B u + B_d (u_d_known + u_disturbance) + model_uncertainty + Delta
+% x(n+1) = A x(n) + B u + B_d (u_d_known + u_disturbance) + model_uncertainty + Delta
 
 [ConstraintsStruct] = Generate_Constraints([X_lb X_ub], [U_lb U_ub], [dU_lb dU_ub], Hp, Hu=Null)
 
