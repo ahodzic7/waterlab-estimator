@@ -21,15 +21,16 @@ API reference for functions
 [U_predict, S_predict] = MPC_solve(solverObj, X0, disturbance_forecast)
 
 % Data types:
-SystemStruct
+SystemStruct:
 {
-A                       Size: Number_of_states x Number_of_states
-B                       Size: Number_of_states x Number_of_inputs
-B_disturbance           Size: Number_of_states x Number_of_disturbances
-C                       Size: Number_of_outputs x Number_of_states
-Delta                   Size: Number_of_states x 1
-prediction_uncertainty  Assumed gaussian, [mean, variance]
-model_uncertainty       Assumed gaussian, [mean, variance]
+    A                       Size: Number_of_states x Number_of_states
+    B                       Size: Number_of_states x Number_of_inputs
+    B_disturbance           Size: Number_of_states x Number_of_disturbances
+    C                       Size: Number_of_outputs x Number_of_states
+    Delta                   Size: Number_of_states x 1
+    prediction_uncertainty  Assumed gaussian, [mean, variance]
+    model_uncertainty       Assumed gaussian, [mean, variance]
+    measurement_uncertainty Assumed gaussian, [mean, variance]
 }
 
 ConstraintsStruct
