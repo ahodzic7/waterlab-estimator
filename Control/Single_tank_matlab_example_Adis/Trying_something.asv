@@ -25,7 +25,6 @@ X  = opti.variable(nS,Hp+1);            % state - volume
 U  = opti.variable(nS,Hp);              % input - pumpflow 
 S_of  = opti.variable(nS,Hp+1);            % slack - overflow volume
 S_uf  = opti.variable(nS,Hp+1);            % slack - for relaxing lower bound
-sigma_X = opti.variable(nS,Hp+1);       % state variance - volume
 
 %% ========================================= Optimization parameters ===========================
 D  = opti.parameter(nS,Hp);             % disturbance - rain inflow
@@ -33,6 +32,7 @@ X0 = opti.parameter(nS);                % initial state - volume
 T  = opti.parameter(nS);                % MPC model sampling time
 R  = opti.parameter(nS);                % reference
 sigma_D = opti.parameter(nS);           % disturbance variance - rain inflow
+sigma_X = opti.parameter(nS,Hp+1);
 
 %% =========================================== Simulation variables  ===========================
 X_sim  = zeros(nS,N); 
@@ -43,7 +43,6 @@ X_prediction = casadi.DM.zeros(nS,Hp+1);
 U_sim_single_step  = casadi.DM.zeros(nS,Hp);
 S_of_sim_single_step  = casadi.DM.zeros(nS,Hp);
 S_uf_sim_single_step  = casadi.DM.zeros(nS,Hp);
-sigma_X_sim  = casadi.DM.zeros(N,Hp+1);
 
 %% =========================================== Objective =======================================
 objective = 0.01*sumsqr(X-R) + 100*sum(S_of) + 100*sum(S_uf) + 40*sumsqr(U) + (10)*sum(sigma_X);
@@ -98,11 +97,17 @@ end
 
 %% ================================= Uncertainty propagation ===============================
 % Initial state                             
-opti.subject_to(sigma_X(:,1)==0.001);                                           % No uncertainty on the measured state     
-
+% opti.subject_to(sigma_X(:,1)==0.001);                                           % No uncertainty on the measured state     
+% 
 % Gap - closing constraint
-for i=1:Hp                             
-   opti.subject_to(sigma_X(:,i+1) == sigma_X(:,i) + sigma_D(:));  
+% for i=1:Hp                             
+%    opti.subject_to(sigma_X(:,i+1) == sigma_X(:,i) + sigma_D(:));  
+% end
+
+sigma_X_sim = zeros(nS,Hp+1);
+sigma_X_sim(:,1) = 0; 
+for i = 1:Hp
+    sigma_X_sim(:,i+1) = sigma_X_sim(:,i) + 0.001;
 end
 
 %% ====================================== Solver settings ==================================
@@ -123,7 +128,7 @@ if warmStartEnabler == 1
     OCP = opti.to_function('OCP',{X0,D,opti.lam_g,opti.x,T,R,sigma_D},{U(:,:),S_of(:,:), S_uf(:,:),opti.lam_g,opti.x,sigma_X(:,:)},{'x0','d','lam_g','x_init','dt','r','sigma_d'},{'u_opt','s_of_opt','s_uf_opt','lam_g','x_init','sigma_x'});
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    OCP = opti.to_function('OCP',{X0,D,T,R,sigma_D},{U(:,:),S_of(:,:),S_uf(:,:),sigma_X(:,:)},{'x0','d','dt','r','sigma_d'},{'u_opt','s_of_opt','s_uf_opt','sigma_x'});
+    OCP = opti.to_function('OCP',{X0,D,T,R,sigma_D,sigma_X(:,:)},{U(:,:),S_of(:,:),S_uf(:,:)},{'x0','d','dt','r','sigma_d','sigma_x'},{'u_opt','s_of_opt','s_uf_opt'});
 end
   
 %% ================================= MPC closed-loop sim. ==================================
@@ -155,7 +160,7 @@ sigma_D_sim = sigma_dist*1;
 
 tic
 disp('MPC running with Casadi')
-plotting = true;
+plotting = false;
 figure
 for i = 1:1:N
     
@@ -166,7 +171,7 @@ for i = 1:1:N
 %     hold on;
     elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [U_sim_single_step, S_of_sim_single_step,S_uf_sim_single_step, sigma_X_sim(i,:)] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), dt_sim, R_sim, sigma_D_sim));
+    [U_sim_single_step, S_of_sim_single_step,S_uf_sim_single_step] = (OCP(X_sim(:,i), disturbance_mean(:,i:i+Hp-1), dt_sim, R_sim, sigma_D_sim, sigma_X_sim));
     end
     U_sim(:,i) = U_sim_single_step(:,1);
     S_of_sim(:,i) =  S_of_sim_single_step(:,1);
@@ -188,7 +193,12 @@ for i = 1:1:N
         set(leg,'Interpreter','latex');
     end
     % Simulate dynamics
-    X_sim(:,i+1) = full(F_integral(X_sim(:,i), U_sim_single_step(:,1), disturbance_rand(:,i), dt_sim ));        
+    X_sim(:,i+1) = full(F_integral(X_sim(:,i), U_sim_single_step(:,1), disturbance_rand(:,i), dt_sim )); 
+%     if X_sim(:,i+1) > X_ub(:,1)
+%         X_sim(:,i+1) = X_ub(:,1);
+%     elseif X_sim(:,i+1) < X_lb(:,1)
+%         X_sim(:,i+1) = X_lb(:,1);
+%     end
     %progressbar(i/N) 
     OCP_results{i} = get_stats(OCP);
     % plot the inputs
@@ -251,9 +261,16 @@ linkaxes(ax, 'x')
 
 %% 
 figure
-plot(X_ub(1)*ones(Hp+1,1),'color',[0 0.7 0],'linestyle','--')
+plot(0:24,X_ub(1)*ones(Hp+1,1),'color',[0 0.7 0],'linestyle','--')
 hold on
-plot(X_ub(1)*ones(Hp+1,1)-sqrt(sigma_X_sim(1,:))'*norminv(0.95),'red')
+plot(0:24,X_ub(1)*ones(Hp+1,1)-sqrt(sigma_X_sim(1,:))'*norminv(0.95),'red')
+grid on;
+xlim([0,24]);
+ylim([4.7,5.05]);
+title('Chance constraint tightening');
+xlabel('k')
+leg = legend('State','Slack of','Slack uf','State limit','Reference');
+set(leg,'Interpreter','latex');
 
 
 %% test

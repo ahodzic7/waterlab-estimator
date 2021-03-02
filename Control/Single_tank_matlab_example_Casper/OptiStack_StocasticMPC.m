@@ -1,6 +1,6 @@
 %% ================================ Init =============================== %% 
 clear vars; clc; close all
-addpath('C:\Users\Casper\OneDrive - Aalborg Universitet\MATLAB\casadi-windows-matlabR2016a-v3.5.5')
+addpath('C:\Users\adish\OneDrive\Documents\MATLAB\CasADi')
 import casadi.*
 opti = casadi.Opti();                   % opti stack 
 pause on
