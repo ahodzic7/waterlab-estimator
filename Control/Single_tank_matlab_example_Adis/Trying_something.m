@@ -1,7 +1,7 @@
 clearvars; clc; close all
 
 % ************ Change to own Casadi path ************
-addpath('C:\Users\adish\OneDrive\Documents\MATLAB\CasADi')
+addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5')
 % ***************************************************
 import casadi.*
 
@@ -161,7 +161,9 @@ sigma_D_sim = sigma_dist*1;
 tic
 disp('MPC running with Casadi')
 plotting = false;
+if plotting
 figure
+end
 for i = 1:1:N
     
     if warmStartEnabler == 1

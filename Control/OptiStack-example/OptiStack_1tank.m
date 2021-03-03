@@ -1,7 +1,7 @@
 clearvars; clc; close all
 
 % ************ Change to own Casadi path ************
-addpath('C:\Users\adish\OneDrive\Documents\MATLAB\CasADi')
+addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5')
 % ***************************************************
 import casadi.*
 
