@@ -3,7 +3,6 @@ function u  = MPC_tank1(X0,disturbance)
 eml.extrinsic('evalin');
 persistent lam_g;
 persistent OCP;
-persistent opti;
 persistent warmStartEnabler;
 persistent x_init;
 % and others
@@ -28,7 +27,7 @@ elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
     [u , S] = (OCP(X0, disturbance, dt));
 end
-lam_g
-u = full(u)
-u = u(1);
+
+u_full = full(u)
+u = u_full(1);
 end
