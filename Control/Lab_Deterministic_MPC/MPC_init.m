@@ -1,3 +1,4 @@
+clear;
 % ************ Change to own Casadi path ************
 addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5')
 % ***************************************************
@@ -18,7 +19,6 @@ U_ub   = 10;                            % input
 U_lb   = 4;
 X_ub   = 6.70*ones(1,Hp+1);              % state
 X_lb   = 1.50*ones(1,Hp+1);
-ref    = 3.00;
 deltaU = [-4; 4]*ones(1,Hp);    % slew rate (inactive if set to high values)
 
 %% ========================================= Optimization variables ============================
@@ -30,14 +30,15 @@ S  = opti.variable(nS,Hu);            % slack - overflow volume
 D  = opti.parameter(nS,Hu);             % disturbance - rain inflow
 X0 = opti.parameter(nS);                % initial state - level
 T  = opti.parameter(nS);                % MPC model_level sampling time
+Reference  = opti.parameter(nS);        % reference
 
 %% =========================================== Objective =======================================
 % Weights
 Decreasing_cost = diag((nU*Hu):-1:1)*10000;
 sum_vector = zeros(nU * Hu,1)+1;
-P = eye(nU * Hu,nU * Hu) * 10000000000 + Decreasing_cost;
-Q = eye(nS * Hp+1,nS * Hp+1) * 1000;
-R = eye(nU * Hu,nU * Hu) * 100;
+P = eye(nU * Hu,nU * Hu) * 100000000000000 + Decreasing_cost;
+Q = eye(nS * Hp+1,nS * Hp+1) * 100000;
+R = eye(nU * Hu,nU * Hu) * 10;
 
 % Rearrange X and U
 X_obj = vertcatComplete(X);
@@ -45,7 +46,7 @@ U_obj = vertcatComplete(U);
 S_obj = vertcatComplete(S);
 
 % Objective function
-objective = (X_obj-ref)'*Q*(X_obj-ref) +U_obj'*R*U_obj+S_obj'*P*sum_vector;
+objective = (X_obj-Reference)'*Q*(X_obj-Reference) + U_obj'*R*U_obj+S_obj'*P*sum_vector;
 opti.minimize(objective);
 
 %% ============================================ Dynamics =======================================
@@ -104,9 +105,10 @@ opti.solver('ipopt',opts);
 
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    OCP = opti.to_function('OCP',{X0,D,opti.lam_g,opti.x,T},{U,S,opti.lam_g,opti.x},{'x0','d','lam_g','x_init','dt'},{'u_opt','s_opt','lam_g','x_init'});
+    OCP = opti.to_function('OCP',{X0,D,opti.lam_g,opti.x,T,Reference},{U,S,opti.lam_g,opti.x},{'x0','d','lam_g','x_init','dt','ref'},{'u_opt','s_opt','lam_g','x_init'});
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    OCP = opti.to_function('OCP',{X0,D,T},{U,S},{'x0','d','dt'},{'u_opt','s_opt'});
+    OCP = opti.to_function('OCP',{X0,D,T,Reference},{U,S},{'x0','d','dt','ref'},{'u_opt','s_opt'});
 end
 
+load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC\disturbance_flow.mat');

@@ -34,16 +34,15 @@ end
 
 % Unit convertion:
 
-X0 = X0/100;
-reference = 3;
+X0 = x=
 
 % run openloop MPC
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    [u , S, lam_g, x_init] = (OCP(X0, disturbance, lam_g, x_init, dT,reference));
+    [u , S, lam_g, x_init] = (OCP(X0, disturbance, lam_g, x_init, dT));
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [u , S] = (OCP(X0, disturbance, dT,reference));
+    [u , S] = (OCP(X0, disturbance, dT));
 end
 
 
