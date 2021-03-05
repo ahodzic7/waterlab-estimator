@@ -1,4 +1,4 @@
-function u  = MPC_tank1(X0,time,disturbance_flow)
+function [output]  = MPC_tank1(X0,time,disturbance_flow)
 % define persistent variables
 eml.extrinsic('evalin');
 persistent x_init;
@@ -50,6 +50,8 @@ end
 u_full = full(u);
 S_full = full(S);
 u = u_full(1);
+S = S_full(1);
+output = [u;S];
 
 %plot_simulink_mpc(u_full,S_full,X0,disturbance,Hp);
 

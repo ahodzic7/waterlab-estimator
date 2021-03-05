@@ -4,7 +4,6 @@ addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5')
 % ***************************************************
 import casadi.*
 
-rand('seed', 1);
 
 %% ============================================== Sim. setup ===================================
 Hp = 24;                                % prediction horizon   
@@ -15,8 +14,8 @@ opti = casadi.Opti();                   % opti stack
 warmStartEnabler = 1;                   % warmstart for optimization
 intMethod = 2;                          % intergration method used in model
 %% ============================================ Constraint limits ==============================
-U_ub   = 10;                            % input
-U_lb   = 4;
+U_ub   = 7;                            % input
+U_lb   = 5.7;
 X_ub   = 6.70*ones(1,Hp+1);              % state
 X_lb   = 1.50*ones(1,Hp+1);
 deltaU = [-4; 4]*ones(1,Hp);    % slew rate (inactive if set to high values)
