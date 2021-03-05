@@ -30,4 +30,4 @@ Max Flow
 Min % 53
 Min FLow 3
 
-Assuming 0.5 meter elevation on both aux tanks.
+Assuming 0.5 meter elevation on both aux tanks
