@@ -11,7 +11,7 @@ Hu = Hp;                                % control horizion
 nS = 1;                                 % number of states
 nU = 1;
 opti = casadi.Opti();                   % opti stack 
-warmStartEnabler = 1;                   % warmstart for optimization
+warmStartEnabler = 0;                   % warmstart for optimization
 intMethod = 2;                          % intergration method used in model
 %% ============================================ Constraint limits ==============================
 U_ub   = 7;                            % input
@@ -33,10 +33,10 @@ Reference  = opti.parameter(nS);        % reference
 
 %% =========================================== Objective =======================================
 % Weights
-Decreasing_cost = diag((nU*Hu):-1:1)*10000;
+Decreasing_cost = diag((nU*Hu):-1:1)*1000000;
 sum_vector = zeros(nU * Hu,1)+1;
-P = eye(nU * Hu,nU * Hu) * 100000000000000 + Decreasing_cost;
-Q = eye(nS * Hp+1,nS * Hp+1) * 100000;
+P = eye(nU * Hu,nU * Hu) * 10000000 + Decreasing_cost;
+Q = eye(nS * Hp+1,nS * Hp+1) * 100;
 R = eye(nU * Hu,nU * Hu) * 10;
 
 % Rearrange X and U
@@ -45,7 +45,7 @@ U_obj = vertcatComplete(U);
 S_obj = vertcatComplete(S);
 
 % Objective function
-objective = (X_obj-Reference)'*Q*(X_obj-Reference) + U_obj'*R*U_obj+S_obj'*P*sum_vector;
+objective = (X_obj-Reference)'*Q*(X_obj-Reference) + U_obj'*R*U_obj+ S_obj'* P *sum_vector;
 opti.minimize(objective);
 
 %% ============================================ Dynamics =======================================
@@ -92,8 +92,8 @@ end
 
 %% ====================================== Solver settings ==================================
 % opti.set_initial(X, 1);                                                    % first guess
-% opti.set_initial(S, 0);
-% opti.set_initial(U, 0);
+opti.set_initial(S, 0);
+opti.set_initial(U, U_lb);
 
 opts = struct;
 opts.ipopt.print_level = 1;

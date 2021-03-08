@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="4259504335" file="C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\system_identification\Create data structures application\Create data structures.prj" location="C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\system_identification\Create data structures application" name="Create data structures" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1726204775" file="C:\Git\waterlab-estimator\system_identification\parameter_estimation\Create data structures application\Create data structures.prj" location="C:\Git\waterlab-estimator\system_identification\parameter_estimation\Create data structures application" name="Create data structures" target="target.mlapps" target-name="Package App">
     <param.appname>Create data structures</param.appname>
     <param.authnamewatermark />
     <param.email />
@@ -8,7 +8,7 @@
     <param.icons />
     <param.summary />
     <param.description />
-    <param.screenshot>C:\Users\adish\AppData\Local\Temp\tpdb7dbdd6_a63d_41b8_9c6c_a9e1bfe2e45d.png</param.screenshot>
+    <param.screenshot>C:\Users\Casper and Adis\AppData\Local\Temp\tpc0b52484_6018_4632_9454_ec12c9c48005.png</param.screenshot>
     <param.version>1.0</param.version>
     <param.products.name />
     <param.products.id />
@@ -38,7 +38,7 @@
     <fileset.resources />
     <fileset.package />
     <build-deliverables>
-      <file location="C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\system_identification" name="Create data structures application" optional="false">C:\Users\adish\Desktop\adis\waterlab_estimator\system_identification\system_identification\Create data structures application</file>
+      <file location="C:\Git\waterlab-estimator\system_identification\parameter_estimation" name="Create data structures application" optional="false">C:\Git\waterlab-estimator\system_identification\parameter_estimation\Create data structures application</file>
     </build-deliverables>
     <workflow />
     <matlab>
