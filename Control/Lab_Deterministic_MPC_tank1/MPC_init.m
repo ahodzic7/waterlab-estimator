@@ -16,7 +16,7 @@ intMethod = 2;                          % intergration method used in model
 %% ============================================ Constraint limits ==============================
 U_ub   = 7;                            % input
 U_lb   = 5.7;
-X_ub   = 6.70*ones(1,Hp+1);              % state
+X_ub   = 7.02*ones(1,Hp+1);              % state
 X_lb   = 1.50*ones(1,Hp+1);
 deltaU = [-4; 4]*ones(1,Hp);    % slew rate (inactive if set to high values)
 
@@ -110,4 +110,4 @@ elseif warmStartEnabler == 0
     OCP = opti.to_function('OCP',{X0,D,T,Reference},{U,S},{'x0','d','dt','ref'},{'u_opt','s_opt'});
 end
 
-load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC\disturbance_flow.mat');
+load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_tank1\disturbance_flow.mat');

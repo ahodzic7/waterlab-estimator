@@ -7,6 +7,7 @@ persistent OCP;
 
 persistent Hp;
 persistent warmStartEnabler;
+persistent log;
 
 % and others
 dT = 1/6;           % Sample time in minutes
@@ -51,7 +52,9 @@ u_full = full(u);
 S_full = full(S);
 u = u_full(1);
 S = S_full(1);
-output = [u;S];
+
+log = [u_full S_full]';
+output = [u;S;log];
 
 %plot_simulink_mpc(u_full,S_full,X0,disturbance,Hp);
 
