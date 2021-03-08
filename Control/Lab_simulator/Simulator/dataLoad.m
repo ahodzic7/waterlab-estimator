@@ -13,11 +13,11 @@
 % 14:17 : [pump1_ref(inflow), pump2_ref(outflow), inflow to tank1_ref, lateral inflow_ref]
 % """
 
-addpath('data');
+%addpath('data');
 
 %load('.\data\dataSet_nominal');
 %load('.\data\Simulation_data_CCTA_v4');
-load('.\data\Simulation_data_WWdata_v2');
+load('.\Lab_simulator\Simulator\data\Simulation_data_WWdata_v2');
 
 labRes = ans;
 
