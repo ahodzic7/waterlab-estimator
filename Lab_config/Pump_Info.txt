@@ -2,9 +2,9 @@ Pump 1
 P 0.1
 I 0.3
 Max % 100
-Max Flow 16.5 l/min
-Min % 51
-Min FLow 5.7 l/min
+Max Flow 8 l/min
+Min % 52
+Min FLow 3 l/min
 -----------------------
 Pump 2
 P 0.145

@@ -147,8 +147,8 @@ for step = 1:1:N
     %Predict comming states:
     
     X_predict(:,1) = X_sim(step);
-    for i = 1:Hp-1
-        X_predict(:,i+1) = F_Euler(X_predict(:,i), U_out(:,i) + K*(X_sim(step) - X_exp(:,i)) + S_out(:,i), dist_forcast(:,step+i-1), dT);
+    for i = 1:Hp-1 % K*(X_sim(step) - X_exp(:,i))
+        X_predict(:,i+1) = F_Euler(X_predict(:,i), U_out(:,i) + S_out(:,i), dist_forcast(:,step+i-1), dT);
     end
     
     %Advance simulation and save values

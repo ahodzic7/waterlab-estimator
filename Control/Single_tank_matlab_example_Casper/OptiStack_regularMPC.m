@@ -33,7 +33,9 @@ S  = opti.variable(nU, Hu);             % 'slack' - overflow volume
 
 %% ========================= Objective Function ======================== %%
 % Weights
-P = eye(nU * Hu,nU * Hu) * 100000;
+Decreasing_cost = diag((nU*Hu):-1:1)*10000;
+sum_vector = zeros(nU * Hu,1)+1;
+P = eye(nU * Hu,nU * Hu) * 10000000000 + Decreasing_cost;
 Q = eye(nS * Hp,nS * Hp) * 1000;
 R = eye(nU * Hu,nU * Hu) * 100;
 
@@ -41,9 +43,9 @@ R = eye(nU * Hu,nU * Hu) * 100;
 X_obj = vertcatComplete(X);
 U_obj = vertcatComplete(U);
 S_obj = vertcatComplete(S);
-objective = X_obj'*Q*X_obj +U_obj'*R*U_obj+S_obj'*P*S_obj;
-opti.minimize(objective); 
 
+objective = X_obj'*Q*X_obj +U_obj'*R*U_obj+S_obj'*P*sum_vector;
+opti.minimize(objective); 
 %% ============================ Constraints =========================== %%
 % Adding system dynamics - Where outflow is "Input + Slack" 
 % Note this would change to two for loops if Hu != Hp
@@ -89,8 +91,8 @@ MPC = opti.to_function('MPC',{X0,D},{U,S},{'x0','d'},{'u_opt','s_opt'});
 N = 96;                                 % number of simulation steps
 
 % Import forcast, add noise and set initial state
-forast_raw = readmatrix('test_disturbance.csv');
-dist_forcast = forast_raw(:,1:(N+Hp));
+forcast_raw = readmatrix('test_disturbance.csv');
+dist_forcast = 5*forcast_raw(:,1:(N+Hp));
 dist = dist_forcast + normrnd(0,0.1,size(dist_forcast));
 dist(dist < 0) = 0;
 
