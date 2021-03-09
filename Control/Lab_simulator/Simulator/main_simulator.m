@@ -1,6 +1,6 @@
 clearvars, clc, clear path
 
-N = 4000;                                                                       % length of simulation (dependent on the length of disturbance data)
+N = 2000;                                                                       % length of simulation (dependent on the length of disturbance data)
 
 %% ============================================ Control setup ======================================
 specifications;
@@ -24,9 +24,11 @@ X_ref_sim = [3;3.5];
 %% Pre-computed inputs and disturbances
 %D_sim(:,1:N) = d(:,1:N);                                                             % for preliminary testing
 
-D_sim(1,:) = 1.4*d_t1(1,1:t_resample/2:(N+Hp+1)*t_resample/2);
-D_sim(2,:) = zeros(1,N+Hp+1);
-D_sim(3,:) = 0.5*d_p(1,1:t_resample/2:(N+Hp+1)*t_resample/2);
+load('D_sim')
+
+% D_sim(1,:) = 1.1*d_t1(1,1:t_resample/2:(N+Hp+1)*t_resample/2);
+% D_sim(2,:) = zeros(1,N+Hp+1);
+% D_sim(3,:) = 0.7*d_p(1,1:t_resample/2:(N+Hp+1)*t_resample/2) + 0.9;
 
 %% ==============================================  Simulate  ======================================
 
@@ -35,12 +37,12 @@ tic
 for i = 1:1:N                                                       
 
 %     onoff_control;
-    [U_MPC,S_MPC,Y_MPC,lam_g,x_init] = OCP(X_sim(:,i), D_sim(:,i:i+Hp-1), P_sim, X_ref_sim, lam_g, x_init, dt_sim);
+    [U_MPC,S_MPC,Y_MPC,lam_g,x_init] = OCP(X_sim(:,i), D_sim(:,(i)*(20)-19:20:(i-1)*20 + (Hp)*20-19), P_sim, X_ref_sim, lam_g, x_init, dt_sim);
     
     U_opt(:,i) = full(U_MPC);
     
     % Dynamics simulator
-    X_sim(:,i+1) = full(F_integral_sim(X_sim(:,i), U_opt(:,i), D_sim(:,i), P_sim, dt_sim ));
+    X_sim(:,i+1) = full(F_integral_sim(X_sim(:,i), U_opt(:,i), D_sim(:,1 + (i-1)*t_resample), P_sim, dt_sim ));
     %U_simulator(:,i) = full(U_sim(:,i)); 
     progressbar(i/N) 
     
@@ -56,7 +58,7 @@ plotEnabler = 1;
 if plotEnabler == 1
 figure
 ax(1) = subplot(3,2,1);
-plot(D_sim(1,:)')
+plot(D_sim(1,1:N)')
 leg = legend('$d_{1}$');
 set(leg,'Interpreter','latex');
 title('Disturbances','interpreter','latex')
@@ -122,12 +124,12 @@ for i = 1:Nxp
     title(['Pipe state', num2str(i)],'interpreter','latex')
 end
 end
-%%
-% test = P_sim(2)*g(X_sim(Nxt+ Nxp,:),P_sim(3))
+
+
+%% Save disturbances that work
+
+% D_sim(1,:) = 1.1*d_t1(1,1:1:end);
+% D_sim(2,:) = zeros(1,size(d_t1,2)/1);
+% D_sim(3,:) = 0.7*d_p(1,1:1:end) + 0.9;
 % 
-% function y = g(z,p)    
-%     y = ((z).^(5/3)) ./ ((z + p(3)).^(2/3));        
-% end 
-
-
-%% 
+% save('D_sim','D_sim')

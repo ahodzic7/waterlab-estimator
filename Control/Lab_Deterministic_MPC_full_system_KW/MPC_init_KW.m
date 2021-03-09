@@ -18,8 +18,8 @@ P_sim = [P_pipe_min_v2, Kt, Kt]';      % all sim parameters
 
 %% Properties for ON/OFF controller
 % Tank constraints
-max_t1 = 6;     min_t1 = 1.5;             % 6.7 physical maximum 
-max_t2 = 6;     min_t2 = 2;
+max_t1 = 7.02;     min_t1 = 1.5;             % 6.7 physical maximum 
+max_t2 = 7.02;     min_t2 = 1.5;
 
 % Pipe constraints
 h_p_max = [0.3;0.3;0.3;0.3];
@@ -29,13 +29,10 @@ u1_on = 16.5;      u1_off = 5.7;
 u2_on = 10.5;       u2_off = 4.3;
 
 %% MPC specs
-Hp = 40;
+Hp = 2;
 dt_MPC = 0.5*t_resample/60;
 
 %% Forecasts 
-D_sim(1,:) = 1.4*d_t1(1,1:2:end);
-D_sim(2,:) = zeros(1,size(d_t1(1,1:2:end),2));
-D_sim(3,:) = 0.5*d_p(1,1:2:end);
-
+load('Lab_Deterministic_MPC_full_system_KW\D_sim.mat');
 MPC_builder;
 

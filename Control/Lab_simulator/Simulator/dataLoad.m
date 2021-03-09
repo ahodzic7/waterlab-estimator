@@ -17,7 +17,7 @@
 
 %load('.\data\dataSet_nominal');
 %load('.\data\Simulation_data_CCTA_v4');
-load('.\Lab_simulator\Simulator\data\Simulation_data_WWdata_v2');
+load('Lab_simulator\Simulator\data\Simulation_data_WWdata_v2');
 
 labRes = ans;
 

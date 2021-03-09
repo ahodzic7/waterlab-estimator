@@ -1,4 +1,4 @@
-function [output]  = MPC_full_KW(X0,time,disturbance_flow)
+function [output]  = MPC_full_KW(X0,time)
 % define persistent variables
 eml.extrinsic('evalin');
 persistent x_init;
@@ -30,11 +30,11 @@ if isempty(lam_g)
     warmStartEnabler = evalin('base','warmStartEnabler');
 end
 
-time = round(time);
+time = int64(round(time));
 disturbance = zeros(3,Hp);
 for i=0:1:Hp-1
-    start_index = time+1+i*dT*60*simulink_frequency;
-    end_index = start_index+dT*60*simulink_frequency-1;
+    start_index = time+1 + i*dT*60*simulink_frequency;
+    end_index = start_index + dT*60*simulink_frequency-1;
     disturbance(:,i+1) = mean(D_sim(:,start_index:end_index),2);
 end
 
@@ -55,8 +55,8 @@ end
 
 u_full = full(u);
 S_full = full(S);
-u = u_full(1);
-S = S_full(1);
+u = u_full(1:2);
+S = S_full(1:2);
 
 output = [u;S];
 
