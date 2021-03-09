@@ -1,18 +1,18 @@
 clearvars, clc, clear path
 
-N = 2000;                                                                       % length of simulation (dependent on the length of disturbance data)
+N = 1000;                                                                       % length of simulation (dependent on the length of disturbance data)
 
 %% ============================================ Control setup ======================================
 specifications;
-load_disturbance;
+%load_disturbance;
 
 %% ===================================  Build dynamics & optimization  =============================
 simulator_builder;                                                                 
 MPC_builder;
 
 %% Initial conditions for simulator
-X_sim(1,1) = x(1,1);                                                                 % init. tank1 state [m^3]
-X_sim(2,1) = x(2,1);                                                                 % init. tank2 state [m^3]                                                                     % warm start - Lagrange multiplier initializer
+X_sim(1,1) = 4; %x(1,1);                                                                 % init. tank1 state [m^3]
+X_sim(2,1) = 4; %x(2,1);                                                                 % init. tank2 state [m^3]                                                                     % warm start - Lagrange multiplier initializer
 X_sim(Nxt+1:Nxt+Nxp,1) = x(Nxt+1:Nxt+Nxp,1);                                         % init. pipe states [m]
 dt_sim = 0.5*t_resample/60;                                                          % sampling time [s]       
 

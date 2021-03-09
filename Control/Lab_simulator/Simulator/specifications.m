@@ -11,8 +11,8 @@ Nxp = 4;                            % number of channel states
 NP = 3 + 2;                         % number of channel parameters 
 ND = 3;                             % number of disturbances
 
-load('.\parameters\P_pipe_min')     % load Gravity pipe parameters
-load('.\parameters\P_pipe_min_v2')     % load Gravity pipe parameters
+load('parameters\P_pipe_min')     % load Gravity pipe parameters
+load('parameters\P_pipe_min_v2')     % load Gravity pipe parameters
 dataLoad;                           % load data from experiment
 
 P_sim = [P_pipe_min_v2, Kt, Kt]';      % all sim parameters

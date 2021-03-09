@@ -23,16 +23,17 @@ max_t2 = 7.02;     min_t2 = 1.5;
 
 % Pipe constraints
 h_p_max = [0.3;0.3;0.3;0.3];
-h_p_min = [0.0001;0.0001;0.0001;0.0001];
+h_p_min = [0;0;0;0];
 
-u1_on = 16.5;      u1_off = 5.7;
+u1_on = 9;          u1_off = 4;
 u2_on = 10.5;       u2_off = 4.3;
 
 %% MPC specs
-Hp = 2;
+Hp = 20;
 dt_MPC = 0.5*t_resample/60;
 
 %% Forecasts 
 load('Lab_Deterministic_MPC_full_system_KW\D_sim.mat');
 MPC_builder;
+
 
