@@ -44,8 +44,10 @@ h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ..
     [convertCharsToStrings(append(dataStructure.level_units,'To',dataStructure.level_convert_to))]);
 
 % Remove the outliers:
-%h(1,:) = hampel(h(1,:),8);
-%h(2,:) = hampel(h(2,:),8);
+h(1,:) = hampel(h(1,:),8);
+h(2,:) = hampel(h(2,:),8);
+h(3,:) = hampel(h(3,:),8);
+h(4,:) = hampel(h(4,:),8);
 
 output = [h(1:1:end,:)'];
 
@@ -67,7 +69,13 @@ if ~isnan(data(7,:))
     output = [output Q(3,:)'];
     N_optimization_variables = N_states+1;
 end
- 
+
+if dataStructure.lateral_inflow
+    Q(4,:) = uConv(data(13,startDataIndex:endDataIndex), ...
+        [convertCharsToStrings(append(dataStructure.flow_units,'To',dataStructure.flow_convert_to))]);               % Lateral disturbance flow
+
+    input = [Q(1,:)' Q(2,:)' Q(4,:)'];  
+end
 
 tank_area = uConv(data(11,startDataIndex),...
     [convertCharsToStrings(append(dataStructure.level_units, '^2' ,'To',dataStructure.level_convert_to, '^2'))]);
@@ -92,6 +100,11 @@ if N_augmented_states > 0
 else
     modelName = append(dataStructure.boundary_condition, '_model')
 end
+
+if dataStructure.lateral_inflow
+    modelName = append(modelName, '_lateral_inflow')
+end
+
     
 Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
 order = [size(output,2) size(input,2) N_states+N_augmented_states];        % [Ny Nu Nx] (order)
