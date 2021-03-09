@@ -39,7 +39,7 @@ Y     = P(2)*g(X(Nxt+ Nxp,:),P(3));
 
 %% =========================================== Objective function ==============================
 % 5000*sumsqr(Gs.*S) + 0.01*sumsqr(Gx.*X(1:Nxt,:)) + 50*sumsqr(Gu.*U);  
-objective = 0*sumsqr(U) + 1*sumsqr(S) + 100*(Kt/dt_MPC)*sumsqr(X(1:Nxt,:) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
+objective = sumsqr(U) + 1*sumsqr(S) + 100*(Kt/dt_MPC)*sumsqr(X(1:Nxt,:) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
 opti.minimize(objective); 
 
 %% ============================================== Dynamics =====================================
@@ -95,8 +95,8 @@ end
 
 % Solver options
 opts = struct;
-opts.ipopt.print_level = 0;                                                     % print enabler to command line
-opts.print_time = false;
+% opts.ipopt.print_level = 0;                                                     % print enabler to command line
+% opts.print_time = false;
 opts.expand = true;                                                             % makes function evaluations faster
 %opts.ipopt.hessian_approximation = 'limited-memory';
 opts.ipopt.max_iter = 300;                                                      % max solver iteration
