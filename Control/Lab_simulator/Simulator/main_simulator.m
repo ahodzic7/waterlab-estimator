@@ -1,6 +1,6 @@
 clearvars, clc, clear path
 
-N = 4000;                                                                       % length of simulation (dependent on the length of disturbance data)
+N = 1000;                                                                       % length of simulation (dependent on the length of disturbance data)
 
 %% ============================================ Control setup ======================================
 specifications;
@@ -24,9 +24,9 @@ X_ref_sim = [3;3.5];
 %% Pre-computed inputs and disturbances
 %D_sim(:,1:N) = d(:,1:N);                                                             % for preliminary testing
 
-D_sim(1,:) = 1.4*d_t1(1,1:t_resample/2:(N+Hp+1)*t_resample/2);
+D_sim(1,:) = 1.1*d_t1(1,1:t_resample/2:(N+Hp+1)*t_resample/2);
 D_sim(2,:) = zeros(1,N+Hp+1);
-D_sim(3,:) = 0.5*d_p(1,1:t_resample/2:(N+Hp+1)*t_resample/2);
+D_sim(3,:) = 0.7*d_p(1,1:t_resample/2:(N+Hp+1)*t_resample/2) + 0.9;
 
 %% ==============================================  Simulate  ======================================
 
@@ -130,4 +130,10 @@ end
 % end 
 
 
-%% 
+%% Save disturbances that work
+
+% D_sim(1,:) = 1.1*d_t1(1,1:2:end);
+% D_sim(2,:) = zeros(1,size(d_t1,2)/2);
+% D_sim(3,:) = 0.7*d_p(1,1:2:end) + 0.9;
+
+%save('D_sim','D_sim')
