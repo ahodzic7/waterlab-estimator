@@ -36,7 +36,7 @@ endDataIndex = size(data,2);
 N_sensors = dataStructure.number_of_sensors;                               % Select section number, i.e. pick number of level sensor data
 
 N_states = N_sensors + 1; % Number of states +1 -> tank 2 // Used to evaluate the Qout form the pipe
-N_augmented_states = dataStructure.number_of_augmented_states;
+N_augmented_states = sum(dataStructure.number_of_augmented_states);
 N_optimization_variables = N_states;
 
 % Load the level measurements and convert
@@ -117,8 +117,7 @@ else
     parametersInitial = dataStructure.initial_parameters;
     parametersInitial = [parametersInitial 1/200];
 end
-
-systemParamaters = [parametersInitial, N_states, N_optimization_variables, N_augmented_states];
+systemParamaters = [parametersInitial, N_states, N_optimization_variables, N_augmented_states, dataStructure.number_of_augmented_states];
 
 initialStates = 0.0001*ones(N_states+N_augmented_states, 1);                                     
 
@@ -139,6 +138,9 @@ sys_init.Parameters(8).Name = 'Nopt_var';
 sys_init.Parameters(8).Fixed = true; 
 sys_init.Parameters(9).Name = 'Naug_states';
 sys_init.Parameters(9).Fixed = true;
+for i = 1:N_states-1
+    sys_init.Parameters(9+i).Fixed = true;
+end
 
 if ~isnan(tank_area)
     sys_init = setinit(sys_init, 'Fixed', false(N_states,1));
@@ -150,7 +152,8 @@ sys_init.SimulationOptions.RelTol = 1e-8;
 
 sys_init.SimulationOptions.Solver = 'ode1';                                                 
 
-sys_init.Parameters(1).Minimum = 0.0001;       % Parameter constraints
+sys_init.Parameters(1).Minimum = 0.03;       % Parameter constraints
+sys_init.Parameters(1).Maximum = 1;
 sys_init.Parameters(2).Minimum = 0.0001;    
 sys_init.Parameters(3).Minimum = 0.0001; 
 sys_init.Parameters(5).Minimum = 0.0001;

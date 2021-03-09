@@ -1,6 +1,10 @@
 clearvars, clc, clear path
 
+<<<<<<< HEAD
 N = 1000;                                                                       % length of simulation (dependent on the length of disturbance data)
+=======
+N = 500;                                                                       % length of simulation (dependent on the length of disturbance data)
+>>>>>>> c92d071be1585a4c8fef38131909ccc2fcfd36ac
 
 %% ============================================ Control setup ======================================
 specifications;
@@ -129,7 +133,17 @@ end
 %% Save disturbances that work
 
 % D_sim(1,:) = 1.1*d_t1(1,1:1:end);
+% D_sim(1,:) = 1*d_t1(1,1:1:end)-1.5;
 % D_sim(2,:) = zeros(1,size(d_t1,2)/1);
 % D_sim(3,:) = 0.7*d_p(1,1:1:end) + 0.9;
+% 
+% for i = 1:size(d_t1,2)
+% if D_sim(1,i) < 4
+%     D_sim(1,i) = 4;
+% end
+% end
+% 
+% plot(D_sim(3,:))
+
 % 
 % save('D_sim','D_sim')
