@@ -95,8 +95,8 @@ end
 
 % Solver options
 opts = struct;
-opts.ipopt.print_level = 0;                                                     % print enabler to command line
-opts.print_time = false;
+% % opts.ipopt.print_level = 0;                                                     % print enabler to command line
+% % opts.print_time = false;
 opts.expand = true;                                                             % makes function evaluations faster
 %%opts.ipopt.hessian_approximation = 'limited-memory';
 opts.ipopt.max_iter = 300;                                                      % max solver iteration
