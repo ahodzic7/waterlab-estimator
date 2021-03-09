@@ -18,10 +18,10 @@ simulink_frequency = 2;  % Sampling frequency in seconds
 
 if isempty(lam_g)
     lam_g = 1;
-    x_init = 0;
+    x_init = 0.001;
     Hp = 0;
     P_sim = zeros(5,1);
-    warmStartEnabler = 0;
+    warmStartEnabler = 1;
     % get optimization problem and warmStartEnabler
     OCP = evalin('base','OCP');
     Hp = evalin('base','Hp');
