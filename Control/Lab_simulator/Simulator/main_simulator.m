@@ -139,15 +139,10 @@ if D_sim_temp(1,i) < 4
 end
 end
 % 
-% % N_resample = 2;
-% % 
-% % D_sim(1,:) = resample(D_sim_temp(1,:),N_resample,1);
-% % D_sim(2,:) = resample(D_sim_temp(2,:),N_resample,1);
-% % D_sim(3,:) = resample(D_sim_temp(3,:),N_resample,1);
-% 
+
  D_sim = D_sim_temp;
 % 
- plot(D_sim(1,1:20:end))
+ plot(D_sim(3,1:20:end))
 
-% 
+% % 
 save('D_sim','D_sim')
