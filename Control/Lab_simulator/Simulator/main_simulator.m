@@ -129,20 +129,20 @@ end
 
 %% Save disturbances that work
 
-% D_sim_temp(1,:) = 1*d_t1(1,1:1:end);
-% D_sim_temp(2,:) = zeros(1,size(d_t1,2)/1);
-% D_sim_temp(3,:) = 0;%0.7*d_p(1,1:1:end) + 0.9;
-% % 
-% for i = 1:size(d_t1,2)
-% if D_sim_temp(1,i) < 5
-%     D_sim_temp(1,i) = 5;
-% end
-% end
-% % 
+D_sim_temp(1,:) = 1*d_t1(1,1:1:end);
+D_sim_temp(2,:) = zeros(1,size(d_t1,2)/1);
+D_sim_temp(3,:) = 0.7*d_p(1,1:1:end) + 0.9;
 % 
-%  D_sim = D_sim_temp;
-% % 
-%  plot(D_sim(1,1:20:end))
+for i = 1:size(d_t1,2)
+if D_sim_temp(1,i) < 5
+    D_sim_temp(1,i) = 5;
+end
+end
 % 
-% % % 
-% save('D_sim','D_sim')
+
+ D_sim = D_sim_temp;
+% 
+ plot(D_sim(3,1:20:end))
+
+% % 
+save('D_sim','D_sim')
