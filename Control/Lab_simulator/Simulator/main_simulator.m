@@ -59,7 +59,7 @@ plotEnabler = 1;
 if plotEnabler == 1
 figure
 ax(1) = subplot(3,2,1);
-plot(D_sim(1,1:N)')
+plot(D_sim(1,1:t_resample:N*t_resample)')
 leg = legend('$d_{1}$');
 set(leg,'Interpreter','latex');
 title('Disturbances','interpreter','latex')
@@ -129,30 +129,30 @@ end
 
 %% Save disturbances that work
 
-D_sim_temp(1,:) = 1*d_t1(1,1:1:end);
-D_sim_temp(2,:) = zeros(1,size(d_t1,2)/1);
-D_sim_temp(3,:) = 0.8*d_p(1,1:1:end) + 2;
+% D_sim_temp(1,:) = 1*d_t1(1,1:1:end);
+% D_sim_temp(2,:) = zeros(1,size(d_t1,2)/1);
+% D_sim_temp(3,:) = 0.8*d_p(1,1:1:end) + 2;
+% % 
+% for i = 1:size(d_t1,2)
+% if D_sim_temp(1,i) <= 5
+%     D_sim_temp(1,i) = 5;
+%         for j = 1:20
+%             D_sim_temp(1,i-j) = 5;
+%         end
+% end
+% end
+% % 
 % 
-for i = 1:size(d_t1,2)
-if D_sim_temp(1,i) <= 5
-    D_sim_temp(1,i) = 5;
-        for j = 1:20
-            D_sim_temp(1,i-j) = 5;
-        end
-end
-end
-% 
-
- D_sim = D_sim_temp;
- 
- % include zeros 
- N_zero = 1600;
- indices = [300,3200,6000,9000,13000, 15000,18000, 21000, 25000,28000, 31000, 33500, 37000, 40000, 43000, 46000, 49000];
- for i = 1:size(indices,2)
- D_sim(3,indices(i):indices(i) + N_zero-1) = zeros(1,N_zero);
- end
-% 
- plot(D_sim(3,1:20:end))
-% 
-% % % 
- save('D_sim','D_sim')
+%  D_sim = D_sim_temp;
+%  
+%  % include zeros 
+%  N_zero = 1600;
+%  indices = [300,3200,6000,9000,13000, 15000,18000, 21000, 25000,28000, 31000, 33500, 37000, 40000, 43000, 46000, 49000];
+%  for i = 1:size(indices,2)
+%  D_sim(3,indices(i):indices(i) + N_zero-1) = zeros(1,N_zero);
+%  end
+% % 
+%  plot(D_sim(3,1:20:end))
+% % 
+% % % % 
+%  save('D_sim','D_sim')
