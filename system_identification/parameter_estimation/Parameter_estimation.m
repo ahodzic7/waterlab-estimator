@@ -23,7 +23,7 @@ while ~exist('dataStructure','var')
         return;
     end
 end
-
+%%
 data = dataStructure.data;
 for i=1:1:size(data,2)
     if ~isnan(data(3:6,i))
@@ -35,9 +35,11 @@ endDataIndex = size(data,2);
 %% ================================================ Prepare Data =============================================
 N_sensors = dataStructure.number_of_sensors;                               % Select section number, i.e. pick number of level sensor data
 
-N_states = N_sensors + 1; % Number of states +1 -> tank 2 // Used to evaluate the Qout form the pipe
-N_augmented_states = sum(dataStructure.number_of_augmented_states);
-N_optimization_variables = N_states;
+N_states = N_sensors; % Number of states +1 -> Qout
+N_augmented_states = sum(dataStructure.number_of_augmented_states)        
+N_optimization_variables = N_states+1;
+
+dataTimeStep = dataStructure.data_time_step;                               % Time step size in seconds
 
 % Load the level measurements and convert
 h(1:N_sensors,:) = uConv(data(3:1:3+N_sensors-1,startDataIndex:endDataIndex), ...
@@ -61,14 +63,25 @@ input = [Q(1,:)' Q(2,:)'];
 
 T2 = uConv(data(8,startDataIndex:endDataIndex), ...
     [convertCharsToStrings(append(dataStructure.level_units,'To',dataStructure.level_convert_to))]);                       % Select tanks
-output = [output T2'];
+tank_area = uConv(data(11,startDataIndex),...
+    [convertCharsToStrings(append(dataStructure.level_units, '^2' ,'To',dataStructure.level_convert_to, '^2'))]);
 
 if ~isnan(data(7,:))
     Q(3,:) = uConv(data(7,startDataIndex:endDataIndex), ...
-        [convertCharsToStrings(append(dataStructure.flow_units,'To',dataStructure.flow_convert_to))]);               % Pump_2 flow
-    output = [output Q(3,:)'];
-    N_optimization_variables = N_states+1;
+        [convertCharsToStrings(append(dataStructure.flow_units,'To',dataStructure.flow_convert_to))]);               % Pipe_output_flow
+else
+    Q(3,:) = zeros(1,size(Q,2));
+    Q_temp = zeros(1,size(Q,2));
+    for i = 1:size(Q,2)-1
+        Q_temp(i) = Q(2,i) + tank_area*(T2(1,i+1)-T2(1,i))/dataTimeStep;
+    end
+    Q_temp(1) = 0;
+    Q_temp = hampel(smooth(Q_temp),8);
+    Q_temp(Q_temp < 0) = 0;
+    Q(3,:) = Q_temp;
 end
+
+output = [output Q(3,:)'];
 
 if dataStructure.lateral_inflow
     Q(4,:) = uConv(data(13,startDataIndex:endDataIndex), ...
@@ -77,11 +90,7 @@ if dataStructure.lateral_inflow
     input = [Q(1,:)' Q(2,:)' Q(4,:)'];  
 end
 
-tank_area = uConv(data(11,startDataIndex),...
-    [convertCharsToStrings(append(dataStructure.level_units, '^2' ,'To',dataStructure.level_convert_to, '^2'))]);
-
 %% ============================================ Iddata object ================================================ 
-dataTimeStep = dataStructure.data_time_step;                               % Time step size in seconds
 
 ioData = iddata(output,input,dataTimeStep);                                % (y,u,Ts) (order)
 
@@ -109,14 +118,8 @@ end
 Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
 order = [size(output,2) size(input,2) N_states+N_augmented_states];        % [Ny Nu Nx] (order)
 
-if ~isnan(tank_area)
-    phi_2 = 1/tank_area;
-    parametersInitial = dataStructure.initial_parameters;
-    parametersInitial = [parametersInitial phi_2];
-else
-    parametersInitial = dataStructure.initial_parameters;
-    parametersInitial = [parametersInitial 1/200];
-end
+parametersInitial = dataStructure.initial_parameters;
+
 systemParamaters = [parametersInitial, N_states, N_optimization_variables, N_augmented_states, dataStructure.number_of_augmented_states];
 
 initialStates = 0.0001*ones(N_states+N_augmented_states, 1);                                     
@@ -128,25 +131,18 @@ sys_init.Parameters(2).Name = 'theta_2';
 sys_init.Parameters(3).Name = 'theta_3';
 sys_init.Parameters(4).Name = 'theta_4';
 sys_init.Parameters(5).Name = 'theta_5';
-sys_init.Parameters(6).Name = 'phi_2';
-if ~isnan(tank_area)
-    sys_init.Parameters(6).Fixed = true;
-end
-sys_init.Parameters(7).Name = 'Nx';
-sys_init.Parameters(7).Fixed = true;                                       % number of sections fixed
-sys_init.Parameters(8).Name = 'Nopt_var';
-sys_init.Parameters(8).Fixed = true; 
-sys_init.Parameters(9).Name = 'Naug_states';
-sys_init.Parameters(9).Fixed = true;
-for i = 1:N_states-1
-    sys_init.Parameters(9+i).Fixed = true;
+sys_init.Parameters(6).Name = 'Nx';
+sys_init.Parameters(6).Fixed = true;                                       % number of sections fixed
+sys_init.Parameters(7).Name = 'Nopt_var';
+sys_init.Parameters(7).Fixed = true; 
+sys_init.Parameters(8).Name = 'Naug_states';
+sys_init.Parameters(8).Fixed = true;
+for i = 1:N_states+1
+    sys_init.Parameters(8+i).Fixed = true;
 end
 
-if ~isnan(tank_area)
-    sys_init = setinit(sys_init, 'Fixed', false(N_states,1));
-else
-    sys_init = setinit(sys_init, 'Fixed', false(N_states+1,1));
-end
+sys_init = setinit(sys_init, 'Fixed', false(N_states,1));
+
 sys_init.SimulationOptions.AbsTol = 1e-10;
 sys_init.SimulationOptions.RelTol = 1e-8;
 
@@ -177,8 +173,7 @@ estimatedParameters = [sys_final.Parameters(1).Value...
              sys_final.Parameters(2).Value...
              sys_final.Parameters(3).Value...
              sys_final.Parameters(4).Value...
-             sys_final.Parameters(5).Value...
-             sys_final.Parameters(6).Value];
+             sys_final.Parameters(5).Value];
 
 estimatedInitialStates = sys_final.Report.Parameters.X0                               % estimated initial states
 toc
