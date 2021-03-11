@@ -26,7 +26,6 @@ if isempty(lam_g)
     OCP = evalin('base','OCP');
     Hp = evalin('base','Hp');
     D_sim = evalin('base','D_sim');
-    X_ref_sim = evalin('base','X_ref_sim');
     P_sim = evalin('base','P_sim');
     warmStartEnabler = evalin('base','warmStartEnabler');
 end
@@ -39,23 +38,23 @@ for i=0:1:Hp-1
     disturbance(:,i+1) = mean(D_sim(:,start_index:end_index),2);
 end
 
-reference = zeros(2,Hp);
+X_ref_sim = zeros(2,Hp);
 for i=0:1:Hp-1
     start_index = time+1 + i*dT*60*simulink_frequency;
     end_index = start_index + dT*60*simulink_frequency-1;
-    reference(:,i+1) = (X_ref_sim(:,start_index:end_index));
+    X_ref_sim(:,i+1) = (X_ref_sim(:,start_index:end_index));
 end
 
 X0 = X0/100;
-%X_ref_sim = [3;3.5];
+X_ref_sim = [3;3.5];
 
 % run openloop MPC
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    [u,S,Y,lam_g,x_init] = OCP(X0, disturbance, P_sim, reference, lam_g, x_init, dT);
+    [u,S,Y,lam_g,x_init] = OCP(X0, disturbance, P_sim, X_ref_sim, lam_g, x_init, dT);
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [u,S,Y] = OCP(X0, disturbance, P_sim, reference, dT);
+    [u,S,Y] = OCP(X0, disturbance, P_sim, X_ref_sim, dT);
 end
 
 
