@@ -1,7 +1,7 @@
-function [dx, y] = free_flow_model_lateral_inflow(t, x, u, p1, p2, p3, p4, p5, p6,N_states , N_optimization_variables, N_aug_states, varargin)
+function [dx, y] = free_flow_model_lateral_inflow(t, x, u, p1, p2, p3, p4, p5,N_states , N_optimization_variables, N_aug_states, varargin)
 % Continous time nlgreyest model for the diffusion wave gravity pipe with the tank in the end of the pipe. 
-Augmented_states = zeros(1,N_states-1);
-for i=1:N_states-1
+Augmented_states = zeros(1,N_states+1);
+for i=1:N_states+1
     Augmented_states(i) = cell2mat(varargin(i));
 end
 dx = zeros(N_states+N_aug_states,1);
@@ -11,6 +11,7 @@ N1 = Augmented_states(1);
 N2 = Augmented_states(2);
 N3 = Augmented_states(3);
 N4 = Augmented_states(4);
+N5 = Augmented_states(5);
 %% Augmented states
 if N1 > 1
     dx(N_states + 1) = p1 * u(1) - p2 * x(N_states + 1) + p3*x(N_states + 2)-p4;
@@ -83,7 +84,7 @@ if N3 == 0
     if N4 == 0
         dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(4) + p1*u(3);                    % Lateral inflow added
     else
-        dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(N_states + N1+N2+N3+1);
+        dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(N_states + N1+N2+N3+1)+ p1*u(3); % Lateral inflow added
     end
 else
     if N4 == 0
@@ -108,22 +109,37 @@ end
 % else
 %     dx(4) = p2 * x(N_states+N1+N2+N3+N4) - p3*x(4) + p4 -  p5*(x(4)-x(5)+tank_offset);
 % end
-
 if N4 == 0
-    dx(N_states-1) = p2 * x(N_states-2) - p3*x(N_states-1) + p4 -  p5*(x(N_states-1));
+    if N5 == 0
+        dx(N_states) = p2 * x(N_states-1) - p3*x(N_states) + p4 -  p5*(x(N_states));
+    else
+        dx(4) =  p2*x(3) - (p2+p3)*x(4) + p3*x(N_states + N1+N2+N3+N4+1);
+    end
 else
-    dx(N_states-1) =  p2*x(N_states + N1+N2+N3+N4) - (p2+p3)*x(N_states-1) + p4 - p5*(x(N_states-1));
+    if N5 == 0
+        dx(N_states) = p2 * x(N_states+N1+N2+N3+N4) - p3*x(N_states) + p4 -  p5*(x(N_states));
+    else
+        dx(4) =  p2*x(N_states + N1+N2+N3+N4) - (p2+p3)*x(4) + p3*x(N_states + N1+N2+N3+N4+1); 
+    end
 end 
 
-% Tank 2 equation
-
-dx(N_states) = p6*(p5/p1*(x(N_states-1))-u(2));
+if N5 > 1
+    dx(N_states +N1+N2+N3+N4+1) = p2*x(4) - (p2+p3)*x(N_states + N1+N2+N3+N4+1) + p3*x(N_states+N1+N2+N3+N4+2);
+    for j = 2:N5-1
+        dx(N_states+N1+N2+N3+N4+j) = p2*x(N_states+N1+N2+N3+N4+j-1) - (p2+p3)*x(N_states+N1+N2+N3+N4 + j) + p3*x(N_states+N1+N2+N3+N4+ j+1);
+    end
+    dx(N_states + N1+N2+N3+N4+N5) = p2*x(N_states+N1+N2+N3+N4+N5-1) - (p2+p3)*x(N_states + N1+N2+N3+N4+N5) + p4 -  p5*(x(N_states + N1+N2+N3+N4+N5));
+elseif N5 == 1
+    dx(N_states + N1+N2+N3+N4+1) = p2*x(4) - (p2+p3)*x(N_states + N1+N2+N3+N4+1)+ p4 -  p5*(x(N_states + N1+N2+N3+N4+1));
+end
 
 
 %% Output equation
 y(1:N_states) = x(1:N_states);
-if N_optimization_variables > N_states
-    y(N_optimization_variables) = p5/p1*(x(N_states-1));
+if N5 > 0
+    y(N_optimization_variables) = p5/p1*(x(N_states + N1+N2+N3+N4+N5));
+else
+    y(N_optimization_variables) = p5/p1*(x(N_states));
 end
 
 end

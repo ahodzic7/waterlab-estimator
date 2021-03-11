@@ -1,5 +1,11 @@
 function [dx, y] = submerged_flow_augmented_model(t, x, u, p1, p2, p3, p4, p5, p6,N_states , N_optimization_variables, N_aug_states, varargin)
 % Continous time nlgreyest model for the diffusion wave gravity pipe with the tank in the end of the pipe. 
+
+% TODO
+% The flow output has to be implemented
+% Cannot be used before
+%
+
 tank_offset = 1.1;
 dx = zeros(N_states + N_aug_states,1);
 y = zeros(N_optimization_variables,1);
