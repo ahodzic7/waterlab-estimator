@@ -5,31 +5,42 @@ addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5')
 import casadi.*
 
 
-%% ============================================== Sim. setup ===================================
+%% ============================================== MPC. setup ===================================
 Hp = 24;                                % prediction horizon   
 Hu = Hp;                                % control horizion
 nS = 1;                                 % number of states
-nU = 1;
+nT = 2;                                 % number of tanks
+nP = 4;                                 % number of pipe sections
+nU = 1;                                 % number of control inputs
+nD = 2;
 opti = casadi.Opti();                   % opti stack 
 warmStartEnabler = 1;                   % warmstart for optimization
-intMethod = 2;                          % intergration method used in model
 %% ============================================ Constraint limits ==============================
-U_ub   = 7;                            % input
-U_lb   = 5.7;
-X_ub   = 7.02*ones(1,Hp+1);              % state
-X_lb   = 1.50*ones(1,Hp+1);
-deltaU = [-4; 4]*ones(1,Hp);    % slew rate (inactive if set to high values)
-
+U_ub   = [8;10.5];                      % input bounds
+U_lb   = [3;4.5];
+dU_ub  = [3;3];
+dU_lb  = [-3;-3];
+Xt_ub  = 7.02;                          % state bounds tank
+Xt_lb  = 1.50;
+Xp_ub  = 0.5;                           % state bounds pipes                          
+Xp_lb  = 0.00001;
+% Combine into system bounds
+X_ub   = [Xt_ub; Xp_ub*ones(1,nP); Xt_ub]'; 
+X_lb   = [Xt_lb; Xp_lb*ones(1,nP); Xt_lb]'; 
 %% ========================================= Optimization variables ============================
 X  = opti.variable(nS,Hp+1);            % state - volume 
-U  = opti.variable(nS,Hu);              % input - pumpflow 
-S  = opti.variable(nS,Hu);            % slack - overflow volume
+U  = opti.variable(nU,Hu);              % input - pumpflow 
+S  = opti.variable(nS,Hp);              % slack - overflow volume
 
 %% ========================================= Optimization parameters ===========================
-D  = opti.parameter(nS,Hu);             % disturbance - rain inflow
+D  = opti.parameter(nD,Hp);             % disturbance - rain inflow
 X0 = opti.parameter(nS);                % initial state - level
-T  = opti.parameter(nS);                % MPC model_level sampling time
+T  = opti.parameter(1);                 % MPC model_level sampling time
 Reference  = opti.parameter(nS);        % reference
+
+%% ====================================== System parameters ====================================
+p = [];
+phi = [];
 
 %% =========================================== Objective =======================================
 % Weights
@@ -49,45 +60,42 @@ objective = (X_obj-Reference)'*Q*(X_obj-Reference) + U_obj'*R*U_obj+ S_obj'* P *
 opti.minimize(objective);
 
 %% ============================================ Dynamics =======================================
+
+% function variables
 dt = casadi.MX.sym('dt',1);             % sampling time 
 x = casadi.MX.sym('x',nS);              % state
 u = casadi.MX.sym('u',nS);              % input
 d = casadi.MX.sym('d',nS);              % disturbance
 
-% Runge Kutta constants
-k1 = model_level(x, u, d);
-k2 = model_level(x + dt / 2.0*k1, u , d);
-k3 = model_level(x + dt / 2.0*k2, u , d);
-k4 = model_level(x + dt*k3, u, d);
+% system matricies
+A       = BuildA(nS, p, phi, dt);                                           % builds two tank topology with nS-2 pipe sections
+B       = BuildB(nS, p, phi, dt);
+Bd      = BuildBd(nS,3,p,phi,dt);                                           % allows d to enter in tank1 and in pipe section 2
+Delta   = BuildDelta(nS, p, dt);
+% function
+system_dynamics = A*x + B*u + Bd*d + Delta;
 
 % Discrete dynamics
-if intMethod == 1                       % Runge-Kutte 4th order
-    xf = x + dt / 6.0 * (k1 + 2*k2 + 2*k3 + k4);
-    F_integral = casadi.Function('F_RK4', {x, u, d, dt}, {xf}, {'x[k]', 'u[k]', 'd[k]', 'dt'}, {'x[k+1]'});
-elseif intMethod == 2                   % Forward Euler
-    xf = x + dt*model_level(x, u, d);
-    F_integral = casadi.Function('F_EUL', {x, u, d, dt}, {xf}, {'x[k]', 'u[k]', 'd[k]', 'dt'}, {'x[k+1]'});
-end
+F_System = casadi.Function('F_DW', {x, u, d, dt}, {system_dynamics}, {'x[k]', 'u[k]', 'd[k]', 'dt'}, {'x[k+1]'});
+
                                     
-%% ==================================== Dynamics constraints ===============================
+%% ======================================== Constraints ========================================
 % Initial state                             
 opti.subject_to(X(:,1)==X0);           
 
-% Gap - closing constraint
+% Dynamic constraints
 for i=1:Hp                             
-   opti.subject_to(X(:,i+1)==F_integral(X(:,i), U(:,i) + S(:,i), D(:,i), T(:)));  
+   opti.subject_to(X(:,i+1)==F_system(X(:,i), U(:,i) + S(:,i), D(:,i), T));
+   opti.subject_to(dU_lb <= (U(:,i) - U(:,i-1)) <= dU_ub);                  % bounded slew rate
+   opti.subject_to(X_lb<=X(:,i)<=X_ub);                                     % level constraints 
 end
 
-%% ==================================== Physical constraints ===============================
-for k = 1:1:nS
-    opti.subject_to(X_lb(k,:)<=X(k,:)<=X_ub(k,:));                          % Soft constraint on state - volume 
-    opti.subject_to(S(k,:)>=zeros(1,Hu));                                 % Slack variable is always positive - Vof >= 0
+for i = 1:1:nS
+    opti.subject_to(S(i,:)>=zeros(1,Hp));                                   % slack variable is always positive - Vof >= 0
 end
 
-opti.subject_to(U_lb <=U<= U_ub);                                           % Bounded input  
-
-for i=1:1:Hp                             
-   opti.subject_to(deltaU(1,i) <= (U(1,i) - U(1,i-1)) <= deltaU(2,i));      % bounded slew rate
+for i = 1:1:Hu
+    opti.subject_to(U_lb <= U(:,i) <= U_ub);                                % bounded input  
 end
 
 %% ====================================== Solver settings ==================================
@@ -110,4 +118,4 @@ elseif warmStartEnabler == 0
     OCP = opti.to_function('OCP',{X0,D,T,Reference},{U,S},{'x0','d','dt','ref'},{'u_opt','s_opt'});
 end
 
-load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_tank1\disturbance_flow.mat');
+load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_tank1\D_sim.mat');

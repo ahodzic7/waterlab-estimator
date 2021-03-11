@@ -15,7 +15,7 @@ simulink_frequency = 2;  % Sampling frequency in seconds
 
 if isempty(lam_g)
     lam_g = 1;
-    x_init = 0.01;
+    x_init = 0;
     Hp = 0;
     warmStartEnabler = 0;
     % get optimization problem and warmStartEnabler
@@ -24,6 +24,8 @@ if isempty(lam_g)
     warmStartEnabler = evalin('base','warmStartEnabler');
 end
 
+
+%Create forcast from disturbance reference
 time = int64(round(time));
 disturbance = zeros(1,Hp);
 for i=0:1:Hp-1
@@ -32,9 +34,7 @@ for i=0:1:Hp-1
     disturbance(i+1) = mean(disturbance_flow(start_index:end_index));
 end
 
-% Unit convertion:
-
-X0 = X0/100;
+X0 = X0/100;                                                               % Unit convertion from mm to dm
 reference = 3;
 
 % run openloop MPC
@@ -49,13 +49,4 @@ end
 
 u_full = full(u);
 S_full = full(S);
-u = u_full(1);
-S = S_full(1);
-
-log = [u_full S_full]';
-output = [u;S;log];
-
-%plot_simulink_mpc(u_full,S_full,X0,disturbance,Hp);
-
-
 end

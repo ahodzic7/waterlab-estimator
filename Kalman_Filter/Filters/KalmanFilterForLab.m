@@ -12,7 +12,7 @@ function [EstimatedX,ErrorCo,KalmanGain] = KalmanFilterForLab(SystemMeas,PrevEst
 %                 0.0134318977059966,0.0182591773612488,0.438651709317892]'.^2;
     variance_model =[0.00139888812206957,0.000797324354867475,0.000322187764180357,0.000534989387547297,0.032914576421211]'.^2;
 %     variance_meas = [0.826888663787374,0.808307645981179,0.782347907960311,0.544902200314622,0.826888663787374]'.^2;
-    variance_meas = [0.00782347907960307,0.00826888663787373,0.0001]'.^2;
+    variance_meas = [0.0078234790960307,0.00826888663787373,0.0001]'.^2;
     Qm = diag(variance_model);       %Covariance of model noise
     Rm = diag(variance_meas);       %Covariance of messurment noise
     
@@ -27,7 +27,7 @@ C(2,4) = 1;
 C(3,5) = 1;
 
 %Prediction Step
-    PredictedX = A * PrevEstimatedX + B * ControlInput  + Delta;
+    PredictedX = A * PrevEstimatedX + B * ControlInput  + B_d *  + Delta;
     PredictedP = A * PrevErrorCo * A' + Qm;
     
 %Compute KalmanGain
