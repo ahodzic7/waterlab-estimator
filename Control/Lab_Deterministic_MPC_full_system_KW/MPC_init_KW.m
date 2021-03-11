@@ -1,7 +1,7 @@
 %% ============================================ Control setup ======================================
 addpath('.\Lab_simulator\Simulator\lab signal design\generated_data');
 load('.\Lab_simulator\Simulator\lab signal design\generated_data\d_lab');
-addpath('.\Lab_simulator\Simulator\control')
+addpath('.\Lab_simulator\Simulator')
 
 dataLoad; 
 
