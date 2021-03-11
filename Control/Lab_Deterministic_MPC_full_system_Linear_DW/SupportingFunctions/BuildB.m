@@ -3,7 +3,7 @@ function B = BuildB(NumberOfStates,p,phi,DeltaT)
 %The first tank is included in the B matrix. dim(p) = (1,5) and
 %   dim(phi) = (1,2)
 
-B = zeros(NumberOfStates,2);
+B = casadi.MX.zeros(NumberOfStates,2);
 
 B(1,:) = [-phi(1) * DeltaT, 0];
 B(2,:) = [p(1) * DeltaT, 0];
