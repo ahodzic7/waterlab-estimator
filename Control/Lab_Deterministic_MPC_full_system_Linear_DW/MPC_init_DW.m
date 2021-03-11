@@ -7,7 +7,7 @@ import casadi.*
 
 %% ============================================== MPC. setup ===================================
 Hp = 24;                                % prediction horizon   
-Hu = 20;                                % control horizion
+Hu = Hp;                                % control horizion
 nS = 6;                                 % number of states
 nT = 2;                                 % number of tanks
 nP = 4;                                 % number of pipe sections
@@ -18,8 +18,8 @@ warmStartEnabler = 0;                   % warmstart for optimization
 %% ============================================ Constraint limits ==============================
 U_ub   = [8;10.5];                      % input bounds
 U_lb   = [3;4.5];
-dU_ub  = [3;3];
-dU_lb  = [-3;-3];
+dU_ub  = [4.5;4.5];
+dU_lb  = [-4.5;-4.5];
 Xt_ub  = 7.02;                          % state bounds tank
 Xt_lb  = 1.50;
 Xp_ub  = 0.5;                           % state bounds pipes                          
@@ -30,11 +30,13 @@ X_lb   = [Xt_lb, Xp_lb*ones(1,nP), Xt_lb]';
 %% ========================================= Optimization variables ============================
 X  = opti.variable(nS,Hp+1);            % state - volume 
 U  = opti.variable(nU,Hp);              % input - pumpflow 
+deltaU = opti.variable(nU,Hp);
 S  = opti.variable(nT,Hp);              % slack - overflow volume
 
 %% ========================================= Optimization parameters ===========================
 D  = opti.parameter(nD,Hp);             % disturbance - rain inflow
 X0 = opti.parameter(nS);                % initial state - level
+U0 = opti.parameter(nU);                % the previous control
 T  = opti.parameter(1);                 % MPC model_level sampling time
 Reference  = opti.parameter(nS);     % reference
 
@@ -48,18 +50,18 @@ Decreasing_cost = diag((nT*Hp):-1:1)*1000000;
 sum_vector = zeros(nT * Hp,1)+1;
 P = eye(nT * Hp,nT * Hp) * 10000000 + Decreasing_cost;
 Q = zeros(nS, nS);
-Q(1,1) = 100;                                                               % cost of tank1 state
-Q(6,6) = 100;                                                               % cost of tank2 state               
+Q(1,1) = 1000;                                                               % cost of tank1 state
+Q(6,6) = 1000;                                                               % cost of tank2 state               
 Q = kron(eye(Hp),Q);
 R = eye(nU * Hp,nU * Hp) * 10;
 
 % Rearrange X and U
 X_obj = vertcatComplete( X(:,2:end) - Reference);
-U_obj = vertcatComplete(U);
+deltaU_obj = vertcatComplete(deltaU);
 S_obj = vertcatComplete(S);
 
 % Objective function
-objective = X_obj'*Q*X_obj + U_obj'*R*U_obj+ S_obj'* P * sum_vector;
+objective = X_obj'*Q*X_obj + deltaU_obj'*R*deltaU_obj+ S_obj'* P * sum_vector;
 opti.minimize(objective);
 
 %% ============================================ Dynamics =======================================
@@ -94,6 +96,11 @@ end
 % Dynamic constraints
 for i=1:Hp                             
    opti.subject_to(X(:,i+1)==F_system(X(:,i), U(:,i) + S(:,i), D(:,i), T));
+   if i == 1
+       opti.subject_to(deltaU(:,i)==U(:,i) - U0)
+   else
+       opti.subject_to(deltaU(:,i)==U(:,i) - U(:,i-1));
+   end
    opti.subject_to(dU_lb <= (U(:,i) - U(:,i-1)) <= dU_ub);                  % bounded slew rate
    opti.subject_to(X_lb<=X(:,i)<=X_ub);                                     % level constraints 
 end
@@ -120,10 +127,10 @@ opti.solver('ipopt',opts);
 
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    OCP = opti.to_function('OCP',{X0,D,opti.lam_g,opti.x,T,Reference},{U,S,opti.lam_g,opti.x},{'x0','d','lam_g','x_init','dt','ref'},{'u_opt','s_opt','lam_g','x_init'});
+    OCP = opti.to_function('OCP',{X0,U0,D,opti.lam_g,opti.x,T,Reference},{U,S,opti.lam_g,opti.x},{'x0','u0','d','lam_g','x_init','dt','ref'},{'u_opt','s_opt','lam_g','x_init'});
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    OCP = opti.to_function('OCP',{X0,D,T,Reference},{U,S},{'x0','d','dt','ref'},{'u_opt','s_opt'});
+    OCP = opti.to_function('OCP',{X0,U0,D,T,Reference},{U,S},{'x0','u0','d','dt','ref'},{'u_opt','s_opt'});
 end
 
 load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
