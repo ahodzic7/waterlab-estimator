@@ -4,7 +4,6 @@ eml.extrinsic('evalin');
 persistent x_init;
 persistent lam_g;
 persistent OCP;
-
 persistent Hp;
 persistent warmStartEnabler;
 persistent log;
@@ -25,7 +24,7 @@ if isempty(lam_g)
     warmStartEnabler = evalin('base','warmStartEnabler');
 end
 
-time = round(time);
+time = int64(round(time));
 disturbance = zeros(1,Hp);
 for i=0:1:Hp-1
     start_index = time+1+i*dT*60*simulink_frequency;
@@ -41,7 +40,7 @@ reference = 3;
 % run openloop MPC
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    [u , S, lam_g, x_init] = (OCP(X0, disturbance, lam_g, x_init, dT,reference));
+    [u , S, lam_g, x_init] = (OCP(X0, D_sim(:,(i)*(20)-19:20:(i-1)*20 + (Hp)*20-19), lam_g, x_init, dT,reference));
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
     [u , S] = (OCP(X0, disturbance, dT,reference));

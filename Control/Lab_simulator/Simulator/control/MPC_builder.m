@@ -39,7 +39,7 @@ Y     = P(2)*g(X(Nxt+ Nxp,:),P(3));
 
 %% =========================================== Objective function ==============================
 % 5000*sumsqr(Gs.*S) + 0.01*sumsqr(Gx.*X(1:Nxt,:)) + 50*sumsqr(Gu.*U);  
-objective = sumsqr(U) + 2*sumsqr(S) + 2*(Kt/dt_MPC)*sumsqr(X(1:Nxt,:) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
+objective = sumsqr(U) + 2*sumsqr(S) + 10*(Kt/dt_MPC)*sumsqr(X(1:Nxt,:) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
 opti.minimize(objective); 
 
 %% ============================================== Dynamics =====================================
@@ -76,7 +76,7 @@ end
 
 %% ==================================== Physical constraints ===============================
 for k = 1:Nxt
-    opti.subject_to(Xt_lb(k,:)+ S(k,:) <= X(k,:) <= Xt_ub(k,:)+ S(k,:));    % Soft constraint on tank state
+    opti.subject_to(Xt_lb(k,:)+ S(k,:) <= X(k,:) <= Xt_ub(k,:)+ S(k,:));   % Soft constraint on tank state
     opti.subject_to(S(k,:) >= zeros(1,Hp+1));                              % Slack variable is always positive - Vof >= 0
 end
 
@@ -85,7 +85,7 @@ for k = 1:Nxt
 end
 
 for k = (Nxt+1):(Nxt+Nxp)
-    opti.subject_to(Xp_lb(k-Nxt,:) < X(k,:) <= Xp_ub(k-Nxt,:));       % hard constraint on pipe state
+    opti.subject_to(Xp_lb(k-Nxt,:) < X(k,:) <= Xp_ub(k-Nxt,:));             % hard constraint on pipe state
 end
 
 %% ====================================== Solver settings ==================================
@@ -95,10 +95,10 @@ end
 
 % Solver options
 opts = struct;
-% opts.ipopt.print_level = 0;                                                     % print enabler to command line
-% opts.print_time = false;
+opts.ipopt.print_level = 0;                                                     % print enabler to command line
+opts.print_time = false;
 opts.expand = true;                                                             % makes function evaluations faster
-%%opts.ipopt.hessian_approximation = 'limited-memory';
+%opts.ipopt.hessian_approximation = 'limited-memory';
 opts.ipopt.max_iter = 300;                                                      % max solver iteration
 opti.solver('ipopt',opts);                                                      % solver: ipopt(default)
 

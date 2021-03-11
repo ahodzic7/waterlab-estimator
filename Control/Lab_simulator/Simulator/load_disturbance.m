@@ -1,2 +1,2 @@
 addpath('.\lab signal design\generated_data');
-load('.\lab signal design\generated_data\d_lab');
+load('.\Lab_Deterministic_MPC_full_system_KW\D_sim.mat');

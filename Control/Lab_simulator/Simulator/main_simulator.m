@@ -2,9 +2,10 @@ clearvars, clc, clear path
 
 N = 2000;                                                                       % length of simulation (dependent on the length of disturbance data)
 
+
 %% ============================================ Control setup ======================================
 specifications;
-load_disturbance;
+%load_disturbance;
 
 %% ===================================  Build dynamics & optimization  =============================
 simulator_builder;                                                                 
@@ -58,7 +59,9 @@ plotEnabler = 1;
 if plotEnabler == 1
 figure
 ax(1) = subplot(3,2,1);
-plot(D_sim(1,1:N)')
+plot(D_sim(1,1:t_resample:N*t_resample)')
+% hold on
+% plot(d(1,:))
 leg = legend('$d_{1}$');
 set(leg,'Interpreter','latex');
 title('Disturbances','interpreter','latex')
@@ -66,6 +69,8 @@ title('Disturbances','interpreter','latex')
 flow_model_est = P_sim(2)*(((X_sim(Nxt+ Nxp,:)).^(5/3)) ./ ((X_sim(Nxt+ Nxp,:) + P_sim(3)).^(2/3)));
 ax(2) = subplot(3,2,2);
 plot(flow_model_est)%+ test(1,1:end-1))
+% hold on
+% plot(d(3,:) + u(1,:))
 leg = legend('$d_{2}$');
 set(leg,'Interpreter','latex');
 title('Disturbances','interpreter','latex')
@@ -78,6 +83,8 @@ hold on
 plot(max_t1*ones(N,1),'red--')
 hold on
 plot(min_t1*ones(N,1),'red--')
+% hold on
+% plot(x(1,:))
 leg = legend('$x_{t1}$','Reference');
 set(leg,'Interpreter','latex');
 title('Tank t1 state','interpreter','latex')
@@ -90,6 +97,8 @@ hold on
 plot(max_t2*ones(N,1),'red--')
 hold on
 plot(min_t2*ones(N,1),'red--')
+% hold on
+% plot(x(2,:))
 leg = legend('$x_{t2}$','Reference');
 set(leg,'Interpreter','latex');
 title('Tank t2 state','interpreter','latex')
@@ -100,6 +109,8 @@ hold on
 plot(u1_on*ones(N,1),'red--')
 hold on
 plot(u1_off*ones(N,1),'red--')
+% hold on
+% plot(u(1,:),'red')
 leg = legend('$u_{t1}$','Limit');
 set(leg,'Interpreter','latex');
 title('Pump 1','interpreter','latex')
@@ -110,6 +121,8 @@ hold on
 plot(u2_on*ones(N,1),'red--')
 hold on
 plot(u1_off*ones(N,1),'red--')
+% hold on
+% plot(u(2,:),'red')
 leg = legend('$u_{t2}$','Limit');
 set(leg,'Interpreter','latex');
 title('Pump 2','interpreter','latex')
@@ -128,8 +141,30 @@ end
 
 %% Save disturbances that work
 
-% D_sim(1,:) = 1.1*d_t1(1,1:1:end);
-% D_sim(2,:) = zeros(1,size(d_t1,2)/1);
-% D_sim(3,:) = 0.7*d_p(1,1:1:end) + 0.9;
+% D_sim_temp(1,:) = 1*d_t1(1,1:1:end);
+% D_sim_temp(2,:) = zeros(1,size(d_t1,2)/1);
+% D_sim_temp(3,:) = 0.8*d_p(1,1:1:end) + 2;
+% % 
+% for i = 1:size(d_t1,2)
+% if D_sim_temp(1,i) <= 5
+%     D_sim_temp(1,i) = 5;
+%         for j = 1:20
+%             D_sim_temp(1,i-j) = 5;
+%         end
+% end
+% end
+% % 
 % 
-% save('D_sim','D_sim')
+%  D_sim = D_sim_temp;
+%  
+%  % include zeros 
+%  N_zero = 1600;
+%  indices = [300,3200,6000,9000,13000, 15000,18000, 21000, 25000,28000, 31000, 33500, 37000, 40000, 43000, 46000, 49000];
+%  for i = 1:size(indices,2)
+%  D_sim(3,indices(i):indices(i) + N_zero-1) = zeros(1,N_zero);
+%  end
+% % 
+%  plot(D_sim(3,1:20:end))
+% % 
+% % % % 
+%  save('D_sim','D_sim')
