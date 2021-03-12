@@ -15,7 +15,6 @@
 
 %addpath('data');
 
-
 load('Lab_simulator\Simulator\data\Experiment_data_deterministic_MPC_full_KW');
 %load('Lab_simulator\Simulator\data\Simulation_data_WWdata_v2');
 
