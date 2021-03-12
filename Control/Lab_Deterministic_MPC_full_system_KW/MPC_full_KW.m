@@ -39,15 +39,16 @@ for i=0:1:Hp-1
     disturbance(:,i+1) = mean(D_sim(:,start_index:end_index),2);
 end
 
+time = int64(round(time));
 reference = zeros(2,Hp);
 for i=0:1:Hp-1
     start_index = time+1 + i*dT*60*simulink_frequency;
     end_index = start_index + dT*60*simulink_frequency-1;
-    reference(:,i+1) = (X_ref_sim(:,start_index:end_index));
+    reference(:,i+1) = mean((X_ref_sim(:,start_index:end_index)),2);
 end
 
 X0 = X0/100;
-%X_ref_sim = [3;3.5];
+%reference = [3;3.5];
 
 % run openloop MPC
 if warmStartEnabler == 1

@@ -1,3 +1,6 @@
+clear all;
+clc
+
 %% ============================================ Control setup ======================================
 addpath('.\Lab_simulator\Simulator\lab signal design\generated_data');
 load('.\Lab_simulator\Simulator\lab signal design\generated_data\d_lab');
@@ -34,6 +37,9 @@ dt_MPC = 0.5*t_resample/60;
 
 %% Forecasts 
 load('Lab_Deterministic_MPC_full_system_KW\D_sim.mat');
+%% reference
+load('Lab_Deterministic_MPC_full_system_KW\X_ref_sim.mat');
+
 MPC_builder;
 
 

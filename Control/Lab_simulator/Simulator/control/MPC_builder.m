@@ -27,7 +27,7 @@ D     = opti.parameter(ND,Hp);                             % disturbance traject
 P     = opti.parameter(NP,1);                                 % pipe parameters
 X0    = opti.parameter(Nxt+ Nxp);                           % initial state 
 DT    = opti.parameter(1);                                  % MPC model sampling time 
-X_ref = opti.parameter(Nxt,1); 
+X_ref = opti.parameter(Nxt,Hp); 
 
 %% ========================================= Simulation variables ============================
 % X_MPC = zeros((Nxt+ Nxp),N); 
@@ -39,7 +39,7 @@ Y     = P(2)*g(X(Nxt+ Nxp,:),P(3));
 
 %% =========================================== Objective function ==============================
 % 5000*sumsqr(Gs.*S) + 0.01*sumsqr(Gx.*X(1:Nxt,:)) + 50*sumsqr(Gu.*U);  
-objective = sumsqr(U) + 2*sumsqr(S) + 10*(Kt/dt_MPC)*sumsqr(X(1:Nxt,:) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
+objective = sumsqr(U) + 2*sumsqr(S) + 10*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
 opti.minimize(objective); 
 
 %% ============================================== Dynamics =====================================
