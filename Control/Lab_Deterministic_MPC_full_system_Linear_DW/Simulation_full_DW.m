@@ -56,7 +56,7 @@ Q = kron(eye(Hp),Q);
 R = eye(nU * Hp,nU * Hp) * 10;
 
 % Rearrange X and U
-X_obj = vertcatComplete( X(:,2:end) - Reference);
+X_obj = vertcatComplete(X(:,2:end) - Reference);
 deltaU_obj = vertcatComplete(deltaU);
 S_obj = vertcatComplete(S);
 
@@ -119,8 +119,8 @@ end
 %opti.set_initial(U, U_lb);
 
 opts = struct;
-% opts.ipopt.print_level = 1;
-% opts.print_time = true;
+opts.ipopt.print_level = 0;
+opts.print_time = false;
 opts.expand = false;                                                         % makes function evaluations faster
 %opts.ipopt.max_iter = 100;
 opti.solver('ipopt',opts);
@@ -141,17 +141,20 @@ load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_full_system_Linear
 %Prep for sim and plot
 N=100;                                                                     % number of simulation steps
 X_sim = casadi.DM.zeros(nS, N+1); 
-X_sim(:,1) = [3 0 0 0 0 3];
+X_sim(:,1) = [4.3 0.01 0.01 0.01 0.01 6.8];
 X_sim_num = full(X_sim);
 X_predict = casadi.DM.zeros(nS, Hp+1);
-U0 = U_lb;
 reference = X_sim(:,1);
-U_sim = casadi.DM.zeros(nU, N+1); 
+
+U_sim = casadi.DM.zeros(nU, N+1);
+U_sim(:,1) = U_lb;
+U_sim_num = full(U_sim);
+
 S_sim = casadi.DM.zeros(nU, N+1); 
 S_ub_sim = casadi.DM.zeros(nS, N+1);
 
 %Set up sim disturbance:
-disturbance = D_sim(1:2:3,1:N);
+disturbance = D_sim(1:2:3,1:N+Hp);
 dist_forcast = disturbance + normrnd(0,0.1,size(disturbance));
 
 
@@ -159,83 +162,36 @@ dist_forcast = disturbance + normrnd(0,0.1,size(disturbance));
 lam_g = 1;
 x_init = 0.001;
 
-
-figure(1)
 %Run Closed loop mpc
 for step = 1:1:N
     %Open loop predicition
     if warmStartEnabler == 1
         % Parametrized Open Loop Control problem with WARM START
-        [u , S, lam_g, x_init] = OCP(X_sim(:,step),U0,dist_forcast(:,step:1:step+Hp-1), lam_g, x_init, 0.5 ,reference);
+        [u , S, lam_g, x_init] = OCP(X_sim(:,step),U_sim(:,step),dist_forcast(:,step:1:step+Hp-1), lam_g, x_init, 0.5/60 ,reference);
     elseif warmStartEnabler == 0
         % Parametrized Open Loop Control problem without WARM START 
-        [u , S] = (OCP(X_sim(:,step),U0,dist_forcast(:,step:1:step+Hp-1), 0.5, reference));
+        [u , S] = (OCP(X_sim(:,step),U_sim(:,step),dist_forcast(:,step:1:step+Hp-1), 0.5/60, reference));
     end
     
     %Predict comming states:
     X_predict(:,1) = X_sim(:,step);
     for i = 1:Hp
-        X_predict(:,i+1) = F_system(X_predict(:,i), u(:,1) + S(:,i), dist_forcast(:,step+i-1), 0.5);
+        X_predict(:,i+1) = F_system(X_predict(:,i), u(:,1) + S(:,i), dist_forcast(:,step+i-1), 0.5/60);
     end
     
-    %Get numerical values
+    %Get numerical value
     U_out_num = full(u);
     S_out_num = full(S);
     X_predict_num = full(X_predict);
     U_sim_num = full(U_sim);
     S_sim_num = full(S_sim);
-    
-    clf
-    subplot(2,1,1)
-    % Time elapsed in simulation
-    elapsed_time = 0:step-1;
-    plot(elapsed_time, X_sim_num(1,1:step),'b')
-    hold on
-    plot(elapsed_time, X_sim_num(6,1:step),'c')
-    hold on
-    % Current step
-    plot(elapsed_time(end), X_sim_num(1,step),'r*');
-    hold on
-    plot(elapsed_time(end), X_sim_num(6,step),'r*');
-    hold on
-    % Future predicitions
-    future_time = elapsed_time(end):(elapsed_time(end)+Hp);
-    plot(future_time ,X_predict_num(1,:),'g');
-    hold on
-    plot(future_time ,X_predict_num(6,:),'g');
-    xlim([0,N+Hp])
-    
-    
-    subplot(2,1,2)  
-    plot(disturbance(1,:),'k--')
-    hold on
-    plot(dist_forcast(1,:),'k')
-    hold on
-    % Time elapsed in simulation
-    plot(elapsed_time, U_sim_num(1,1:step),'b')
-    hold on
-    plot(elapsed_time, S_sim_num(1,1:step),'g')
-    hold on
-    
-    % Current step
-    plot(elapsed_time(end), U_sim_num(1,step),'r*');
-    hold on
-    plot(elapsed_time(end), S_sim_num(1,step),'r*');
-    hold on
-
-    % Future predicitions
-    future_time = elapsed_time(end):(elapsed_time(end)+Hp-1 );
-    plot(future_time ,U_out_num,'b--');
-    hold on
-    plot(future_time ,S_out_num,'g--');
-    hold on
-    xlim([1,N+Hp])
-    pause(0.25);
+   
+    plot_MPC;
     
     %Advance simulation and save values
     X_sim(:,step+1) = F_system(X_sim(:,step), u(:,1), disturbance(:,step), 0.5);
-    U_sim(:,step) = u(:,1);
-    S_sim(:,step) = S(:,1);
+    U_sim(:,step+1) = u(:,1);
+    S_sim(:,step+1) = S(:,1);
     
     X_sim_num = full(X_sim);
     if X_sim_num(:,step+1) > X_ub 
