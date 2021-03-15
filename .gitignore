@@ -6,3 +6,5 @@ system_identification/system_identification/data/p_grav_Nx4
 system_identification/system_identification/slprj/
 slprj/
 system_identification/lab_interface_MATLAB/experiment_setup.slx.original
+*.asv
+*.slxc

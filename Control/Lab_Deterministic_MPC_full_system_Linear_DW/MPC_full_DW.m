@@ -18,7 +18,7 @@ if isempty(lam_g)
     x_init = 0.001;
     % get optimization problem and warmStartEnabler
     OCP = evalin('base','OCP');
-    Hp = evalin('base','Hp');,
+    Hp = evalin('base','Hp');
     D_sim = evalin('base','D_sim');
     warmStartEnabler = evalin('base','warmStartEnabler');
     U0 = [3;4.5];
