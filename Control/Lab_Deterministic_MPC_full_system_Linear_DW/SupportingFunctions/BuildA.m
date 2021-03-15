@@ -4,7 +4,9 @@ function [A] = BuildA(NumberOfStates,p,phi,DeltaT)
 %   dim(phi) = (1,2)
 
 A = casadi.MX.zeros(NumberOfStates,NumberOfStates);
+
 A(1,:) = [1, zeros(1,NumberOfStates-1)];
+
 A(2,:) = [0, 1 - p(2) * DeltaT, p(3) * DeltaT, zeros(1,NumberOfStates-3)]; 
 
 for index = 3:1:NumberOfStates-2;

@@ -7,9 +7,9 @@
     title('Tank States');
     hold on
     % Time elapsed in simulation
-    plot(elapsed_time, X_sim_num(1,1:step),'b')
+    plot(elapsed_time, X_sim_num(1,1:step),'b', 'DisplayName','Tank1')
     hold on
-    plot(elapsed_time, X_sim_num(6,1:step),'g')
+    plot(elapsed_time, X_sim_num(6,1:step),'g', 'DisplayName','Tank2')
     hold on
     % Current step
     plot(elapsed_time(end), X_sim_num(1,step),'r*');
@@ -17,12 +17,13 @@
     plot(elapsed_time(end), X_sim_num(6,step),'r*');
     hold on
     % Future predicitions
-    plot(future_time ,X_predict_num(1,:),'b');
+    plot(future_time ,X_predict_num(1,:),'b--');
     hold on
     plot(future_time ,X_predict_num(6,:),'g--');
     hold on
     xlim([0,N+Hp])
     hold off
+    legend show
     
     subplot(4,1,2)  
     title('Control inputs');

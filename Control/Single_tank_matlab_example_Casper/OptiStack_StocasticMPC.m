@@ -173,37 +173,46 @@ for step = 1:1:N
     elapsed_time = 1:step;
     plot(elapsed_time, X_sim_num(1,1:step),'b')
     hold on
+    plot(elapsed_time, X_sim_num(2,1:step),'c')
+    hold on
     % Current step
     plot(step, X_sim_num(1,step),'r*');
     hold on
+    plot(step, X_sim_num(2,step),'r*');
+    hold on
     % Future predicitions
     future_time = elapsed_time(end):(elapsed_time(end)+Hp-1 );
-    plot(future_time ,X_predict_num,'g');
+    plot(future_time ,X_predict_num(1,:),'g');
+    hold on
+    plot(future_time ,X_predict_num(2,:),'g');
     xlim([1,N+Hp])
     
+    
     subplot(2,1,2)  
-    plot(dist,'k--')
+    plot(dist(1,:),'k--')
     hold on
-    plot(dist_forcast,'k')
+    plot(dist_forcast(1,:),'k')
     hold on
     
     % Time elapsed in simulation
     elapsed_time = 1:step;
     plot(elapsed_time, U_sim_num(1,1:step),'b')
+    hold on
     plot(elapsed_time, S_sim_num(1,1:step),'g')
-    plot(elapsed_time, S_ub_sim_num(1,1:step),'y')
     hold on
     
     % Current step
     plot(step, U_sim_num(1,step),'r*');
-    plot(step, S_sim_num(1,step),'r*');
-    plot(step, S_ub_sim_num(1,step),'r*');
     hold on
+    plot(step, S_sim_num(1,step),'r*');
+    hold on
+
     % Future predicitions
     future_time = elapsed_time(end):(elapsed_time(end)+Hp-1 );
     plot(future_time ,U_out_num,'b--');
+    hold on
     plot(future_time ,S_out_num,'g--');
-    plot(future_time ,S_ub_out_num,'y--');
+    hold on
     xlim([1,N+Hp])
     pause(0.25);
 end

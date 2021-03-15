@@ -16,14 +16,14 @@ nD = 2;
 opti = casadi.Opti();                   % opti stack 
 warmStartEnabler = 0;                   % warmstart for optimization
 %% ============================================ Constraint limits ==============================
-U_ub   = [8;10.5];                      % input bounds
-U_lb   = [3;4.5];
-dU_ub  = [4.5;4.5];
-dU_lb  = [-4.5;-4.5];
+U_ub   = [8;10.5]/60;                      % input bounds
+U_lb   = [3;4.5]/60;
+dU_ub  = [4.5;4.5]/60;
+dU_lb  = [-4.5;-4.5]/60;
 Xt_ub  = 7.02;                          % state bounds tank
 Xt_lb  = 1.50;
 Xp_ub  = 0.5;                           % state bounds pipes                          
-Xp_lb  = 0.00001;
+Xp_lb  = -1;
 % Combine into system bounds
 X_ub   = [Xt_ub, Xp_ub*ones(1,nP), Xt_ub]'; 
 X_lb   = [Xt_lb, Xp_lb*ones(1,nP), Xt_lb]'; 
@@ -46,22 +46,23 @@ phi = [1/4.908738521234052,1/4.908738521234052];
 
 %% =========================================== Objective =======================================
 % Weights
-Decreasing_cost = diag((nT*Hp):-1:1)*1000000;
+Decreasing_cost = diag((nT*Hp):-1:1)*10000000;
 sum_vector = zeros(nT * Hp,1)+1;
-P = eye(nT * Hp,nT * Hp) * 10000000 + Decreasing_cost;
+P = eye(nT * Hp,nT * Hp) * 1000000000 + Decreasing_cost;
 Q = zeros(nS, nS);
-Q(1,1) = 1000;                                                               % cost of tank1 state
-Q(6,6) = 1000;                                                               % cost of tank2 state               
+Q(1,1) = 100;                                                               % cost of tank1 state
+Q(6,6) = 100;                                                               % cost of tank2 state               
 Q = kron(eye(Hp),Q);
-R = eye(nU * Hp,nU * Hp) * 10;
+R = eye(nU * Hp,nU * Hp) * 1;
 
 % Rearrange X and U
-X_obj = vertcatComplete( X(:,2:end) - Reference);
+X_obj = vertcatComplete( X(:,1:end-1) - Reference);
 deltaU_obj = vertcatComplete(deltaU);
+U_obj = vertcatComplete(U);
 S_obj = vertcatComplete(S);
 
 % Objective function
-objective = X_obj'*Q*X_obj + deltaU_obj'*R*deltaU_obj+ S_obj'* P * sum_vector;
+objective = X_obj'*Q*X_obj + U_obj'*R*U_obj + S_obj'* P * sum_vector + deltaU_obj'*R*deltaU_obj;
 opti.minimize(objective);
 
 %% ============================================ Dynamics =======================================
