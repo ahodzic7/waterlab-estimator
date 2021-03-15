@@ -71,7 +71,6 @@ for i = 1:Hp-1
 end
 
 for i = 1:Hp
-    opti.subject_to(X_lb<=X(:,i)<=X_ub);        % Tank size constriant
     opti.subject_to(U_lb <= U <= U_ub);    
 end
 
