@@ -28,7 +28,7 @@ P_sim = [P_pipe_min_v2, Kt, Kt]';   % all sim parameters
 
 %% GP dynamics properties
 
-M = 25;                             % dimesnion of K_ZZ covariance matrix used in MPC
+M = 200;                             % dimesnion of K_ZZ covariance matrix used in MPC
 Nz = Nx + Nu + ND;                  % dimension of the training set 
 
 GP = load('.\parameters\GP_parameters.mat');
@@ -47,7 +47,8 @@ if controlType == 1
     u2_on = 12;     u2_off = 0;%5;
 elseif controlType == 2 || controlType == 3   
     u1_on = 9;      u1_off = 4;
-    u2_on = 10.5;   u2_off = 5;
+    u2_on = 12;%10.5;   
+    u2_off = 5;
 end
 
 %% state constraints 

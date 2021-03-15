@@ -8,3 +8,5 @@ slprj/
 system_identification/lab_interface_MATLAB/experiment_setup.slx.original
 *.asv
 *.slxc
+*.autosave
+*.original

@@ -1,14 +1,15 @@
 clearvars, clc, clear path
 
-N = 260;                                                                                % length of simulation (dependent on the length of disturbance data)
+N = 600;                                                                                % length of simulation (dependent on the length of disturbance data)
 
-controlType = 3;                                                                         % switch between on/off and MPC
+controlType = 3;                                                                         % switch between on/off, NMPC and GP-MPC
 
 %% ============================================ Control setup ======================================
 specifications;
 %dataLoad;                                                                               % Load when comparing lab results
 
 %% ===================================  Build dynamics & optimization  =============================
+addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5') 
 simulator_builder;                                                                       % build simulator dynamics
 if controlType == 2
     MPC_builder_PDE;

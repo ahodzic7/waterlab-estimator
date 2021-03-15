@@ -3,7 +3,7 @@
 % Build GP-based MPC
 % """
 
-addpath('C:\Users\74647\OneDrive - Grundfos\MATLAB\CasAdi') 
+%addpath('C:\Users\74647\OneDrive - Grundfos\MATLAB\CasAdi') 
 import casadi.*
 opti = casadi.Opti();                                       
 
@@ -108,7 +108,7 @@ for k = 1:Hp
     grad_mu = grad_mu(1:Nx,1:Nx);
     
     % Mean and covariance dynamics
-    mu_X{k+1} = A*mu_X{k} + B*U(:,k) + E*D(:,k) + Bd*mu_d;%+ Beta;
+    mu_X{k+1} = A*mu_X{k} + B*U(:,k) + E*D(:,k) + Bd*mu_d; %+ Beta;
     sigma_X{k+1} = Bd*diag(sigma_d)*Bd' + (A + Bd*grad_mu)*sigma_X{k}*(A + Bd*grad_mu)';
 
 progressbar(k/Hp) 

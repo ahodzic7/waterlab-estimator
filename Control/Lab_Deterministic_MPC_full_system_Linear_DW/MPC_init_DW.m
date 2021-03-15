@@ -135,3 +135,4 @@ elseif warmStartEnabler == 0
 end
 
 load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
+load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_full_system_Linear_DW\X_ref_sim.mat');
