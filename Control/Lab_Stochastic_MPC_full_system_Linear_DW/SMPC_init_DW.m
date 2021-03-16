@@ -40,8 +40,6 @@ X0 = opti.parameter(nS);                % initial state - level
 U0 = opti.parameter(nU);                % the previous control
 T  = opti.parameter(1);                 % MPC model_level sampling time
 Reference  = opti.parameter(nS);        % reference
-X0_predicted = opti.parameter(nS);
-K  = opti.parameter(nU,nS);
 
 sigma_X = opti.parameter(nT,Hp);
 
@@ -83,11 +81,19 @@ A       = BuildA(nS, p, phi, dt);                                           % bu
 B       = BuildB(nS, p, phi, dt);
 Bd      = BuildBd(nS,2,p,phi,dt);                                           % allows d to enter in tank1 and in pipe section 2
 Delta   = BuildDelta(nS, p, dt);
+
 % function
 system_dynamics = A*x + B*u + Bd*d + Delta;
-
 % Discrete dynamics
 F_system = casadi.Function('F_DW', {x, u, d, dt}, {system_dynamics}, {'x[k]', 'u[k]', 'd[k]', 'dt'}, {'x[k+1]'});
+
+% make struct to get when MPC is run
+A_num       = casadi.Function('eval_A',{dt},{A},{'dt'},{'A'});
+B_num       = casadi.Function('eval_B',{dt},{B},{'dt'},{'B'});
+Bd_num      = casadi.Function('eval_Bd',{dt},{Bd},{'dt'},{'Bd'});
+Delta_num   =casadi.Function('eval_Delta',{dt},{Delta},{'dt'},{'Delta'});
+sys = struct('A', A_num, 'B', B_num, 'Bd',Bd_num,'Delta',Delta_num,'F_system',F_system,'X_lb', X_lb, 'X_ub' ,X_ub);
+
 
 %% ======================================== Constraints ========================================
 % Initial state                             
@@ -100,7 +106,7 @@ end
 
 % Dynamic constraints
 for i=1:Hp                             
-   opti.subject_to(X(:,i+1)==F_system(X(:,i), -K*(X0-X0_predicted) + U(:,i) + S(:,i), D(:,i), T));
+   opti.subject_to(X(:,i+1)==F_system(X(:,i), U(:,i) + S(:,i), D(:,i), T));
    if i == 1
        opti.subject_to(deltaU(:,i)==U(:,i) - U0)
    else
@@ -114,20 +120,34 @@ for i = 1:1:nT
     opti.subject_to(S(i,:)>=zeros(1,Hp));                                   % slack variable is always positive - Vof >= 0
 end
 
+for i = 1:1:Hu
+    opti.subject_to(U_lb <= U(:,i) <= U_ub);                                % bounded input  
+end
+
+%% ================================= Add Chance constraints ===============================
+% Precompute sigma_X for chance constraint, Open Loop MPC:
+var_x_prev = casadi.MX.sym('xvp',nS,nS);     
+var_D = casadi.MX.sym('vd',nD,nD);              
+var_model = casadi.MX.sym('vm',nS,nS); 
+
+% function
+var_x = A*var_x_prev*A' + Bd*var_D*Bd' + var_model;
+% discrete dynamics
+F_variance = casadi.Function('F_var', {var_x_prev, var_D, var_model,dt}, {var_x}, {'vx[k]', 'vd', 'vm','dt'}, {'vx[k+1]'});
+
+% add constraints
 for i = 1:1:Hp
    opti.subject_to(X_lb(1)<=X(1,i)<=X_ub(1) + S_ub(1,i) - sqrt(sigma_X(1,i))*norminv(0.95));
    opti.subject_to(X_lb(6)<=X(6,i)<=X_ub(6) + S_ub(2,i) - sqrt(sigma_X(2,i))*norminv(0.95));
    opti.subject_to(zeros(nT,1) <= S_ub(:,i) <= sqrt(sigma_X(:,i))*norminv(0.95));                                 % Slack variable is always positive - Vof >= 0
 end
 
-for i = 1:1:Hu
-    opti.subject_to(U_lb <= U(:,i) <= U_ub);                                % bounded input  
-end
+
 
 %% ====================================== Solver settings ==================================
 % opti.set_initial(X, 1);                                                    % first guess
 %opti.set_initial(S, 0);
-%opti.set_initial(U, U_lb);
+%opti.set_inivar_x_prev = casadi.MX.sym('x',nS,nS);tial(U, U_lb);
 
 opts = struct;
 % opts.ipopt.print_level = 1;
@@ -138,10 +158,10 @@ opti.solver('ipopt',opts);
 
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    OCP = opti.to_function('OCP',{X0,X0_predicted,U0,K,D,opti.lam_g,opti.x,T,Reference,sigma_X},{U,S,S_ub,opti.lam_g,opti.x},{'x0','x0_p','u0','k','d','lam_g','x_init','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt','lam_g','x_init'});
+    OCP = opti.to_function('OCP',{X0,U0,D,opti.lam_g,opti.x,T,Reference,sigma_X},{U,S,S_ub,opti.lam_g,opti.x},{'x0','u0','d','lam_g','x_init','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt','lam_g','x_init'});
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    OCP = opti.to_function('OCP',{X0,X0_predicted,K,U0,D,T,Reference,sigma_X},{U,S,S_ub},{'x0','x0_p','k','u0','d','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt'});
+    OCP = opti.to_function('OCP',{X0,U0,D,T,Reference,sigma_X},{U,S,S_ub},{'x0','u0','d','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt'});
 end
 
 % load('.\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
