@@ -15,14 +15,9 @@
 
 %addpath('data');
 
-<<<<<<< HEAD
-load('.\data\Experiment_data_deterministic_MPC_full_KW_12_3_21');
-%load('.\data\Experiment_data_deterministic_MPC_full_KW');
-%load('.\data\Simulation_data_WWdata_v2');
-=======
+
 load('Lab_simulator\Simulator\data\Experiment_data_deterministic_MPC_full_KW');
 %load('Lab_simulator\Simulator\data\Simulation_data_WWdata_v2');
->>>>>>> 0e8cfd9b4a0f1c1588a52f602ade1e3fc26be295
 
 labRes = ans;
 

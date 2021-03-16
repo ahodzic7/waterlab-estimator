@@ -9,7 +9,11 @@ specifications;
 
 %% ===================================  Build dynamics & optimization  =============================
 simulator_builder;                                                                 
-MPC_builder;
+%MPC_builder;
+
+%% C&A controller:
+SMPC_init_DW;
+%%
 
 %% Initial conditions for simulator
 X_sim(1,1) = x(1,1);                                                                 % init. tank1 state [m^3]
@@ -38,7 +42,11 @@ tic
 for i = 1:1:N                                                       
 
 %     onoff_control;
-    [U_MPC,S_MPC,Y_MPC,lam_g,x_init] = OCP(X_sim(:,i), D_sim(:,(i)*(20)-19:20:(i-1)*20 + (Hp)*20-19), P_sim, X_ref_sim, lam_g, x_init, dt_sim);
+    %[U_MPC,S_MPC,Y_MPC,lam_g,x_init] = OCP(X_sim(:,i), D_sim(:,(i)*(20)-19:20:(i-1)*20 + (Hp)*20-19), P_sim, X_ref_sim, lam_g, x_init, dt_sim);
+    %% C&A controller:
+    
+    %%
+    
     
     U_opt(:,i) = full(U_MPC);
     

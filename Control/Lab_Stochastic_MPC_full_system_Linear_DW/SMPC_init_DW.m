@@ -144,5 +144,5 @@ elseif warmStartEnabler == 0
     OCP = opti.to_function('OCP',{X0,X0_predicted,K,U0,D,T,Reference,sigma_X},{U,S,S_ub},{'x0','x0_p','k','u0','d','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt'});
 end
 
-load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
-load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_full_system_Linear_DW\X_ref_sim.mat');
+% load('.\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
+load('.\Lab_Deterministic_MPC_full_system_Linear_DW\X_ref_sim.mat');
