@@ -9,40 +9,33 @@ persistent warmStartEnabler;
 persistent D_sim;
 persistent X_ref;
 persistent U0;
-persistent sigma_x
+persistent sigma_x;
+persistent X_pre;
+persistent sys;
 % and others
-dT = 10;           % Sample time in minutes
+dT = 10;                 % Sample time in minutes
 simulink_frequency = 2;  % Sampling frequency in seconds
-% init persistent variables
 
 if isempty(lam_g)
+    % init persistent variables
     lam_g = 1;
     x_init = 0.001;
+    
+    % initialize MPC
+    U0 = [3;4.5];
+    X_pre = X0;
+    
     % get optimization problem and warmStartEnabler
     OCP = evalin('base','OCP');
     Hp = evalin('base','Hp');
     D_sim = evalin('base','D_sim');
+    D_sim = D_sim(1:2:3,:);
     X_ref = evalin('base','X_ref_sim');
     warmStartEnabler = evalin('base','warmStartEnabler');
-    U0 = [3;4.5];
-    D_sim = D_sim(1:2:3,:);
     
-    % Precompute sigma_X for chance constraint, Open Loop MPC:
-    sigma_D = diag([0.0051; 0.0099]);          % Forecast uncertainty in L/s
-    sigma_measurements = diag(zeros(6,1));                % Measurement variance in dm 
-    sigma_model = diag(zeros(6,1));                       % Model variance
-    var_x = zeros(6,6,Hp);
-    var_x(:,:,1) = sigma_measurements; 
-    for i = 1:Hp-1
-        var_x(:,:,i+1) = A*var_x(:,:,i)*A' + Bd*sigma_D*Bd' + sigma_model;
-    end
-    h1 = [1 zeros(1,5)];
-    h2 = [zeros(1,5) 1];
-    sigma_x = zeros(2,Hp);
-    for i = 1:Hp
-        sigma_x(1,i) = h1*var_x(:,:,i)*h1';
-        sigma_x(2,i) = h2*var_x(:,:,i)*h2';
-    end
+    % initialize CC tube controller
+    make_LQR      % Calculate LQR
+    make_sigma_X  % Precompute sigma_X for chance constraint, Open Loop MPC
 end
 
 
@@ -64,15 +57,24 @@ if warmStartEnabler == 1
     [u , S, S_ub, lam_g, x_init] = (OCP(X0,U0,disturbance, lam_g, x_init, dT,reference,sigma_x));
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [u , S, S_ub] = (OCP(X0,U0, disturbance, dT, reference,sigma_x));
+    [u , S, S_ub] = (OCP(X0 ,U0, disturbance, dT, reference,sigma_x));
 end
 
-
+% create outputs
 u_full = full(u);
 S_full = full(S);
 S_ub_full = full(S_ub);
+lqr_contribution = K*(X0-X_pre);
 
-output = [u_full(:,1); S_full(:,1)]*60;
+output = [u_full(:,1) - lqr_contribution ; S_full(:,1)]*60;
 output = [output; X_ref(:,time+1)*100; S_ub_full(:,1)];
+
+% Set vairables for next iteration
 U0 = u_full(:,1);
+X_pre = full(sys.F_system(X0, u_full(:,1)-lqr_contribution, disturbance(:,1), dT));
+if X_pre > sys.X_ub
+    X_pre = sys.X_ub;
+elseif X_pre < sys.X_lb
+    X_pre = sys.X_lb;
+end
 end
