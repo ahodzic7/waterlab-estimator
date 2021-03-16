@@ -12,18 +12,19 @@ persistent U0;
 persistent sigma_x;
 persistent X_pre;
 persistent sys;
+persistent K;
 % and others
 dT = 10;                 % Sample time in minutes
 simulink_frequency = 2;  % Sampling frequency in seconds
 
-if isempty(lam_g)
+if isempty(lam_g) | time == 1
     % init persistent variables
     lam_g = 1;
     x_init = 0.001;
     
     % initialize MPC
     U0 = [3;4.5];
-    X_pre = X0;
+    X_pre = X0/100;
     
     % get optimization problem and warmStartEnabler
     OCP = evalin('base','OCP');
@@ -64,7 +65,7 @@ end
 u_full = full(u);
 S_full = full(S);
 S_ub_full = full(S_ub);
-lqr_contribution = K*(X0-X_pre);
+lqr_contribution = 0;% K*(X0-X_pre)
 
 output = [u_full(:,1) - lqr_contribution ; S_full(:,1)]*60;
 output = [output; X_ref(:,time+1)*100; S_ub_full(:,1)];

@@ -1,4 +1,4 @@
-    F_variance = evalin('base','F_varaiance');
+    F_variance = evalin('base','F_variance');
     h1 = [1 zeros(1,5)];
     h2 = [zeros(1,5) 1];
     sigma_x = zeros(2,Hp);
