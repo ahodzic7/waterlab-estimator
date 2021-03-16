@@ -1,4 +1,4 @@
-%%clear;
+clear;
 % ************ Change to own Casadi path ************
 addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5')
 % ***************************************************
@@ -164,5 +164,5 @@ elseif warmStartEnabler == 0
     OCP = opti.to_function('OCP',{X0,U0,D,T,Reference,sigma_X},{U,S,S_ub},{'x0','u0','d','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt'});
 end
 
-% load('.\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
+load('.\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
 load('.\Lab_Deterministic_MPC_full_system_Linear_DW\X_ref_sim.mat');
