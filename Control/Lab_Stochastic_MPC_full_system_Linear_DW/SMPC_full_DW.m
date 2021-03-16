@@ -27,12 +27,21 @@ if isempty(lam_g)
     U0 = [3;4.5];
     D_sim = D_sim(1:2:3,:);
     
-    % Precompute sigma_X for chance constraint
-    sigma_D = 0.0065^2; 
-    sigma_x = zeros(nS,Hp);
-    sigma_x(:,1) = sigma_D; 
+    % Precompute sigma_X for chance constraint, Open Loop MPC:
+    sigma_D = diag([0.0051; 0.0099]);          % Forecast uncertainty in L/s
+    sigma_measurements = diag(zeros(6,1));                % Measurement variance in dm 
+    sigma_model = diag(zeros(6,1));                       % Model variance
+    var_x = zeros(6,6,Hp);
+    var_x(:,:,1) = sigma_measurements; 
     for i = 1:Hp-1
-        sigma_x(:,i+1) = sigma_x(:,i) + sigma_D;
+        var_x(:,:,i+1) = A*var_x(:,:,i)*A' + Bd*sigma_D*Bd' + sigma_model;
+    end
+    h1 = [1 zeros(1,5)];
+    h2 = [zeros(1,5) 1];
+    sigma_x = zeros(2,Hp);
+    for i = 1:Hp
+        sigma_x(1,i) = h1*var_x(:,:,i)*h1';
+        sigma_x(2,i) = h2*var_x(:,:,i)*h2';
     end
 end
 

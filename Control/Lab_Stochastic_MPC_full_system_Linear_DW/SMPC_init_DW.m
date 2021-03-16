@@ -39,9 +39,11 @@ D  = opti.parameter(nD,Hp);             % disturbance - rain inflow
 X0 = opti.parameter(nS);                % initial state - level
 U0 = opti.parameter(nU);                % the previous control
 T  = opti.parameter(1);                 % MPC model_level sampling time
-Reference  = opti.parameter(nS);     % reference
+Reference  = opti.parameter(nS);        % reference
+X0_predicted = opti.parameter(nS);
+K  = opti.parameter(nU,nS);
 
-sigma_X = opti.parameter(nS,Hp);
+sigma_X = opti.parameter(nT,Hp);
 
 %% ====================================== System parameters ====================================
 p = [0.0344584980456826,0.0864650413052119,0.00653614397630376,-0.00280609998794716,0.0550243659248174];
@@ -65,7 +67,7 @@ U_obj = vertcatComplete(U);
 S_obj = vertcatComplete(S);
 
 % Objective function
-objective = X_obj'*Q*X_obj + S_obj'* P * sum_vector + deltaU_obj'*R*deltaU_obj + + 10000*sum(S_ub);
+objective = X_obj'*Q*X_obj + S_obj'* P * sum_vector + deltaU_obj'*R*deltaU_obj + 10000*sum(sum(S_ub'));
 opti.minimize(objective);
 
 %% ============================================ Dynamics =======================================
@@ -87,7 +89,6 @@ system_dynamics = A*x + B*u + Bd*d + Delta;
 % Discrete dynamics
 F_system = casadi.Function('F_DW', {x, u, d, dt}, {system_dynamics}, {'x[k]', 'u[k]', 'd[k]', 'dt'}, {'x[k+1]'});
 
-                                    
 %% ======================================== Constraints ========================================
 % Initial state                             
 opti.subject_to(X(:,1)==X0);           
@@ -99,22 +100,24 @@ end
 
 % Dynamic constraints
 for i=1:Hp                             
-   opti.subject_to(X(:,i+1)==F_system(X(:,i), U(:,i) + S(:,i), D(:,i), T));
+   opti.subject_to(X(:,i+1)==F_system(X(:,i), -K*(X0-X0_predicted) + U(:,i) + S(:,i), D(:,i), T));
    if i == 1
        opti.subject_to(deltaU(:,i)==U(:,i) - U0)
    else
        opti.subject_to(deltaU(:,i)==U(:,i) - U(:,i-1));
    end
    opti.subject_to(dU_lb <= (U(:,i) - U(:,i-1)) <= dU_ub);                  % bounded slew rate
-   opti.subject_to(X_lb<=X(:,i)<=X_ub + S_ub(:,i) - sqrt(sigma_X(:,i))*norminv(0.95));                                     % level constraints 
+   opti.subject_to(X_lb(2:5)<=X(2:5,i)<=X_ub(2:5));  
 end
 
 for i = 1:1:nT
     opti.subject_to(S(i,:)>=zeros(1,Hp));                                   % slack variable is always positive - Vof >= 0
 end
 
-for i = 1:1:Hp 
-    opti.subject_to(zeros(2,Hp) <= S_ub(:,i) <= sqrt(sigma_X(:,i))*norminv(0.95));                                 % Slack variable is always positive - Vof >= 0
+for i = 1:1:Hp
+   opti.subject_to(X_lb(1)<=X(1,i)<=X_ub(1) + S_ub(1,i) - sqrt(sigma_X(1,i))*norminv(0.95));
+   opti.subject_to(X_lb(6)<=X(6,i)<=X_ub(6) + S_ub(2,i) - sqrt(sigma_X(2,i))*norminv(0.95));
+   opti.subject_to(zeros(nT,1) <= S_ub(:,i) <= sqrt(sigma_X(:,i))*norminv(0.95));                                 % Slack variable is always positive - Vof >= 0
 end
 
 for i = 1:1:Hu
@@ -135,10 +138,10 @@ opti.solver('ipopt',opts);
 
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    OCP = opti.to_function('OCP',{X0,U0,D,opti.lam_g,opti.x,T,Reference,sigma_X},{U,S,S_ub,opti.lam_g,opti.x},{'x0','u0','d','lam_g','x_init','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt','lam_g','x_init'});
+    OCP = opti.to_function('OCP',{X0,X0_predicted,U0,K,D,opti.lam_g,opti.x,T,Reference,sigma_X},{U,S,S_ub,opti.lam_g,opti.x},{'x0','x0_p','u0','k','d','lam_g','x_init','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt','lam_g','x_init'});
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    OCP = opti.to_function('OCP',{X0,U0,D,T,Reference,sigma_x},{U,S,S_ub},{'x0','u0','d','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt'});
+    OCP = opti.to_function('OCP',{X0,X0_predicted,K,U0,D,T,Reference,sigma_X},{U,S,S_ub},{'x0','x0_p','k','u0','d','dt','ref','sigma_x'},{'u_opt','s_opt','S_ub_opt'});
 end
 
 load('C:\Git\waterlab-estimator\Control\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
