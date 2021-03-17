@@ -1,4 +1,9 @@
 clear;
+
+%% Add paths
+
+addpath('Stocastic_MPC\supporting_functions\matlab_sf')
+
 % ************ Change to own Casadi path ************
 addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5')
 % ***************************************************
