@@ -96,7 +96,7 @@ F_system = casadi.Function('F_DW', {x, u, d, dt}, {system_dynamics}, {'x[k]', 'u
 A_num       = casadi.Function('eval_A',{dt},{A},{'dt'},{'A'});
 B_num       = casadi.Function('eval_B',{dt},{B},{'dt'},{'B'});
 Bd_num      = casadi.Function('eval_Bd',{dt},{Bd},{'dt'},{'Bd'});
-Delta_num   =casadi.Function('eval_Delta',{dt},{Delta},{'dt'},{'Delta'});
+Delta_num   = casadi.Function('eval_Delta',{dt},{Delta},{'dt'},{'Delta'});
 sys = struct('A', A_num, 'B', B_num, 'Bd',Bd_num,'Delta',Delta_num,'F_system',F_system,'X_lb', X_lb, 'X_ub' ,X_ub);
 
 
@@ -134,11 +134,12 @@ end
 var_x_prev = casadi.MX.sym('xvp',nS,nS);     
 var_D = casadi.MX.sym('vd',nD,nD);              
 var_model = casadi.MX.sym('vm',nS,nS); 
+lqr_K = casadi.MX.sym('lqr_k',nU,nS);
 
 % function
-var_x = A*var_x_prev*A' + Bd*var_D*Bd' + var_model;
+var_x = (A-B*lqr_K)*var_x_prev*(A-B*lqr_K)' + Bd*var_D*Bd' + var_model;
 % discrete dynamics
-F_variance = casadi.Function('F_var', {var_x_prev, var_D, var_model,dt}, {var_x}, {'vx[k]', 'vd', 'vm','dt'}, {'vx[k+1]'});
+F_variance = casadi.Function('F_var', {var_x_prev, var_D, var_model, lqr_K, dt}, {var_x}, {'vx[k]', 'vd', 'vm', 'lqrK','dt'}, {'vx[k+1]'});
 
 % add constraints
 for i = 1:1:Hp
