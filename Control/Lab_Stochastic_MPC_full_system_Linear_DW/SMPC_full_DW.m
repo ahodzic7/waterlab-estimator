@@ -17,7 +17,7 @@ persistent K;
 dT = 10;                 % Sample time in minutes
 simulink_frequency = 2;  % Sampling frequency in seconds
 
-if isempty(lam_g) | time == 1
+if isempty(lam_g) 
     % init persistent variables
     lam_g = 1;
     x_init = 0.001;
