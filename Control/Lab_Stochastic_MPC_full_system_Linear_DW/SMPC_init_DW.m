@@ -134,12 +134,13 @@ end
 var_x_prev = casadi.MX.sym('xvp',nS,nS);     
 var_D = casadi.MX.sym('vd',nD,nD);              
 var_model = casadi.MX.sym('vm',nS,nS); 
+var_U = casadi.MX.sym('vu',nU,nU);
 lqr_K = casadi.MX.sym('lqr_k',nU,nS);
 
 % function
-var_x = (A-B*lqr_K)*var_x_prev*(A-B*lqr_K)' + Bd*var_D*Bd' + var_model;
+var_x = (A-B*lqr_K)*var_x_prev*(A-B*lqr_K)' + Bd*var_D*Bd' + B*var_U*B' + var_model;
 % discrete dynamics
-F_variance = casadi.Function('F_var', {var_x_prev, var_D, var_model, lqr_K, dt}, {var_x}, {'vx[k]', 'vd', 'vm', 'lqrK','dt'}, {'vx[k+1]'});
+F_variance = casadi.Function('F_var', {var_x_prev, var_D, var_model, var_U, lqr_K, dt}, {var_x}, {'vx[k]', 'vd', 'vm', 'vu', 'lqrK','dt'}, {'vx[k+1]'});
 
 % add constraints
 for i = 1:1:Hp
