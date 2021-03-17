@@ -9,8 +9,17 @@
     var_x_prev = var_measuremants;
     
     for i = 1:Hp
-        var_x = full(F_variance(var_x_prev, var_D, var_model,10));
+        var_x = full(F_variance(var_x_prev, var_D, var_model,K,10));
         sigma_x(1,i) = h1*var_x*h1';
         sigma_x(2,i) = h2*var_x*h2';
         var_x_prev = var_x;
+    end
+    
+    analyse = 1;
+    if analyse
+        tightening = sqrt(sigma_x)*norminv(0.95);
+        figure
+        plot(tightening(1,:));
+        hold on;
+        plot(tightening(2,:));
     end

@@ -65,17 +65,21 @@ end
 u_full = full(u);
 S_full = full(S);
 S_ub_full = full(S_ub);
-lqr_contribution = K*(X0-X_pre)
+(X0-X_pre)
+lqr_contribution = K*(X0-X_pre);
+K*(X0-X_pre)*60
 
-output = [u_full(:,1) - lqr_contribution; S_full(:,1)]*60;
+output = [min(sys.U_ub, max(sys.U_lb, u_full(:,1) - lqr_contribution)) ; S_full(:,1)]*60;           % Saturate the outputs
 output = [output; X_ref(:,time+1)*100; S_ub_full(:,1)];
 
 % Set vairables for next iteration
 U0 = u_full(:,1);
-X_pre = full(sys.F_system(X0, u_full(:,1) - lqr_contribution, disturbance(:,1), dT))
-if X_pre > sys.X_ub
-    X_pre = sys.X_ub;
-elseif X_pre < sys.X_lb
-    X_pre = sys.X_lb;
+X_pre = full(sys.F_system(X0, u_full(:,1), disturbance(:,1), dT))
+for i =1:5:6
+    if X_pre(i) > sys.X_ub(i)
+        X_pre(i) = sys.X_ub(i);
+    elseif X_pre(i) < sys.X_lb(i)
+        X_pre(i) = sys.X_lb(i);
+    end
 end
 end
