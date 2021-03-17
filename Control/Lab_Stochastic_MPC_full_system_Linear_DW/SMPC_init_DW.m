@@ -28,7 +28,7 @@ dU_lb  = [-4.5;-4.5]/60;
 Xt_ub  = 7.02;                          % state bounds tank
 Xt_lb  = 1.50;
 Xp_ub  = 0.5;                           % state bounds pipes                          
-Xp_lb  = -1;
+Xp_lb  = -10;
 % Combine into system bounds
 X_ub   = [Xt_ub, Xp_ub*ones(1,nP), Xt_ub]'; 
 X_lb   = [Xt_lb, Xp_lb*ones(1,nP), Xt_lb]'; 
@@ -97,7 +97,7 @@ A_num       = casadi.Function('eval_A',{dt},{A},{'dt'},{'A'});
 B_num       = casadi.Function('eval_B',{dt},{B},{'dt'},{'B'});
 Bd_num      = casadi.Function('eval_Bd',{dt},{Bd},{'dt'},{'Bd'});
 Delta_num   = casadi.Function('eval_Delta',{dt},{Delta},{'dt'},{'Delta'});
-sys = struct('A', A_num, 'B', B_num, 'Bd',Bd_num,'Delta',Delta_num,'F_system',F_system,'X_lb', X_lb, 'X_ub' ,X_ub);
+sys = struct('A', A_num, 'B', B_num, 'Bd',Bd_num,'Delta',Delta_num,'F_system',F_system,'X_lb', X_lb, 'X_ub' ,X_ub, 'U_lb', U_lb, 'U_ub', U_ub);
 
 
 %% ======================================== Constraints ========================================
@@ -171,4 +171,4 @@ elseif warmStartEnabler == 0
 end
 
 load('.\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
-load('.\Lab_Deterministic_MPC_full_system_Linear_DW\X_ref_sim.mat');
+load('.\Lab_Stochastic_MPC_full_system_Linear_DW\X_ref_sim.mat');

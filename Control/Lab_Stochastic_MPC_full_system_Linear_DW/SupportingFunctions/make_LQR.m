@@ -1,5 +1,5 @@
     max_deviation_from_mean_x = 1;
-    max_allowed_u = 0.5/60;
+    max_allowed_u = 1/60;
     sys = evalin('base','sys');
     A = full(sys.A(dT));
     B = full(sys.B(dT));
