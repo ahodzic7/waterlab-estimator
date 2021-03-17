@@ -4,12 +4,11 @@
 %% Calculate one step residuals
 % Setup Model
 NumberOfStates = 5;
+Nx = 5;
 % For lab
-p = [0.0348661973172381,0.0548687811513346,0.000100000000000000,...
-        -0.00169231647536930,0.0342193052314381,0.203718327157626];
+p = [0.0334154182449777,0.0806990546254455,0.006536143976304,-0.00257535506895047,0.0517389007944013];
 phi = [1,1/4.908738521234052];
 DeltaT = 0.5;
-
 % For Basic Test
 % p = [0.00573303726337542,0.00455712815840905,0.00100679057458217,...
 %     -6.99861868943381e-05,0.00307844320832101,0.00500000000000000];
@@ -22,10 +21,10 @@ Delta = BuildDelta(NumberOfStates, p,DeltaT);
 
 measurements = [h; T2];
 %% Free running
-x_est(1,:) = sys_final.Report.Parameters.X0';
+x_est(1,:) = measurements(:,1)';
 
 for k = 1:1:size(output,1)-1
-    x_est(k+1,:) = (A*x_est(k,:)' + B*input(k,:)' + Delta)';
+    x_est(k+1,:) = (A*x_est(k,:)' + B*input(k,1:2)' + Delta)';
 end
 t = 1:1:size(output,1);
 figure
@@ -35,18 +34,19 @@ plot(t,x_est(1:end,1)','r')
 
 %% 1 step prediction
 
-x_est(1,:) = [0 0 0 0 0]';
+x_est(1,:) = measurements(:,1)';
 for k = 1:1:size(output,1)-1
-    x_est(k+1,:) = (A*measurements(:,k) + B*input(k,:)' + Delta)';
+    x_est(k+1,:) = (A*measurements(:,k) + B*input(k,1:2)' + Delta)';
 end
 
 t = 1:1:size(output,1);
 figure
-plot(t,measurements(1,1:end),'b')
+plot(t,measurements(5,1:end),'b')
 hold on
-plot(t,x_est(1:end,1)','r')
+plot(t,x_est(1:end,5)','r')
 %% Calculate Residuals
-residual= (output-x_est);
+output = measurements';
+residual = (output-x_est);
 
 %Plot
 figure
@@ -185,17 +185,17 @@ noise_sigmaHat
 figure
 model_muHat = [];
 model_sigmaHat = [];
- Nx = Nx;
+Nx = Nx;
 for i = 1:1:Nx
-    if i == Nx
+    if i == 5
         model_residual = residual(:,i);
     else
         residual_col = residual(:,i)
         model_residual = residual_col(residual_col < 0.005)
         model_residual = model_residual(model_residual > -0.005)
         
-        for t = 0:1:9
-            model_residual= [model_residual; residual_col(residual_col > 0.005 + 0.01 * t & residual_col < 0.015 + 0.01 * t) - 0.01 * ( t+1)] ;
+        for t = 0:1:15
+            model_residual= [model_residual; residual_col(residual_col > 0.005 + 0.01 * t & residual_col < 0.015 + 0.01 * t) - 0.01 * ( t+1)];
             model_residual= [model_residual; residual_col(residual_col < - 0.005 - 0.01 * t & residual_col > -0.015 - 0.01 * t) + 0.01 * ( t+1)] ;
         end
     end
@@ -216,7 +216,7 @@ for i = 1:1:Nx
     subplot(Nx,1,i);
     plot(t,pdf);
     hold on;
-    if i == Nx
+    if i == 5
         histogram(model_residual,200,'Normalization','probability');
         xlabel(['$w_{T2} [dm]$'],'interpreter','latex');
         axis([-0.08 0.08 0 1.5])
