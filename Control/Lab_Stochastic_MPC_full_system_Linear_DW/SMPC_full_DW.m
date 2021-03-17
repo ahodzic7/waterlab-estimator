@@ -66,9 +66,9 @@ u_full = full(u);
 S_full = full(S);
 S_ub_full = full(S_ub);
 (X0-X_pre)
-lqr_contribution = K*(X0-X_pre)
+lqr_contribution = K*(X0-X_pre)*60
 
-output = [u_full(:,1) - lqr_contribution ; S_full(:,1)]*60;
+output = [u_full(:,1); S_full(:,1)]*60;
 output = [output; X_ref(:,time+1)*100; S_ub_full(:,1)];
 
 % Set vairables for next iteration
