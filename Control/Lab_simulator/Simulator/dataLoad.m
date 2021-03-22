@@ -52,7 +52,7 @@ Kt = labRes.Data(1,10)*conv_mm2Todm2;
 %plot(y)
 
 %% 
-plotEnable = 1;
+plotEnable = 0;
 if plotEnable == 1
 figure
 subplot(2,1,1)
