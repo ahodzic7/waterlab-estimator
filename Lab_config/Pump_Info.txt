@@ -26,7 +26,7 @@ Aux pump 1 (Tank 1 Disturbance)
 P 0.15
 I 0.45
 Max % 100
-Max Flow  9.5 l/min 7.23 l/min
+Max Flow  9.5 l/min 
 Min % 45
 Min FLow 4 l/min
 -----------------------
