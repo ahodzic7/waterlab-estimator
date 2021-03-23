@@ -66,7 +66,7 @@ S_full = full(S);
 u = u_full(1:2);
 S = S_full(1:2);
 
-output = [u;S;reference(:,time+1)*100];
+output = [u;S;reference(:,1)*100];
 
 %plot_simulink_mpc(u_full,S_full,X0,disturbance,Hp);
 

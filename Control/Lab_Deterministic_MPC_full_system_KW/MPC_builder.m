@@ -99,7 +99,7 @@ opts.ipopt.print_level = 0;                                                     
 opts.print_time = false;
 opts.expand = true;                                                             % makes function evaluations faster
 %opts.ipopt.hessian_approximation = 'limited-memory';
-opts.ipopt.max_iter = 300;                                                      % max solver iteration
+opts.ipopt.max_iter = 100;                                                      % max solver iteration
 opti.solver('ipopt',opts);                                                      % solver: ipopt(default)
 
 warmStartEnabler = 1;
