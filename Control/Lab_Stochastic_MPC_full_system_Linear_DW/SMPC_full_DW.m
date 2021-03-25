@@ -38,19 +38,22 @@ if isempty(lam_g)
     make_LQR      % Calculate LQR
     make_sigma_X  % Precompute sigma_X for chance constraint, Open Loop MPC
 end
+X0 = X0/100;                                                               % Unit convertion from mm to dm
 
 
 %Create forcast from disturbance reference
 time = int64(round(time));
 disturbance = zeros(2,Hp);
+reference = zeros(6,Hp);
 for i=0:1:Hp-1
     start_index = time+1+i*dT*simulink_frequency;
     end_index = start_index+dT*simulink_frequency-1;
     disturbance(:,i+1) = mean(D_sim(:,start_index:end_index),2)/60;
+    reference(1:5:6,i+1) = mean((X_ref(:,start_index:end_index)),2);
 end
 
-X0 = X0/100;                                                               % Unit convertion from mm to dm
-reference = [X_ref(1,time+1), 0, 0, 0, 0, X_ref(2,time+1)]';
+
+sys.U_ub
 
 % run openloop MPC
 if warmStartEnabler == 1
@@ -61,20 +64,20 @@ elseif warmStartEnabler == 0
     [u , S, S_ub] = (OCP(X0 ,U0, disturbance, dT, reference,sigma_x));
 end
 
+
+
 % create outputs
 u_full = full(u);
 S_full = full(S);
 S_ub_full = full(S_ub);
-(X0-X_pre)
 lqr_contribution =min(1/60*ones(2,1), max(-1/60*ones(2,1),  K*(X0-X_pre)));
-lqr_contribution*60
 
 output = [min(sys.U_ub, max(sys.U_lb, u_full(:,1) - lqr_contribution)) ; S_full(:,1)]*60;           % Saturate the outputs
 output = [output; X_ref(:,time+1)*100; S_ub_full(:,1)];
 
 % Set vairables for next iteration
 U0 = u_full(:,1);
-X_pre = full(sys.F_system(X0, u_full(:,1), disturbance(:,1), dT))
+X_pre = full(sys.F_system(X0, u_full(:,1), disturbance(:,1), dT));
 for i =1:5:6
     if X_pre(i) > sys.X_ub(i)
         X_pre(i) = sys.X_ub(i);

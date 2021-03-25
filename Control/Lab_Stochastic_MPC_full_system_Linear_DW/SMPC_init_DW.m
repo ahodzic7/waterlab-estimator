@@ -21,12 +21,12 @@ nD = 2;
 opti = casadi.Opti();                   % opti stack 
 warmStartEnabler = 0;                   % warmstart for optimization
 %% ============================================ Constraint limits ==============================
-U_ub   = [8;10.5]/60;                      % input bounds
-U_lb   = [3;4.5]/60;
+U_ub   = [8.3;16]/60;                      % input bounds
+U_lb   = [3.4;5.4]/60;
 dU_ub  = [4.5;4.5]/60;
 dU_lb  = [-4.5;-4.5]/60;
 Xt_ub  = 7.02;                          % state bounds tank
-Xt_lb  = 1.50;
+Xt_lb  = 1.80;
 Xp_ub  = 0.5;                           % state bounds pipes                          
 Xp_lb  = -10;
 % Combine into system bounds
@@ -44,7 +44,7 @@ D  = opti.parameter(nD,Hp);             % disturbance - rain inflow
 X0 = opti.parameter(nS);                % initial state - level
 U0 = opti.parameter(nU);                % the previous control
 T  = opti.parameter(1);                 % MPC model_level sampling time
-Reference  = opti.parameter(nS);        % reference
+Reference  = opti.parameter(nS,Hp);        % reference
 
 sigma_X = opti.parameter(nT,Hp);
 
@@ -172,5 +172,5 @@ elseif warmStartEnabler == 0
 end
 
 load('.\Lab_Stochastic_MPC_full_system_Linear_DW\X_ref_sim.mat');
-load('.\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
+load('.\Lab_Stochastic_MPC_full_system_Linear_DW\D_sim.mat');
 
