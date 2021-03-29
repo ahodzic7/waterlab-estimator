@@ -53,7 +53,7 @@ for i=0:1:Hp-1
 end
 
 
-sys.U_ub
+
 
 % run openloop MPC
 if warmStartEnabler == 1

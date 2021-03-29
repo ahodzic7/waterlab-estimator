@@ -42,7 +42,6 @@ for i=0:1:Hp-1
     disturbance(:,i+1) = mean(D_sim(:,start_index:end_index),2);
 end
 
-time = int64(round(time));
 reference = zeros(2,Hp);
 for i=0:1:Hp-1
     start_index = time+1 + i*dT*60*simulink_frequency;

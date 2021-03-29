@@ -27,19 +27,20 @@ if isempty(lam_g)
     D_sim = D_sim(1:2:3,:);
 end
 
+X0 = X0/100;   
 
 %Create forcast from disturbance reference
 time = int64(round(time));
 disturbance = zeros(2,Hp);
+reference = zeros(6,Hp);
 for i=0:1:Hp-1
     start_index = time+1+i*dT*simulink_frequency;
     end_index = start_index+dT*simulink_frequency-1;
     disturbance(:,i+1) = mean(D_sim(:,start_index:end_index),2)/60;
+    reference(1:5:6,i+1) = mean((X_ref(:,start_index:end_index)),2);
 end
 
-X0 = X0/100;                                                               % Unit convertion from mm to dm
-reference = [X_ref(1,time+1), 0, 0, 0, 0, X_ref(2,time+1)]';
-
+                                                            % Unit convertion from mm to dm
 % run openloop MPC
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START

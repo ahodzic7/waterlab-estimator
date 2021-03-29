@@ -1,4 +1,4 @@
-clear;
+clear all;
 
 %% Add paths
 
@@ -19,14 +19,14 @@ nP = 4;                                 % number of pipe sections
 nU = 2;                                 % number of control inputs
 nD = 2;
 opti = casadi.Opti();                   % opti stack 
-warmStartEnabler = 0;                   % warmstart for optimization
+warmStartEnabler = 1;                   % warmstart for optimization
 %% ============================================ Constraint limits ==============================
 U_ub   = [8.3;16]/60;                      % input bounds
-U_lb   = [3.4;5.4]/60;
+U_lb   = [3.4;6]/60;
 dU_ub  = [4.5;4.5]/60;
 dU_lb  = [-4.5;-4.5]/60;
 Xt_ub  = 7.02;                          % state bounds tank
-Xt_lb  = 1.80;
+Xt_lb  = 1.8;
 Xp_ub  = 0.5;                           % state bounds pipes                          
 Xp_lb  = -10;
 % Combine into system bounds
@@ -56,12 +56,12 @@ phi = [1/4.908738521234052,1/4.908738521234052];
 % Weights
 Decreasing_cost = diag((nT*Hp):-1:1)*10000000;
 sum_vector = zeros(nT * Hp,1)+1;
-P = eye(nT * Hp,nT * Hp) * 1000000000 + Decreasing_cost;
+P = eye(nT * Hp,nT * Hp) * 100000000000 + Decreasing_cost;
 Q = zeros(nS, nS);
-Q(1,1) = 100;                                                               % cost of tank1 state
-Q(6,6) = 100;                                                               % cost of tank2 state               
+Q(1,1) = 10;                                                               % cost of tank1 state
+Q(6,6) = 10;                                                               % cost of tank2 state               
 Q = kron(eye(Hp),Q);
-R = eye(nU * Hp,nU * Hp) * 1;
+R = eye(nU * Hp,nU * Hp) * 1000;
 
 % Rearrange X and U
 X_obj = vertcatComplete( X(:,1:end-1) - Reference);
@@ -70,7 +70,7 @@ U_obj = vertcatComplete(U);
 S_obj = vertcatComplete(S);
 
 % Objective function
-objective = X_obj'*Q*X_obj + S_obj'* P * sum_vector + deltaU_obj'*R*deltaU_obj + 10000*sum(sum(S_ub'));
+objective = X_obj'*Q*X_obj + S_obj'* P * sum_vector + deltaU_obj'*R*deltaU_obj + 10000000*sum(sum(S_ub'));% + U_obj'*R*U_obj;
 opti.minimize(objective);
 
 %% ============================================ Dynamics =======================================
@@ -156,12 +156,14 @@ end
 %opti.set_initial(S, 0);
 %opti.set_inivar_x_prev = casadi.MX.sym('x',nS,nS);tial(U, U_lb);
 
+% Solver options
 opts = struct;
-% opts.ipopt.print_level = 1;
-% opts.print_time = true;
-opts.expand = false;                                                         % makes function evaluations faster
-%opts.ipopt.max_iter = 100;
-opti.solver('ipopt',opts);
+opts.ipopt.print_level = 0;                                                     % print enabler to command line
+opts.print_time = false;
+opts.expand = true;                                                             % makes function evaluations faster
+%opts.ipopt.hessian_approximation = 'limited-memory';
+opts.ipopt.max_iter = 100;                                                      % max solver iteration
+opti.solver('ipopt',opts);         
 
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
