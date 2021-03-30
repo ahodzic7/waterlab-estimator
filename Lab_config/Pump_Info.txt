@@ -2,9 +2,9 @@ Pump 1
 P 0.1
 I 0.3
 Max % 100
-Max Flow 8 l/min
-Min % 52
-Min FLow 3 l/min
+Max Flow 8.3 l/min
+Min % 70
+Min FLow 3.4 l/min
 -----------------------
 Pump 2
 P 0.145
@@ -13,21 +13,29 @@ Max % 100
 Max Flow 10.5 l/min
 Min % 54
 Min FLow 4.25 l/min
+
+Pump 2 18/3/2021
+P 0.145
+I 0.61
+Max % 100
+Max Flow 19.5 l/min
+Min % 40
+Min FLow 5.4 l/min
 -----------------------
 Aux pump 1 (Tank 1 Disturbance)
 P 0.15
 I 0.45
 Max % 100
 Max Flow  9.5 l/min 
-Min % 39
+Min % 45
 Min FLow 4 l/min
 -----------------------
 Aux pump 2 (Pipe Disturbance)
 P 0.1
 I 0.4
-Max % 12.5
-Max Flow
-Min % 53
-Min FLow 3
+Max % 100
+Max Flow 12.5
+Min % 55
+Min FLow 3.5
 
 Assuming 0.5 meter elevation on both aux tanks
