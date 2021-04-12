@@ -25,13 +25,14 @@ U_ub   = [8.3;16]/60;                      % input bounds
 U_lb   = [3.4;6]/60;
 dU_ub  = [4.5;4.5]/60;
 dU_lb  = [-4.5;-4.5]/60;
-Xt_ub  = 7.02;                          % state bounds tank
+Xt1_ub  = 7.02;                          % state bounds tank
+Xt2_ub  = 7.02;
 Xt_lb  = 1.8;
 Xp_ub  = 0.5;                           % state bounds pipes                          
 Xp_lb  = -10;
 % Combine into system bounds
 X_ub   = [Xt_ub, Xp_ub*ones(1,nP), Xt_ub]'; 
-X_lb   = [Xt_lb, Xp_lb*ones(1,nP), Xt_lb]'; 
+X_lb   = [Xt1_lb, Xp_lb*ones(1,nP), Xt2_lb]'; 
 %% ========================================= Optimization variables ============================
 X  = opti.variable(nS,Hp+1);            % state - volume 
 U  = opti.variable(nU,Hp);              % input - pumpflow 
