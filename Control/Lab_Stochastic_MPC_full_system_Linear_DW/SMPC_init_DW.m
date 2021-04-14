@@ -25,14 +25,24 @@ U_ub   = [8.3;16]/60;                      % input bounds
 U_lb   = [3.4;6]/60;
 dU_ub  = [4.5;4.5]/60;
 dU_lb  = [-4.5;-4.5]/60;
+<<<<<<< HEAD
 Xt_1_ub  = 7.02;                          % state bounds tank
 Xt_2_ub  = 6.43;  
+=======
+Xt1_ub  = 7.02;                          % state bounds tank
+Xt2_ub  = 6.49;
+>>>>>>> 293d18c27e14b600fad167cee6f5cae09ec62318
 Xt_lb  = 1.8;
 Xp_ub  = 0.5;                           % state bounds pipes                          
 Xp_lb  = -10;
 % Combine into system bounds
+<<<<<<< HEAD
 X_ub   = [Xt_1_ub, Xp_ub*ones(1,nP), Xt_2_ub]'; 
 X_lb   = [Xt_lb, Xp_lb*ones(1,nP), Xt_lb]'; 
+=======
+X_ub   = [Xt_ub, Xp_ub*ones(1,nP), Xt_ub]'; 
+X_lb   = [Xt1_lb, Xp_lb*ones(1,nP), Xt2_lb]'; 
+>>>>>>> 293d18c27e14b600fad167cee6f5cae09ec62318
 %% ========================================= Optimization variables ============================
 X  = opti.variable(nS,Hp+1);            % state - volume 
 U  = opti.variable(nU,Hp);              % input - pumpflow 
@@ -140,8 +150,10 @@ lqr_K = casadi.MX.sym('lqr_k',nU,nS);
 
 % function
 var_x = (A-B*lqr_K)*var_x_prev*(A-B*lqr_K)' + Bd*var_D*Bd' + B*var_U*B' + var_model;
+var_x_ol = (A)*var_x_prev*(A)' + Bd*var_D*Bd' + B*var_U*B' + var_model;
 % discrete dynamics
 F_variance = casadi.Function('F_var', {var_x_prev, var_D, var_model, var_U, lqr_K, dt}, {var_x}, {'vx[k]', 'vd', 'vm', 'vu', 'lqrK','dt'}, {'vx[k+1]'});
+F_variance_ol = casadi.Function('F_var', {var_x_prev, var_D, var_model, var_U, dt}, {var_x_ol}, {'vx[k]', 'vd', 'vm', 'vu','dt'}, {'vx[k+1]'});
 
 % add constraints
 for i = 1:1:Hp
