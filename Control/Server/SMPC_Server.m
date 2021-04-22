@@ -16,13 +16,15 @@ DataBaseHolding = uint16(zeros(1,number_of_receiving_data*4));
 % 2 pump references + 2 overflow slacks + 2 tank references + 2 slack tightenings = 8
 DataBaseInput = uint16(zeros(1,number_of_sending_data*4));
 % Ignore Coils
-DataBaseCoils = logical(0)
+DataBaseCoils = logical(0);
 
 Client_IP = '192.168.100.123';
 Port_Number = 502;
-ModBusTCP = openConnectionServer(Client_IP, Port_Number)
+
+display('Server is running!')
 
 while(1)
+    ModBusTCP = openConnectionServer(Client_IP, Port_Number)
     %Modbus server
     while ~ModBusTCP.BytesAvailable
         %wait for the response to be in the buffer
@@ -36,11 +38,11 @@ while(1)
                               DataBaseInput,DataBaseHolding,DataBaseCoils);
    
     %MPC
-    if(all(oldDataBaseHolding ~= DataBaseHolding))
+    if(any(oldDataBaseHolding ~= DataBaseHolding))
         Updated_Measurements_data = unit16Be2doubleLe(DataBaseHolding);
       
         %Run MPC
-        X0 = Updated_Measurements_data(1,1:6);
+        X0 = Updated_Measurements_data(1,1:6)';
         time = Updated_Measurements_data(1,7);
         
         output = SMPC_full_DW(X0, time); 
