@@ -1,30 +1,30 @@
 clearvars, clc, clear path
-close all;
 
-N = 100;                                                                       % length of simulation (dependent on the length of disturbance data)
+N = 2000;                                                                       % length of simulation (dependent on the length of disturbance data)
 
 
 %% ============================================ Control setup ======================================
 specifications;
 %load_disturbance;
-%% Initial conditions for simulator
-X_sim(1,1) = x(1,1);                                                                 % init. tank1 state [m^3]
-X_sim(2,1) = x(2,1);                                                                 % init. tank2 state [m^3]    
-                                                              % warm start - Lagrange multiplier initializer
-X_sim(Nxt+1:Nxt+Nxp,1) = x(Nxt+1:Nxt+Nxp,1);                                         % init. pipe states [m]
-dt_sim = 0.5*t_resample/60;                                                          % sampling time [s] 
 
 %% ===================================  Build dynamics & optimization  =============================
 simulator_builder;                                                                 
-% MPC_builder;
+MPC_builder;
 
-%% C&A controller:
-SMPC_init_DW;      
+%%
+
+%% Initial conditions for simulator
+X_sim(1,1) = x(1,1);                                                                 % init. tank1 state [m^3]
+X_sim(2,1) = x(2,1);                                                                 % init. tank2 state [m^3]                                                                     % warm start - Lagrange multiplier initializer
+X_sim(Nxt+1:Nxt+Nxp,1) = x(Nxt+1:Nxt+Nxp,1);                                         % init. pipe states [m]
+dt_sim = 0.5*t_resample/60;                                                          % sampling time [s]       
 
 %% Initial conditions for MPC
 lam_g = 0;                                                                           % warm start - Lagrange multiplier initializer
 x_init = 0.01;  
 %X_ref_sim = [3;3.5];
+load('.\Lab_Deterministic_MPC_full_system_Linear_DW\X_ref_sim.mat');
+X_ref_sim(:,1)
 
 %% Pre-computed inputs and disturbances
 %D_sim(:,1:N) = d(:,1:N);                                                             % for preliminary testing
@@ -42,12 +42,11 @@ tic
 for i = 1:1:N                                                       
 
 %     onoff_control;
-%     [U_MPC,S_MPC,Y_MPC,lam_g,x_init] = OCP(X_sim(:,i), D_sim(:,(i)*(20)-19:20:(i-1)*20 + (Hp)*20-19), P_sim, X_ref_sim, lam_g, x_init, dt_sim);
-%     U_opt(:,i) = full(U_MPC);
-    %% C&A controller:
-    [output]  = SMPC_full_DW([X_sim(1,i);X_sim(3:end,i);X_sim(2,i)],i);
-    U_opt(:,i) = output(1:2,:);
+    [U_MPC,S_MPC,Y_MPC,lam_g,x_init] = OCP(X_sim(:,i), D_sim(:,(i)*(20)-19:20:(i-1)*20 + (Hp)*20-19), P_sim, X_ref_sim(:,20*i), lam_g, x_init, dt_sim);
     %%
+    
+    
+    U_opt(:,i) = full(U_MPC);
     
     % Dynamics simulator
     X_sim(:,i+1) = full(F_integral_sim(X_sim(:,i), U_opt(:,i), D_sim(:,1 + (i-1)*t_resample), P_sim, dt_sim ));

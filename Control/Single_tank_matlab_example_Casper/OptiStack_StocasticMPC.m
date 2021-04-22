@@ -10,7 +10,7 @@ nS = 1;                                 % Number of System sates
 nU = nS;                                % Number of System Inputs
 dT = 1;                                 % Sampling time
 initial_state = 2.5;
-sigma_D = 0.1;
+sigma_D = 0.0001;
 
 % System model:
 dt = casadi.MX.sym('dt',1);             % state
@@ -103,6 +103,7 @@ N = 96;                                 % number of simulation steps
 t_dist = 0:(N+Hp);
 smax =  1.5;
 smin = -1;
+dist_rescale = 2;
 
 % % Import forcast, add noise and set initial state
 % forast_raw = readmatrix('test_disturbance.csv');
@@ -110,8 +111,10 @@ smin = -1;
 % dist = dist_forcast + normrnd(0,sigma_D,size(dist_forcast));
 % dist(dist < 0) = 0;
 % stochastic disturbance
-sigma_dist = 0.0065^2; %0.0045^2;
-dist_forcast = 0.15*abs(smooth(smooth(smooth(smin + (smax-smin)*rand(1,length(t_dist))))))';
+rng('default');
+rng(5)
+sigma_dist = 0.0045^2; %0.0045^2;
+dist_forcast = dist_rescale*0.15*abs(smooth(smooth(smooth(smin + (smax-smin)*rand(1,length(t_dist))))))';
 dist = dist_forcast + sqrt(sigma_dist).*randn(N+Hp+1,1)';
 dist(dist <= 0) = 0;
 
@@ -172,43 +175,43 @@ for step = 1:1:N
     elapsed_time = 1:step;
     plot(elapsed_time, X_sim_num(1,1:step),'b')
     hold on
-    plot(elapsed_time, X_sim_num(2,1:step),'c')
+    %plot(elapsed_time, X_sim_num(2,1:step),'c')
     hold on
     % Current step
     plot(step, X_sim_num(1,step),'r*');
     hold on
-    plot(step, X_sim_num(2,step),'r*');
+    %plot(step, X_sim_num(2,step),'r*');
     hold on
     % Future predicitions
     future_time = elapsed_time(end):(elapsed_time(end)+Hp-1 );
     plot(future_time ,X_predict_num(1,:),'g');
     hold on
-    plot(future_time ,X_predict_num(2,:),'g');
+    %plot(future_time ,X_predict_num(2,:),'g');
     xlim([1,N+Hp])
     
     
     subplot(2,1,2)  
-    plot(dist(1,:),'k--')
+    plot(dist(1,:),'k')
     hold on
-    plot(dist_forcast(1,:),'k')
+    plot(dist_forcast(1,:),'k--')
     hold on
     
     % Time elapsed in simulation
     elapsed_time = 1:step;
-    plot(elapsed_time, U_sim_num(1,1:step),'b')
+    stairs(elapsed_time, U_sim_num(1,1:step),'b')
     hold on
     plot(elapsed_time, S_sim_num(1,1:step),'g')
     hold on
     
     % Current step
-    plot(step, U_sim_num(1,step),'r*');
+    stairs(step, U_sim_num(1,step),'r*');
     hold on
     plot(step, S_sim_num(1,step),'r*');
     hold on
 
     % Future predicitions
     future_time = elapsed_time(end):(elapsed_time(end)+Hp-1 );
-    plot(future_time ,U_out_num,'b--');
+    stairs(future_time ,U_out_num,'b--');
     hold on
     plot(future_time ,S_out_num,'g--');
     hold on

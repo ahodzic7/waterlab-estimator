@@ -16,7 +16,7 @@
         var_x_prev = var_x;
     end
     
-    analyse = 0;
+    analyse = 1;
     if analyse
         tightening = sqrt(sigma_x)*norminv(0.95);
         figure

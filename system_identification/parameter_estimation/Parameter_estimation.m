@@ -90,6 +90,7 @@ if dataStructure.lateral_inflow
     input = [Q(1,:)' Q(2,:)' Q(4,:)'];  
 end
 
+
 %% ============================================ Iddata object ================================================ 
 
 ioData = iddata(output,input,dataTimeStep);                                % (y,u,Ts) (order)
@@ -114,7 +115,6 @@ if dataStructure.lateral_inflow
     modelName = append(modelName, '_lateral_inflow')
 end
 
-    
 Ts_model = 0;                                                              % 0 - continuous model, 1,2,.. - discrete model 
 order = [size(output,2) size(input,2) N_states+N_augmented_states];        % [Ny Nu Nx] (order)
 
@@ -189,7 +189,7 @@ estimatedParameters
 %% =========================== Post processing ============================
 EstimatedModelPlotter;
 %% Save session
-FileName = append('.\results\',erase(structureName,'.mat'),date);
+FileName = append('.\results\',strcat(erase(structureName,'.mat'),'_'),date);
 [fPath, fName, fExt] = fileparts(FileName);
 
 if isempty(fExt)  % No '.mat' in FileName
