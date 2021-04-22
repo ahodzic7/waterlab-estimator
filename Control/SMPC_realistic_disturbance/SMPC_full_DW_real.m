@@ -32,7 +32,7 @@ if isempty(lam_g)
     % get optimization problem and warmStartEnabler
     OCP = evalin('base','OCP');
     Hp = evalin('base','Hp');
-    mean_disturbance = evalin('base','D_sim');
+    mean_disturbance = evalin('base','mean_disturbance');
     mean_disturbance = mean_disturbance(1:2:3,:);
     average_dist_variance_Hp = evalin('base', 'average_dist_variance_Hp');
     warmStartEnabler = evalin('base','warmStartEnabler');
@@ -53,7 +53,7 @@ reference = ones(6,Hp)*2;
 for i=0:1:Hp-1
     start_index = time+1+i*dT*simulink_frequency;
     end_index = start_index+dT*simulink_frequency-1;
-    disturbance(:,i+1) = mean_disturbance(:,start_index:end_index)/60;
+    disturbance(:,i+1) = mean(mean_disturbance(:,start_index:end_index),2)/60;
 end
 
 
@@ -77,7 +77,7 @@ S_ub_full = full(S_ub);
 lqr_contribution =min(1/60*ones(2,1), max(-1/60*ones(2,1),  K*(X0-X_pre)));
 
 output = [min(sys.U_ub, max(sys.U_lb, u_full(:,1) - lqr_contribution)) ; S_full(:,1)]*60;           % Saturate the outputs
-output = [output; X_ref(:,time+1)*100; S_ub_full(:,1)];
+output = [output; 2*ones(2,1)*100; S_ub_full(:,1)];
 
 % Set vairables for next iteration
 U0 = u_full(:,1);
