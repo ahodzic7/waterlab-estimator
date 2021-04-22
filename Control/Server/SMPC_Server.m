@@ -2,7 +2,7 @@
 clear all;
 clc;
 addpath(genpath('Lab_Stochastic_MPC_full_system_Linear_DW_Ofload_to_Server'));
-SMPC_init_DW
+SMPC_init_DW_real
 
 
 %%
@@ -45,7 +45,7 @@ while(1)
         X0 = Updated_Measurements_data(1,1:6)';
         time = Updated_Measurements_data(1,7);
         
-        output = SMPC_full_DW(X0, time); 
+        output = SMPC_full_DW_real(X0, time); 
         
 %         U = output(1:2,:);
 %         Overflow = output(3:4,:);

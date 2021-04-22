@@ -10,3 +10,6 @@ system_identification/lab_interface_MATLAB/experiment_setup.slx.original
 *.slxc
 *.autosave
 *.original
+system_identification/parameter_estimation/results/Lat_inflow_2_aug_states10-Mar-2021(2).mat
+system_identification/parameter_estimation/results/
+Control/Lab_Deterministic_MPC_full_system_Linear_DW/results/

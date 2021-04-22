@@ -35,8 +35,8 @@ for i=1:1:size(data,2)
 end
 endDataIndex = size(data,2);
 %%
-load('.\Lab_Deterministic_MPC_full_system_Linear_DW\X_ref_sim.mat');
-load('.\Lab_Deterministic_MPC_full_system_Linear_DW\D_sim.mat');
+load('.\Lab_Deterministic_MPC_full_system_KW\X_ref_sim.mat');
+load('.\Lab_Deterministic_MPC_full_system_KW\D_sim.mat');
 D_sim = D_sim(1:2:3,:);
 if size(data,1) < 22
     data(22,:) = X_ref_sim(1,startDataIndex:endDataIndex)*100;

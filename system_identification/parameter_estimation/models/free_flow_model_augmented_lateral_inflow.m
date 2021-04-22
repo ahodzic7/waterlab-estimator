@@ -1,4 +1,4 @@
-function [dx, y] = free_flow_model_lateral_inflow(t, x, u, p1, p2, p3, p4, p5,N_states , N_optimization_variables, N_aug_states, varargin)
+function [dx, y] = free_flow_model_augmented_lateral_inflow(t, x, u, p1, p2, p3, p4, p5,N_states , N_optimization_variables, N_aug_states, varargin)
 % Continous time nlgreyest model for the diffusion wave gravity pipe with the tank in the end of the pipe. 
 Augmented_states = zeros(1,N_states+1);
 for i=1:N_states+1
@@ -52,15 +52,15 @@ end
 %dx(2) =  p2*x(N_states + N1+N2) - (p2+p3)*x(2) + p3*x(N_states + N1+N2+1); 
 if N2 == 0
     if N3 == 0
-        dx(2) =  p2 * x(1) - (p2+p3) * x(2) + p3*x(3);
+        dx(2) =  p2 * x(1) - (p2+p3) * x(2) + p3*x(3)+ p1*u(3);
     else
-        dx(2) =  p2 * x(1) - (p2+p3) * x(2) + p3*x(N_states + N1+N2+1);
+        dx(2) =  p2 * x(1) - (p2+p3) * x(2) + p3*x(N_states + N1+N2+1)+ p1*u(3);
     end
 else
     if N3 == 0
-        dx(2) =  p2*x(N_states + N1+N2) - (p2+p3)*x(2) + p3*x(3); 
+        dx(2) =  p2*x(N_states + N1+N2) - (p2+p3)*x(2) + p3*x(3)+p1*u(3); 
     else
-        dx(2) =  p2*x(N_states + N1+N2) - (p2+p3)*x(2) + p3*x(N_states + N1+N2+1); 
+        dx(2) =  p2*x(N_states + N1+N2) - (p2+p3)*x(2) + p3*x(N_states + N1+N2+1)+p1*u(3); 
     end
 end 
 
@@ -82,9 +82,11 @@ end
 
 if N3 == 0
     if N4 == 0
-        dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(4) + p1*u(3);                    % Lateral inflow added
+        %dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(4) + p1*u(3);                    % Lateral inflow added
+        dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(4);
     else
-        dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(N_states + N1+N2+N3+1)+ p1*u(3); % Lateral inflow added
+        %dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(N_states + N1+N2+N3+1)+ p1*u(3); % Lateral inflow added
+        dx(3) =  p2 * x(2) - (p2+p3) * x(3) + p3*x(N_states + N1+N2+N3+1);
     end
 else
     if N4 == 0
