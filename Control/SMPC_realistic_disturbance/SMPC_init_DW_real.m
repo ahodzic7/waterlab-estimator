@@ -21,7 +21,7 @@ nD = 2;
 opti = casadi.Opti();                   % opti stack 
 warmStartEnabler = 1;                   % warmstart for optimization
 %% ============================================ Constraint limits ==============================
-U_ub   = [8.3;16]/60;                      % input bounds
+U_ub   = [8.3;15]/60;                      % input bounds
 U_lb   = [3.4;6]/60;
 dU_ub  = [4.5;4.5]/60;
 dU_lb  = [-4.5;-4.5]/60;

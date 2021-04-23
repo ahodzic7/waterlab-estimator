@@ -34,7 +34,7 @@ save('SMPC_realistic_disturbance/average_dist_variance_Hp.mat','average_dist_var
 %%
 figure
 for i = 1:10
-plot(ensambles_pipe(i,:),'--');
+plot(ensambles_T1(i,:),'--');
 hold on;
 end
 plot(mean_disturbance_T1);
