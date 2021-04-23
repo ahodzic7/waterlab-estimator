@@ -1,23 +1,29 @@
 clear all; clc;
 load('.\SMPC_realistic_disturbance\D_sim_ens');
 
-%% ===== Calculating variance of disturbances =====
+%% ======== Setup for MPC =========
 D_sim_ens = D_sim_ens/60;
 Hp = 24;
+dT = 10;     %seconds
+simulink_frequency = 2;   %1/s
+
+MPC_prediction_horizon_in_steps = Hp*dT*simulink_frequency;
+
+%% ===== Calculating variance of disturbances =====
 ensambles_T1 = [D_sim_ens(1:10,:)];
 mean_disturbance_T1 = mean(ensambles_T1);
 variance_disturbance_T1 = var(ensambles_T1);
-variance_prediction_T1 = zeros(1,size(D_sim_ens,2)-Hp);
-for i = 1:size(D_sim_ens,2)-Hp
-    variance_prediction_T1(i) = mean(variance_disturbance_T1(i:i+Hp));
+variance_prediction_T1 = zeros(1,size(D_sim_ens,2)-MPC_prediction_horizon_in_steps);
+for i = 1:size(D_sim_ens,2)-MPC_prediction_horizon_in_steps
+    variance_prediction_T1(i) = mean(variance_disturbance_T1(i:i+MPC_prediction_horizon_in_steps));
 end
 
 ensambles_pipe = [D_sim_ens(21:30,:)];
 mean_disturbance_pipe = mean(ensambles_pipe);
 variance_disturbance_pipe = var(ensambles_pipe);
-variance_prediction_pipe = zeros(1,size(D_sim_ens,2)-Hp);
-for i = 1:size(D_sim_ens,2)-Hp
-    variance_prediction_pipe(i) = mean(variance_disturbance_pipe(i:i+Hp));
+variance_prediction_pipe = zeros(1,size(D_sim_ens,2)-MPC_prediction_horizon_in_steps);
+for i = 1:size(D_sim_ens,2)-MPC_prediction_horizon_in_steps
+    variance_prediction_pipe(i) = mean(variance_disturbance_pipe(i:i+MPC_prediction_horizon_in_steps));
 end
 
 mean_disturbance = [mean_disturbance_T1;D_sim_ens(11,:);mean_disturbance_pipe]*60;
