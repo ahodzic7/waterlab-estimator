@@ -76,7 +76,7 @@ S_full = full(S);
 S_ub_full = full(S_ub);
 lqr_contribution =min(1/60*ones(2,1), max(-1/60*ones(2,1),  K*(X0-X_pre)));
 
-output = [min(sys.U_ub, max(sys.U_lb, u_full(:,1) - lqr_contribution)) ; S_full(:,1)]*60;           % Saturate the outputs
+output = [min(sys.U_ub+1, max(sys.U_lb, u_full(:,1) - lqr_contribution)) ; S_full(:,1)]*60;           % Saturate the outputs
 output = [output; 2*ones(2,1)*100; S_ub_full(:,1)];
 
 % Set vairables for next iteration

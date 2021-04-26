@@ -2,7 +2,7 @@
 clear;
 % Add as many files as you want:
 files = dir('Experiment_data_deterministic_MPC_full_DW.mat');
-files = [files dir('Experiment_data_deterministic_MPC.mat') dir('Experiment_data_stochastic_MPC_full_DW')];
+files = [files dir('Experiment_data_deterministic_MPC.mat') dir('Experiment_data_stochastic_MPC_full_DW.mat') dir('SMPC_DW_Realistic.mat')];
 %%
 % Loop through each file 
 for id = 1:length(files)
