@@ -62,10 +62,10 @@ end
 % run openloop MPC
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    [u , S, S_ub, lam_g, x_init] = (OCP(X0,U0,disturbance, lam_g, x_init, dT,reference,sigma_x));
+    [u , S, S_ub, lam_g, x_init] = (OCP(X0,U0,disturbance, lam_g, x_init, dT,reference,sigma_x,K));
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [u , S, S_ub] = (OCP(X0 ,U0, disturbance, dT, reference,sigma_x));
+    [u , S, S_ub] = (OCP(X0 ,U0, disturbance, dT, reference,sigma_x,K));
 end
 
 
