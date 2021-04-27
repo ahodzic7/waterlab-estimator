@@ -52,7 +52,7 @@ T  = opti.parameter(1);                 % MPC model_level sampling time
 Reference  = opti.parameter(nS,Hp);        % reference
 
 sigma_X = opti.parameter(nT,Hp);
-K = opti.parameter(nU,nS);              %LQR gain
+sigma_U = opti.parameter(nT,Hp);              %LQR gain
 
 %% ====================================== System parameters ====================================
 p = [0.0344584980456826,0.0864650413052119,0.00653614397630376,-0.00280609998794716,0.0550243659248174];
@@ -154,8 +154,8 @@ for i = 1:1:Hp
 end
 
 for i = 1:1:Hu
-    opti.subject_to(U_lb(1) <= U(1,i) <= U_ub(1) - sqrt(K^2*sigma_X(1,i))*norminv(0.95));
-    opti.subject_to(U_lb(2) <= U(2,i) <= U_ub(2) - sqrt(K^2*sigma_X(2,i))*norminv(0.95));% bounded input  
+    opti.subject_to(U_lb(1) <= U(1,i) <= U_ub(1) - sqrt(sigma_U(1,i))*norminv(0.95));
+    opti.subject_to(U_lb(2) <= U(2,i) <= U_ub(2) - sqrt(sigma_U(2,i))*norminv(0.95));% bounded input  
 end
 
 
@@ -176,10 +176,10 @@ opti.solver('ipopt',opts);
 
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    OCP = opti.to_function('OCP',{X0,U0,D,opti.lam_g,opti.x,T,Reference,sigma_X,K},{U,S,S_ub,opti.lam_g,opti.x},{'x0','u0','d','lam_g','x_init','dt','ref','sigma_x','k-gain'},{'u_opt','s_opt','S_ub_opt','lam_g','x_init'});
+    OCP = opti.to_function('OCP',{X0,U0,D,opti.lam_g,opti.x,T,Reference,sigma_X,sigma_U},{U,S,S_ub,opti.lam_g,opti.x},{'x0','u0','d','lam_g','x_init','dt','ref','sigma_x','sigma_u'},{'u_opt','s_opt','S_ub_opt','lam_g','x_init'});
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    OCP = opti.to_function('OCP',{X0,U0,D,T,Reference,sigma_X,K},{U,S,S_ub},{'x0','u0','d','dt','ref','sigma_x','k-gain'},{'u_opt','s_opt','S_ub_opt'});
+    OCP = opti.to_function('OCP',{X0,U0,D,T,Reference,sigma_X,sigma_U},{U,S,S_ub},{'x0','u0','d','dt','ref','sigma_x','sigma_u'},{'u_opt','s_opt','S_ub_opt'});
 end
 
 load('.\SMPC_realistic_disturbance\X_ref_sim.mat');

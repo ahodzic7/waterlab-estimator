@@ -12,6 +12,7 @@ persistent F_variance;
 persistent X_ref;
 persistent U0;
 persistent sigma_x;
+persistent sigma_u;
 persistent X_pre;
 persistent sys;
 persistent K;
@@ -62,10 +63,10 @@ end
 % run openloop MPC
 if warmStartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
-    [u , S, S_ub, lam_g, x_init] = (OCP(X0,U0,disturbance, lam_g, x_init, dT,reference,sigma_x,K));
+    [u , S, S_ub, lam_g, x_init] = (OCP(X0,U0,disturbance, lam_g, x_init, dT,reference,sigma_x,sigma_u));
 elseif warmStartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
-    [u , S, S_ub] = (OCP(X0 ,U0, disturbance, dT, reference,sigma_x,K));
+    [u , S, S_ub] = (OCP(X0 ,U0, disturbance, dT, reference,sigma_x,sigma_u));
 end
 
 
