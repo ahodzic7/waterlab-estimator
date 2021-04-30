@@ -39,12 +39,20 @@ u2_off = 5.4;
 Hp = 40;
 dt_MPC = 0.5*t_resample/60;
 
+lam_g = 0;                                                                                % warm start - Lagrange multiplier initializer
+x_init = 0.001;  
+
+X_ref_design;   
+t_step = 20;
+
+dt_sim = 0.5*t_resample/60;  
+
 %% Forecasts 
 load('Lab_Deterministic_MPC_full_system_KW\D_sim.mat');
 %% reference
 load('Lab_Deterministic_MPC_full_system_KW\X_ref_sim.mat');
-resample(X_ref_sim,4,1)
+resample(X_ref_sim,4,1);
 
-MPC_builder;
+
 
 
