@@ -2,8 +2,9 @@
 % """
 % Builds optimization problem
 % """
+addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5') 
 import casadi.*
-opti = casadi.Opti();                                       % Optimization problem
+opti = casadi.Opti();   
 
 %% ============================================ Constraint bounds =============================
 U_ub = [u1_on ; u2_on];                                     % Input bounds
@@ -33,10 +34,10 @@ Y     = P(2)*g(X(Nxt+ Nxp,:),P(3));
 
 %% =========================================== Objective function ============================== 
 % reference tracking
-%objective = sumsqr(U) + 10000*sumsqr(S) + 100*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
+objective = sumsqr(U) + 10000*sumsqr(S) + 100*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
 
 % overflow prevention
-objective = 0.001*sumsqr(U(2,:)) + 1*sumsqr(U(1,:)) + 10000*sumsqr(S) + 5*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
+%objective = 0.001*sumsqr(U(2,:)) + 1*sumsqr(U(1,:)) + 10000*sumsqr(S) + 5*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - X_ref); %+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);                          
 
 opti.minimize(objective); 
 
@@ -89,8 +90,8 @@ end
 %% ====================================== Solver settings ==================================
 % Solver options
 opts = struct;
-opts.ipopt.print_level = 0;                                                     % print enabler to command line
-opts.print_time = false;
+% opts.ipopt.print_level = 0;                                                     % print enabler to command line
+% opts.print_time = false;
 opts.expand = true;                                                             % makes function evaluations faster
 %opts.ipopt.hessian_approximation = 'limited-memory';
 opts.ipopt.max_iter = 300;                                                      % max solver iteration

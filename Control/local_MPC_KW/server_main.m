@@ -51,8 +51,10 @@ while(1)
         Updated_Measurements_data = unit16Be2doubleLe(DataBaseHolding);
       
         %Run MPC
-        X0 = Updated_Measurements_data(1,1:10)';
-        time = Updated_Measurements_data(1,11);
+        X0 = Updated_Measurements_data(1,1:6)'/100;
+        time = Updated_Measurements_data(1,7);
+        
+        time = time +1;
         
         if controlType == 1
         onoff_control;
@@ -61,8 +63,8 @@ while(1)
             P_sim, X_ref_sim(:,(time)*(t_step)-(t_step-2):t_step:(time-1)*t_step + (Hp)*t_step-(t_step-2)),...
             lam_g, x_init, dt_sim);
 
-        U_opt(:,time) = full(U_MPC);
-        S_opt(:,time) = full(S_MPC);
+        U_opt = full(U_MPC);
+        S_opt = full(S_MPC);
         end
         
         output = [U_opt; S_opt; X_ref_sim(:,time)];

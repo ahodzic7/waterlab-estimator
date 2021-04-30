@@ -1,5 +1,3 @@
-clear all;
-clc
 
 %% ============================================ Control setup ======================================
 addpath('.\Lab_simulator\Simulator\lab signal design\generated_data');
