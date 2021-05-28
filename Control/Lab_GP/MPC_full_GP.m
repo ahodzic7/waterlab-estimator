@@ -2,14 +2,14 @@ function [output]  = MPC_full_GP(X0,time)
 
 % define persistent variables
 eml.extrinsic('evalin');
-persistent warmStartEnabler; persistent x_init;         persistent lam_g;
+persistent warmstartEnabler; persistent x_init;         persistent lam_g;
 persistent OCP;              persistent D_sim;          persistent sigma_X0; 
 persistent GP;               persistent inv_K_xx_val;   persistent u_prev;
 persistent X_ref_sim;        persistent Hp;             persistent Z_train_subset;
 persistent Y_train_subset;   persistent M;              persistent Nx
 
 if isempty(lam_g)                % get persistent values from workspace
-    warmStartEnabler = evalin('base','warmStartEnabler');
+    warmstartEnabler = evalin('base','warmstartEnabler');
     lam_g = evalin('base','lam_g');
     x_init = evalin('base','x_init');
     OCP = evalin('base','OCP'); 
@@ -47,16 +47,18 @@ end
 % State measure 
 X0 = X0/100;
 
+tic
 % openloop MPC
-if warmStartEnabler == 1
+if warmstartEnabler == 1
     % Parametrized Open Loop Control problem with WARM START
     [U_opt_Hp,mu_X_opt,sigma_X_opt,lam_g,x_init] = ...
      OCP(X0,disturbance,sigma_X0,Z_train_subset,Y_train_subset,GP.sigma_f,GP.sigma_L,lam_g,x_init,reference,inv_K_xx_val,u_prev);
-elseif warmStartEnabler == 0
+elseif warmstartEnabler == 0
     % Parametrized Open Loop Control problem without WARM START 
     [U_opt_Hp,mu_X_opt,sigma_X_opt] = ...
      OCP(X0,disturbance,sigma_X0,Z_train_subset,Y_train_subset,GP.sigma_f,GP.sigma_L,reference,inv_K_xx_val,u_prev);
 end
+toc
 
 % Solution
 u_sol = full(U_opt_Hp(:,1));
@@ -65,6 +67,7 @@ Z_pred = [full(mu_X_opt); full(U_opt_Hp); disturbance];
 
 % Subset of Data (SoD) point selection 
 [Z_train_subset, Y_train_subset] = reduce_M(Z_pred,GP.z_train,GP.y_train,Hp,M);
+
 % Pre-calculate K_xx and inv_K_xx
 inv_K_xx_val = K_xx_builder(Z_train_subset,GP,Nx,M);
 

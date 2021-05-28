@@ -38,9 +38,8 @@ X_ref = opti.parameter(Nxt,Hp);
 Y     = P(2)*g(X(Nxt+ Nxp,:),P(3));
 
 %% =========================================== Objective function ==============================
-% 5000*sumsqr(Gs.*S) + 0.01*sumsqr(Gx.*X(1:Nxt,:)) + 50*sumsqr(Gu.*U);  
-objective = sumsqr(U) + 10000*sumsqr(S) + 1*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - [2;2]); 
-%+ 1*sumsqr(X(1:Nxt,:)); %+ sumsqr(X(1:Nxt,:) - X_ref); %+ sumsqr(S);   % this is for ref track                        
+
+objective = sumsqr(U) + 10000*sumsqr(S) + 100*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - X_ref); %+ 1*(Kt/dt_MPC)*sumsqr(X(1:Nxt,2:end) - [2;2]);                       
 opti.minimize(objective); 
 
 %% ============================================== Dynamics =====================================

@@ -14,14 +14,14 @@ load('.\Lab_GP\parameters\Kt')      % load tank parameters
 
 %% GP dynamics properties
 
-M = 40;                             % dimesnion of K_ZZ covariance matrix used in MPC
+M = 30;                             % dimesnion of K_ZZ covariance matrix used in MPC
 Nz = Nx + Nu + ND;                  % dimension of the training set 
-GP = load('.\Lab_GP\parameters\GP_parameters_lab.mat');     % v4
+GP = load('.\Lab_GP\parameters\GP_parameters_lab.mat');     
 
 %% input constraints  
-u1_on = 9;%8.3;                           
+u1_on = 8.3;                           
 u1_off = 3.4;                         
-u2_on = 17;%17.5;%17           
+u2_on = 16;%17.5;%17           
 u2_off = 5.4;                         
 
 %% state constraints 
@@ -32,7 +32,7 @@ max_t2 = 6.5;
 min_t2 = 1.8;
 % Pipe constraints
 h_p_max = 0.4;
-h_p_min = 0.00001;
+h_p_min = 0.0001;
 
 %% MPC specs
 Hp = 5;                % 40 for Pde mpc
@@ -65,7 +65,7 @@ sigma_X0 = zeros(Nx,Nx);
 z_train_subset = GP.z_train(:,1:M); % initial z_subset
 y_train_subset = GP.y_train(:,1:M); % initial z_subset
 
-K_xx_builder(z_train_subset,GP,Nx,M);                       % initial inv_K_xx
+[inv_K_xx_val,K_xx] = K_xx_builder(z_train_subset,GP,Nx,M);                       % initial inv_K_xx
 
 disp('Initialization:')
 toc
