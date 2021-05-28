@@ -31,8 +31,8 @@ Xt_lb  = 1.8;
 Xp_ub  = 0.5;                           % state bounds pipes                          
 Xp_lb  = -10;
 % Combine into system bounds
-X_ub   = [Xt_ub, Xp_ub*ones(1,nP), Xt_ub]'; 
-X_lb   = [Xt1_lb, Xp_lb*ones(1,nP), Xt2_lb]'; 
+X_ub   = [Xt1_ub, Xp_ub*ones(1,nP), Xt2_ub]'; 
+X_lb   = [Xt_lb, Xp_lb*ones(1,nP), Xt_lb]'; 
 %% ========================================= Optimization variables ============================
 X  = opti.variable(nS,Hp+1);            % state - volume 
 U  = opti.variable(nU,Hp);              % input - pumpflow 

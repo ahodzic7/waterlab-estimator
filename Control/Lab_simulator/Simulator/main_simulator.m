@@ -47,7 +47,6 @@ for i = 1:1:N
     
     %%
     
-    
     U_opt(:,i) = full(U_MPC);
     
     % Dynamics simulator

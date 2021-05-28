@@ -9,11 +9,12 @@ persistent warmStartEnabler;
 persistent D_sim;
 persistent X_ref;
 persistent U0;
-% and others
-dT = 10;           % Sample time in minutes
-simulink_frequency = 2;  % Sampling frequency in seconds
-% init persistent variables
 
+% and others
+dT = 5;                % Sample time in seconds
+simulink_frequency = 2; % Sampling frequency in seconds
+
+% init persistent variables
 if isempty(lam_g)
     lam_g = 1;
     x_init = 0.001;
@@ -32,12 +33,13 @@ X0 = X0/100;
 %Create forcast from disturbance reference
 time = int64(round(time));
 disturbance = zeros(2,Hp);
-reference = zeros(6,Hp);
+reference = [2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 2]'; 
+
 for i=0:1:Hp-1
     start_index = time+1+i*dT*simulink_frequency;
     end_index = start_index+dT*simulink_frequency-1;
     disturbance(:,i+1) = mean(D_sim(:,start_index:end_index),2)/60;
-    reference(1:5:6,i+1) = 2*onse(2,1);%mean((X_ref(:,start_index:end_index)),2);
+    %reference(1:5:6,i+1) = 2*ones(2,1);%mean((X_ref(:,start_index:end_index)),2);
 end
 
                                                             % Unit convertion from mm to dm
