@@ -16,8 +16,8 @@
 %addpath('data');
 
 
-%load('data_GP_26_05_2021');
-load('Experiment_data_deterministic_MPC_full_KW');
+load('data_GP_31_05_2021');
+%load('Experiment_data_deterministic_MPC_full_KW');
 
 %%
 labRes = ans;

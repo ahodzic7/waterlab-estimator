@@ -1,7 +1,7 @@
 %% MPC_builder_GP.m
 
-%addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5') 
-addpath('C:\Users\74647\OneDrive - Grundfos\MATLAB\CasAdi') 
+addpath('C:\Users\Casper and Adis\Desktop\casadi-windows-matlabR2016a-v3.5.5') 
+%addpath('C:\Users\74647\OneDrive - Grundfos\MATLAB\CasAdi') 
 import casadi.*
 opti = casadi.Opti();                                       
 
@@ -106,7 +106,7 @@ for i = 1:Hp
     objective_sigma = objective_sigma + trace(sigma_X(1:Nxt,((i-1)*Nx+1):(i*Nx)-Nxp));
 end
 
-objective_all = 2*(Kt/dt_MPC)*(objective_ref_t1 + objective_ref_t2 + objective_sigma ) + 0.5*sumsqr(dU); %+ 100*(Kt/dt_MPC)*sumsqr(EPS);    %5000 on EPS
+objective_all = 10000*5*(Kt/dt_MPC)*(objective_ref_t1 + objective_ref_t2 + objective_sigma ) + 0.5*sumsqr(dU); %+ 100*(Kt/dt_MPC)*sumsqr(EPS);    %5000 on EPS
 opti.minimize(objective_all); 
 
 %% ============================================== Constraints ==================================
