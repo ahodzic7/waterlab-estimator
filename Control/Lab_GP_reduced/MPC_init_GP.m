@@ -14,9 +14,10 @@ load('.\Lab_GP_reduced\parameters\Kt')      % load tank parameters
 
 %% GP dynamics properties
 
-M = 100;                             % dimesnion of K_ZZ covariance matrix used in MPC
+M = 80;                             % dimesnion of K_ZZ covariance matrix used in MPC
 Nz = Nx + Nu + ND;                  % dimension of the training set 
-GP = load('.\Lab_GP_reduced\parameters\GP_parameters_lab.mat');     
+%GP = load('.\Lab_GP_reduced\parameters\GP_parameters_lab.mat');  
+GP = load('.\Lab_GP_reduced\parameters\from_sim\GP_parameters_reduced.mat');
 
 %% input constraints  
 u1_on = 8.3;                           
@@ -35,7 +36,7 @@ h_p_max = 0.4;
 h_p_min = 0.0001;
 
 %% MPC specs
-Hp = 5;                % 40 for Pde mpc
+Hp = 10;                % 40 for Pde mpc
 dt_original = 0.5;
 data_timeUnit = 60;
 t_resample = 20;                    % Resample raw data - conversion between simulator/MPC time steps
@@ -45,7 +46,7 @@ dt_MPC = dt_original*t_resample/data_timeUnit;
 load('.\Lab_GP_reduced\signals\D_sim.mat');
 
 % For testing:
-D_sim(3,:) = D_sim(3,:)*0.8;
+%D_sim(3,:) = D_sim(3,:)*0.8;
 
 %% reference
 load('.\Lab_GP\signals\X_ref_sim.mat');
@@ -53,17 +54,16 @@ load('.\Lab_GP\signals\X_ref_sim.mat');
 %resample(X_ref_sim,4,1);
 
 %% Replace GP.training_set with full_set
-load('.\Lab_GP_reduced\signals\y_all.mat');
-load('.\Lab_GP_reduced\signals\z_all.mat');
+% load('.\Lab_GP_reduced\signals\y_all.mat');
+% load('.\Lab_GP_reduced\signals\z_all.mat');
+% GP.y_train = y_all;
+% GP.z_train = z_all;
+
+load('.\Lab_GP_reduced\signals\from_sim\y_all.mat');
+load('.\Lab_GP_reduced\signals\from_sim\z_all.mat');
 GP.y_train = y_all;
 GP.z_train = z_all;
 
-load('z_train_all_test','z_train_all_test');
-load('y_train_all_test','y_train_all_test');
-z_train_all_test(4:5,:) = [];
-y_train_all_test(4:5,:) = [];
- GP.z_train = z_train_all_test;
- GP.y_train = y_train_all_test;
 
 %% Build MPC
 MPC_builder_GP
