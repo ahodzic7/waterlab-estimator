@@ -14,7 +14,7 @@ load('.\Lab_GP_reduced\parameters\Kt')      % load tank parameters
 
 %% GP dynamics properties
 
-M = 80;                             % dimesnion of K_ZZ covariance matrix used in MPC
+M = 110;                             % dimesnion of K_ZZ covariance matrix used in MPC
 Nz = Nx + Nu + ND;                  % dimension of the training set 
 %GP = load('.\Lab_GP_reduced\parameters\GP_parameters_lab.mat');  
 GP = load('.\Lab_GP_reduced\parameters\from_sim\GP_parameters_reduced.mat');
@@ -36,7 +36,7 @@ h_p_max = 0.4;
 h_p_min = 0.0001;
 
 %% MPC specs
-Hp = 10;                % 40 for Pde mpc
+Hp = 8;                % 40 for Pde mpc
 dt_original = 0.5;
 data_timeUnit = 60;
 t_resample = 20;                    % Resample raw data - conversion between simulator/MPC time steps
