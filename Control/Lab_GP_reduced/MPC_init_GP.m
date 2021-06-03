@@ -50,6 +50,7 @@ load('.\Lab_GP_reduced\signals\D_sim.mat');
 
 %% reference
 load('.\Lab_GP\signals\X_ref_sim.mat');
+X_ref_sim(2,24000:26100) = 4.5;
 %X_ref_sim(2,1:1600) = 4;
 %resample(X_ref_sim,4,1);
 
