@@ -45,12 +45,17 @@ dt_MPC = dt_original*t_resample/data_timeUnit;
 %% Forecasts 
 load('.\Lab_GP_reduced\signals\D_sim.mat');
 
+%D_sim = D_sim(:,24200:end);
+
 % For testing:
 %D_sim(3,:) = D_sim(3,:)*0.8;
 
 %% reference
 load('.\Lab_GP\signals\X_ref_sim.mat');
-X_ref_sim(2,24000:26100) = 4.5;
+
+%X_ref_sim = X_ref_sim(:,6050:end);
+
+% test
 %X_ref_sim(2,1:1600) = 4;
 %resample(X_ref_sim,4,1);
 
