@@ -106,7 +106,7 @@ for i = 1:Hp
     objective_sigma = objective_sigma + trace(sigma_X(1:Nxt,((i-1)*Nx+1):(i*Nx)-Nxp));
 end
 
-objective_all = 5*(Kt/dt_MPC)*(objective_ref_t1 + objective_ref_t2 + objective_sigma ) + 0.5*sumsqr(dU); %+ 100*(Kt/dt_MPC)*sumsqr(EPS);    %5000 on EPS
+objective_all = 2*(Kt/dt_MPC)*(objective_ref_t1 + objective_ref_t2 + objective_sigma ) + 0.5*sumsqr(dU); %+ 100*(Kt/dt_MPC)*sumsqr(EPS);    %5000 on EPS
 opti.minimize(objective_all); 
 
 %% ============================================== Constraints ==================================
