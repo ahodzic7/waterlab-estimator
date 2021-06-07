@@ -22,7 +22,7 @@ GP = load('.\Lab_GP_reduced\parameters\from_sim\GP_parameters_reduced.mat');
 %% input constraints  
 u1_on = 8.3;                           
 u1_off = 3.4;                         
-u2_on = 15.5;%17.5;%17           
+u2_on = 15;%15.5       
 u2_off = 5.4;                         
 
 %% state constraints 
