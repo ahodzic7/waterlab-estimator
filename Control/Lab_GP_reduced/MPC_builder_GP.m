@@ -89,7 +89,7 @@ for k = 1:Hp
     alpha = opti.parameter(M,Nx);
     for a = 1:Nx
         alpha(:,a) = inv_K_xx(:,(a-1)*M+1:a*M) * Y_train(a,:)';  
-        grad_mu(:,a) = ((-1/GP_sigma_L(a))*(GP.C{a}'*GP.C{a})*(Z - Z_train)*(K_xz(:,a).*alpha(:,a)))';
+        grad_mu(:,a) = ((-1/GP_sigma_L(a).^2)*(GP.C{a}'*GP.C{a})*(Z - Z_train)*(K_xz(:,a).*alpha(:,a)))';
     end
     grad_mu = grad_mu(1:Nx,1:Nx);
     % Mean and covariance dynamics - uncertainty propagation
